@@ -1,0 +1,232 @@
+<odoo>
+    <data>
+        <!-- inherit CRM from veiw -->
+        <record id="crm_lead_view_form_inherit" model="ir.ui.view">
+            <field name="name">crm.lead.form.inherit</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_lead_view_form"/> 
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('oe_title')]/h1" position="before">
+                    <h3><field name="category_id" class="text-break" style="width: 400px;" widget="Many2one" options="{'line_breaks': False, 'no_create': True, 'no_edit':True}"/></h3>
+                </xpath>
+                <xpath expr="//h1/field[@name='name']" position="replace">
+                    <div class="o_row" style="display: flex; align-items: center; max-width: 800px;">
+                        <div class="o_col" style="flex: 2; padding-right: 20px;">
+                            <field name="name" class="o_input" style="width: 500px;" placeholder="e.g. Product Pricing"/>
+                        </div>
+                        <div class="o_col" style="width:  200px;">
+                        </div>
+                        <div class="o_col" style="flex: 1; padding_left:20px;">
+                            <field name="load_type" widget="selection" string="Load Type"/>
+                        </div> 
+                    </div>
+                </xpath>
+                <xpath expr="//button[@name='action_sale_quotations_new']" position="replace">
+                        <button string="New Quotation" name="action_new_quotation" type="object" class="oe_highlight" data-hotkey="q"
+                        title="Create new quotation"
+                        invisible="type == 'lead' or probability == 0 and not active or quotation_count > 0"/>
+                    
+                </xpath>
+                <xpath expr="//group[@name='opportunity_partner']//field[@name='partner_id']" position="after">
+                    <field name="currency_id" string="Currency"/>
+                    <field name="so_ids" invisible="1" widget="many2many_tags"/>
+                </xpath>                
+                <xpath expr="//field[@name='expected_revenue']" position="attributes">
+                    <attribute name="options">{'currency_field': 'currency_id'}</attribute>
+                </xpath>
+
+
+                <xpath expr="//div[hasclass('oe_title')]/h1" position="after">
+                    <h2><field name="crm_ref"/></h2>
+                </xpath>
+                <xpath expr="//group[@name='opportunity_partner']//field[@name='partner_id']" position="attributes">
+                    <attribute name="required">1</attribute>
+                    <attribute name="options">{'no_create': True, 'no_edit': False}</attribute>
+                </xpath>
+                <xpath expr="//div[hasclass('o_lead_opportunity_form_inline_fields')]//field[@name='date_deadline']" position="attributes">
+                    <attribute name="required">stage_seq not in [0, 1, 2]</attribute>
+                </xpath>
+                <xpath expr="//field[@name='tag_ids']" position="after">
+                    <field name="industry_id" required="stage_seq !=0 and stage_seq !=2 and stage_seq!=3" />
+                    <field name="commodity" required="stage_seq !=0 and stage_seq !=2 and stage_seq!=3"  />
+                    <field name="payment_term_id" required="stage_seq !=0 and stage_seq !=1 and stage_seq!=2"/>
+                    <field name="follow_up_state" readonly="1" invisible="1"/>
+                    <field name="stage_seq" invisible="1"/>
+                    <field name="reason_seq1" invisible="stage_seq !=0"/>
+                    <field name="date_seq1" invisible="stage_seq !=0" readonly="0" force_save="1"/>
+                    <field name="reason_seq2" invisible="stage_seq !=1" required="1"/>
+                    <field name="date_seq2" invisible="stage_seq !=1" readonly="1" force_save="1"/>
+                    <field name="reason_seq3" invisible="stage_seq !=2" required="1"/>
+                    <field name="date_seq3" invisible="stage_seq !=2" readonly="1" force_save="1"/>
+                    <field name="reason_seq4" invisible="stage_seq !=3"/>
+                    <field name="date_seq4" invisible="stage_seq !=3" readonly="1" force_save="1"/>
+                </xpath>
+                <xpath expr="//field[@name='commodity']" position="after">
+                    <label for="volume" string="Volume"/>
+                    <div class="o_row">
+                        <field name="volume" required="stage_seq == 1"/>
+                        <field name="unit_id" options="{'no_open':True,'no_create':True}" required="stage_seq == 1"/>
+                    </div>
+                </xpath> 
+
+                <xpath expr="//small[hasclass('d-inline-block', 'oe_grey','h6','mb-0')]" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='lost_reason_id']" position="after">
+                    <field name="lost_date" invisible="active"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- inherit CRM kanban view -->
+        <record id="crm_lead_view_kanban_inherit" model="ir.ui.view">
+            <field name="name">crm.lead.kanban.inherit</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.quick_create_opportunity_form"/>
+            <field name="arch" type="xml"> 
+                <xpath expr="//form//group//field[@name='partner_id']" position="before">
+                    <field name="category_id"/>
+                </xpath>     
+                <xpath expr="//form//group//field[@name='name']" position="after">
+                    <field name="load_type"/>
+                </xpath>         
+                <xpath expr="//form//group//field[@name='company_currency']" position="before">
+                    <field name="currency_id" string="Currency"/>
+                    <field name="industry_id"/>
+                    <field name="commodity"/>
+                    <field name="stage_id" invisible="1"/>
+                    <field name="stage_seq" invisible="1"/>
+                    <field name="volume" required="stage_id == 2"/>
+                    <field name="unit_id"/>
+                    <field name="payment_term_id"/>
+                </xpath>            
+                <xpath expr="//form//group//field[@name='expected_revenue']" position="attributes">
+                    <attribute name="options">{'currency_field': 'currency_id'}</attribute>
+                    <attribute name="required">1</attribute>
+                </xpath> 
+            </field>
+        </record>
+
+        <!-- inherit CRM tree view -->
+        <record id="crm_case_tree_view_oppor_inherit" model="ir.ui.view">
+            <field name="name">crm.lead.tree.inherit.kmtl</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_tree_view_oppor"/>
+            <field name="arch" type="xml">    
+                <xpath expr="header" position="inside">
+                    <button string="Create Quotations" name="action_create_quotation" type="object"/>
+                </xpath>           
+                <xpath expr="field[@name='name']" position="before">
+                    <field name="crm_ref" readonly="1"/>
+                </xpath> 
+                 <xpath expr="field[@name='name']" position="after">
+                    <field name="load_type"/>
+                </xpath>   
+                <xpath expr="field[@name='expected_revenue']" position="after">
+                    <field name="date_deadline" optional="hide"/>
+                    <field name="category_id" optional="show"/>
+                    <field name="currency_id" optional="show"/>
+                    <field name="payment_term_id" optional="show"/>
+                    <field name="industry_id" optional="show"/> 
+                    <field name="commodity" optional="show"/>
+                    <field name="volume" optional="show"/>
+                    <field name="unit_id" optional="show"/>
+                    <field name="so_ids" widget="many2many_tags" optional="hide"/>
+                    <field name="is_won_stage" optional="hide"/>
+                    <field name="date_seq1" optional="hide"/>
+                    <field name="date_seq2" optional="hide"/>
+                    <field name="date_seq3" optional="hide"/>
+                    <field name="date_seq4" optional="hide"/>
+                    <field name="lost_date" optional="hide"/>
+                    <field name="reason_seq1" optional="hide"/>
+                    <field name="reason_seq2" optional="hide"/>
+                    <field name="reason_seq3" optional="hide"/>
+                    <field name="reason_seq4" optional="hide"/>
+                </xpath>
+                <xpath expr="field[@name='partner_id']" position="attributes">
+                    <attribute name="optional">show</attribute>
+                </xpath>                  
+            </field>
+        </record>
+
+        <record id="crm_case_kanban_view_leads_inherit" model="ir.ui.view">
+            <field name="name">crm.lead.kanban.inherited</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_kanban_view_leads"/>
+            <field name="arch" type="xml">
+                <field name="partner_id" position="before">
+                    <field name="crm_ref"/>
+                </field> 
+                <xpath expr="//progressbar" position="attributes">
+                    <attribute name="sum_field"></attribute>
+                    <attribute name="recurring_revenue_sum_field"></attribute>
+                </xpath>
+                <xpath expr="//strong[hasclass('o_kanban_record_title')]" position="inside">
+                    <t t-if="record.crm_ref">
+                        <br />
+                        <span>
+                            <field name="crm_ref"/>
+                        </span>
+                    </t>
+                </xpath>
+                <xpath expr="///kanban/templates/t[2]/div[1]/div[2]/div[2]/t[1]/field[@name='expected_revenue']" position="attributes">
+                    <attribute name="options">{"currency_field":"company_currency", "no_symbol":true}</attribute>
+                </xpath>
+                <xpath expr="//kanban/templates/t[2]/div[1]/div[2]/div[2]/t[1]/field[@name='expected_revenue']" position="after">
+                    <field name="currency_id"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="crm_case_form_view_oppor_inherit_sale_crm" model="ir.ui.view">
+            <field name="name">crm.lead.form.inherit.sale.crm</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="sale_crm.crm_case_form_view_oppor"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='action_view_sale_order']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="crm_lead_search_view_inherit" model="ir.ui.view">
+            <field name="name">crm.lead.search.view.inherit</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.view_crm_case_opportunities_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//separator[1]" position="before">
+                    <field name="crm_ref" string="Reference" filter_domain="[('crm_ref', 'ilike', self)]"/>
+                    <field name="date_seq1" string="Date 1" filter_domain="[('date_seq1', '=', self),('stage_seq', '=', 0)]"/>
+                    <field name="date_seq2" string="Date 2" filter_domain="[('date_seq2', '=', self),('stage_seq', '=', 1)]"/>
+                    <field name="date_seq3" string="Date 3" filter_domain="[('date_seq3', '=', self),('stage_seq', '=', 2)]"/>
+                    <field name="date_seq4" string="Date 4" filter_domain="[('date_seq4', '=', self),('stage_seq', '=', 3)]"/>
+                </xpath>
+                <xpath expr="//group" position="inside">
+                    <filter string="Date 1" name="date_1" date="date_seq1"/>
+                    <filter string="Date 2" name="date_2" date="date_seq2"/>
+                    <filter string="Date 3" name="date_3" date="date_seq3"/>
+                    <filter string="Date 4" name="date_4" date="date_seq4"/>
+                    <filter string="Reference" name="group_by_crm_ref" context="{'group_by':'crm_ref'}"/>
+                    <filter string="Date 1" name="date_1" context="{'group_by': 'date_seq1'}"/>
+                    <filter string="Date 2" name="date_2" context="{'group_by': 'date_seq2'}"/>
+                    <filter string="Date 3" name="date_3" context="{'group_by': 'date_seq3'}"/>
+                    <filter string="Date 4" name="date_4" context="{'group_by': 'date_seq4'}"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- inherit crm_iap_mine kanban view to add forecast button -->
+        <record id="crm_case_kanban_view_leads_inherit_forecast" model="ir.ui.view">
+            <field name="name">crm.lead.kanban.inherited.forecast</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm_iap_mine.crm_case_kanban_view_leads"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='action_generate_leads']" position="after">
+                    <button name="%(action_customer_forecast_revenue_new)d" type="action" class="btn-secondary" string="Forecast Revenue" display="always"/>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<odoo>
+    <template id="report_invoice_document_inherit" inherit_id="account.report_invoice_document" >
+        <!-- remove address -->
+        <xpath expr="//div[@class='row']" position="replace">
+            <div class="row" style="margin-top: -100px;">                     
+            </div>
+        </xpath> 
+
+        <!-- Center Invoice --> 
+        <xpath expr="//div[@class='page mb-4']//h2" position="attributes">
+            <attribute name="class">text-center</attribute>   
+            <attribute name="style">font-size: 40px;margin-top: -20px;font-weight: bold;</attribute>          
+        </xpath>
+        
+        <!-- Remove Invoice Number -->
+        <xpath expr="//div[@class='page mb-4']//h2//span[@t-field='o.name']" position="replace">            
+        </xpath>
+
+
+        <!-- cutomer information -->
+        <xpath expr="//div[@class='page mb-4']//h2" position="after">
+            <div class="row my-2">
+                <strong style="font-size: 18px">Bill To</strong>
+            </div>
+
+            <div class="row" name="customer_detail" id="informations">                               
+                <div class="col-6 ">
+                    <!-- Customer Code -->
+                    <div class="row">
+                        <div class="col-3">
+                            <strong>Customer Name</strong>
+                        </div>
+                        <div class="col-9">
+                            :<span class="ms-2" t-field="o.partner_id.name"/> 
+                        </div>                                         
+                    </div>                    
+                    <!-- Address -->
+                    <div class="row">
+                        <div class="col-3">
+                            <strong>Address</strong>
+                        </div>
+                        <div class="col-9">
+                            :<span class="col-8 ms-2" t-field="o.partner_id.contact_address_complete"/>
+                        </div>                    
+                    </div>
+                    <!-- Attention to -->
+                    <div class="row" >
+                        <div class="col-3">
+                            <strong>Attention To</strong>
+                        </div>
+                        <div class="col-9">
+                            :<span class="ms-2" t-field="o.attention_to"/>
+                        </div>  
+                    </div>
+                    <!-- Email Address -->
+                    <div class="row">
+                        <div class="col-3">
+                            <strong>Email Address</strong>
+                        </div>
+                        <div class="col-9">
+                            :<span class="ms-2" t-field="o.partner_id.email"/> 
+                        </div>                      
+                    </div>
+                </div>                
+                
+                <div class="col-5 ms-2" name="order_detail">
+                    <!-- Contact Person -->
+                    <div class="row">
+                        <div class="col-4">
+                            <strong>Contact Person</strong>
+                        </div>
+                        <div class="col">
+                            :<span class="ms-2" t-field="o.contact_person"/>
+                        </div>                      
+                    </div>
+                    <!-- Contact Phone Number -->
+                    <div class="row">
+                        <div class="col-4">
+                            <strong>Contact Ph No</strong>
+                        </div>
+                        <div class="col">
+                            :<span class="ms-2" t-field="o.partner_id.phone"/>
+                        </div>                                           
+                    </div>
+                    
+                </div>
+            </div>
+        </xpath>
+
+    
+        <!-- add invoice number -->
+        <xpath expr="//div[@id='informations']/div[@name='invoice_date']" position="before">
+            <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2" t-if="o.name" name="name">
+                <strong>Invoice No:</strong><br/>
+                <span t-field="o.name"/>
+            </div>
+        </xpath>
+
+        <!-- remove "Source" -->
+        <xpath expr="//div[@id='informations']/div[@name='origin']" position="replace">            
+        </xpath>
+
+        <!-- Customer Code -->
+        <xpath expr="//div[@id='informations']/div[@name='customer_code']" position="replace">            
+        </xpath>
+
+        <!-- add payment term -->
+        <xpath expr="//div[@id='informations']/div[@name='due_date']" position="after">
+            <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-4" t-if="o.invoice_payment_term_id" name="invoice_payment_term_id">
+                <strong>Payment Term:</strong><br/>
+                <span t-field="o.invoice_payment_term_id"/>
+            </div>
+        </xpath>
+
+        <!--No-->
+        <xpath expr="//table[@name='invoice_line_table']//th[@name='th_description']" position="before">        
+            <th name="no" class="text-start"><span style="text-transform: capitalize;">No</span></th>    
+        </xpath>       
+        <xpath expr="//tbody[@class='invoice_tbody']//t[@name='account_invoice_line_accountable']//td[@name='account_invoice_line_name']" position="before">            
+            <td name="no" t-attf-class="{{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
+                <span class="" t-esc="line_index + 1"/>
+                <span>.</span>
+            </td>
+        </xpath>
+
+        <!-- center description -->       
+        <xpath expr="//table[@name='invoice_line_table']//th[@name='th_description']" position="attributes">
+            <attribute name="class">text-center</attribute>
+            <attribute name="style">text-transform: capitalize;</attribute>
+        </xpath>
+
+        <!--Qty -->        
+        <xpath expr="//table[@name='invoice_line_table']//th[@name='th_quantity']" position="replace">
+            <th name="th_quantity" class="text-center">
+                <span style="text-transform: capitalize;">Qty</span>
+            </th>
+        </xpath>
+        <xpath expr="//tbody[@class='invoice_tbody']//t[@name='account_invoice_line_accountable']//td[@name='td_quantity']" position="replace">            
+            <td name="td_quantity" class="text-end">
+                <span t-field="line.quantity">3.00</span>                
+            </td>
+        </xpath>
+
+        <!--UOM -->
+        <xpath expr="//table[@name='invoice_line_table']//th[@name='th_quantity']" position="after">
+            <th name="th_unit" class="text-center"><span>UOM</span></th>
+        </xpath>
+        <xpath expr="//tbody[@class='invoice_tbody']//t[@name='account_invoice_line_accountable']//td[@name='td_quantity']" position="after">            
+            <td name="td_unit" class="text-center">
+                <span t-field="line.product_uom_id"  groups="uom.group_uom">Unit</span>                
+            </td>
+        </xpath>
+
+        <!-- Unit Price -->
+        <xpath expr="//table[@name='invoice_line_table']//th[@name='th_priceunit']" position="replace"> 
+            <th name="th_priceunit" t-attf-class="text-center {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
+                <span style="text-transform: capitalize;">Unit <br/>
+                     Price
+                </span>
+            </th>           
+        </xpath>
+
+        <!--TAXES -->
+        <xpath expr="//table[@name='invoice_line_table']//th[@name='th_taxes']" position="replace">            
+        </xpath>
+        <xpath expr="//tbody[@class='invoice_tbody']//t[@name='account_invoice_line_accountable']//td[@name='td_taxes']" position="replace">            
+        </xpath> 
+
+        <!--Disc -->
+        <xpath expr="//table[@name='invoice_line_table']//th[@name='th_discount']" position="replace">            
+        </xpath>
+        <xpath expr="//tbody[@class='invoice_tbody']//t[@name='account_invoice_line_accountable']//td[@name='td_discount']" position="replace">            
+        </xpath>
+
+        <!-- total CT / Non-CT -->
+        <xpath expr="//table[@name='invoice_line_table']//th[@name='th_taxes']" position="before">   
+            <t t-set="non_ct_total" t-value="0"/>         
+            <t t-set="ct_total" t-value="0"/>         
+        </xpath>
+
+        <!--"Amount(Non-CT)" "Amount(CT)"-->
+        <xpath expr="//table[@name='invoice_line_table']//th[@name='th_priceunit']" position="after">
+            <th name="th_amount_none_ct" class="text-center"><span style="text-transform: capitalize;">Amount<br/>(Non-CT)</span></th>
+            <th name="th_amount_ct" class="text-center"><span style="text-transform: capitalize;">Amount<br/>(CT)</span></th>
+        </xpath>
+        <xpath expr="//tbody[@class='invoice_tbody']//t[@name='account_invoice_line_accountable']//td[@name='td_price_unit']" position="after">            
+            <t t-if="line.tax_ids">
+            <td name="td_amount_none_ct" class="text-end"></td>
+            <td name="td_amount_ct" class="text-end">
+                <span t-esc="line.price_total"/>                
+            </td>
+            
+            </t>
+            <t t-else="">
+                <td name="td_amount_none_ct" class="text-end">
+                    <span t-esc="line.price_total"/>           
+                </td>
+                <td name="td_amount_ct" class="text-end">
+                </td>
+            </t>
+        </xpath>
+
+        <!-- Total Amount -->
+        <xpath expr="//table[@name='invoice_line_table']//th[@name='th_subtotal']" position="replace">
+            <th name="th_subtotal" class="text-center" style="text-transform: capitalize;">
+                <span>Total <br/> Amount</span>
+            </th>
+        </xpath>
+        <xpath expr="//tbody[@class='invoice_tbody']//t[@name='account_invoice_line_accountable']//td[@name='td_subtotal']" position="replace">            
+            <td name="td_subtotal" class="text-end o_price_total">
+                <span class="text-nowrap" t-field="line.price_subtotal" t-options="{'widget': 'float', 'precision': 2}">27.00</span>
+            </td>
+        </xpath>
+
+        <!-- Payment Information -->
+        <xpath expr="//div[@id='payment_term']" position="replace">                       
+        </xpath>        
+
+        <!-- Amount in words --> 
+        <xpath expr="//div[@id='right-elements']//div[2]" position="replace">                       
+        </xpath>
+
+        <!-- Amount in words -->
+        <xpath expr="//div[@class='mt-5 clearfix']" position="after">  
+            <div class="row mt-5">
+                <p class="lh-sm" t-if="o.company_id.display_invoice_amount_total_words">
+                    <span style="font-weight: bold">Total amount in words(<span t-out="o.currency_id.name"/>) :</span>
+                    <span class="lh-sm"><span t-field="o.amount_total_words">Thirty one dollar and Five cents</span></span>
+                </p>
+            </div>   
+            <div class="row mb-1">
+                <div style="font-weight: bold">Note:</div>                
+            </div>   
+            <div class="row mt-1">
+                <div t-field="o.narration"/>
+            </div>
+                         
+        </xpath>        
+        
+    </template>
+
+    <!-- total template -->
+    <template id="total_inherit" inherit_id="account.document_tax_totals_template">
+        <xpath expr="//tr[@class='border-black o_subtotal']//td" position="replace">    
+            <td>
+                <strong>                    
+                    Sub Total
+                    (<span t-out="o.currency_id.name"/>)                  
+                </strong>
+            </td>             
+        </xpath>
+
+        <xpath expr="//tr[@class='border-black o_total']//td" position="replace">    
+            <td>
+                <strong>
+                    Grand Total
+                    (<span t-out="o.currency_id.name"/>)
+                </strong>
+            </td>                       
+        </xpath>
+    </template>
+
+    <!-- Tax template -->
+    <template id="tax_groups_totals_inherit" inherit_id="account.tax_groups_totals">
+        <xpath expr="//tr//t[1]//td[1]" position="replace">
+            <td>
+                <span t-esc="amount_by_group['tax_group_name']"/>                
+            </td>                      
+        </xpath>
+        <xpath expr="//tr//t[2]//td[1]" position="replace">
+            <td>
+                <span t-out="amount_by_group['tax_group_name']">Tax 15%</span>
+            </td>                      
+        </xpath>
+    </template>
+
+    <!-- company currency total template -->
+    <template id="company_currency_total_inherit" inherit_id="account.document_tax_totals_company_currency_template">
+        <xpath expr="//div[2]" position="replace">         
+        </xpath>
+    </template>
+    
+</odoo>

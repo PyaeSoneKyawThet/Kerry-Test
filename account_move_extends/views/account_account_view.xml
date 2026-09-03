@@ -1,0 +1,30 @@
+<odoo>
+    <data>
+        <!-- tree view -->
+        <record id="view_account_list_inherit_custom" model="ir.ui.view">
+            <field name="name">account.account.list.inherit.custom</field>
+            <field name="model">account.account</field>
+            <field name="inherit_id" ref="account.view_account_list"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='reconcile']" position="after">
+                    <field name="is_wht_tax"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- form view -->
+        <record id="view_account_form_inherit_custom" model="ir.ui.view">
+            <field name="name">account.account.form</field>
+            <field name="model">account.account</field>
+            <field name="inherit_id" ref="account.view_account_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//h1" position="after">
+                    <div class="o_row">
+                        <label for="is_wht_tax" string="Is WHT Tax"/>
+                        <field name="is_wht_tax" />
+                    </div>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

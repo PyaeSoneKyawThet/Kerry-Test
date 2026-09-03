@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Form View -->
+        <record id="view_customer_forecast_revenue_form" model="ir.ui.view">
+            <field name="name">customer.forecast.revenue.form</field>
+            <field name="model">customer.forecast.revenue</field>
+            <field name="arch" type="xml">
+                <form string="Forecast Revenue">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="user_id"/>
+                                <field name="customer_id" options="{'no_open': True, 'no_create': True, 'no_edit': True}"/>
+                                <field name="commodity"/>
+                                <field name="parent_category_id" options="{'no_open': True, 'no_create': True, 'no_edit': True}"/>
+                                <field name="category_id" options="{'no_open': True, 'no_create': True, 'no_edit': True}"/>
+                            </group>
+                            <group>
+                                <label for="f_year" string="Forecast Month"/>
+                                <div class="o_row">
+                                    <field name="f_year" nolabel="1" placeholder="Year"/>
+                                    <field name="f_month" nolabel="1" placeholder="Month"/>
+                                </div>
+                                <field name="currency_id"/>
+                                <field name="expected_revenue"/>
+                                <field name="company_id" invisible="1"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Tree View -->
+        <record id="view_customer_forecast_revenue_tree" model="ir.ui.view">
+            <field name="name">customer.forecast.revenue.tree</field>
+            <field name="model">customer.forecast.revenue</field>
+            <field name="arch" type="xml">
+                <tree string="Forecast Revenue">
+                    <field name="user_id"/>
+                    <field name="customer_id"/>
+                    <field name="commodity"/>
+                    <field name="parent_category_id"/>
+                    <field name="category_id"/>
+                    <field name="forecast_month_str"/>
+                    <field name="expected_revenue"/>
+                    <field name="currency_id" column_invisible="True"/>
+                    <field name="company_id" column_invisible="True"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="action_customer_forecast_revenue" model="ir.actions.act_window">
+            <field name="name">Forecast Revenue</field>
+            <field name="res_model">customer.forecast.revenue</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create your first Forecast Revenue!
+                </p>
+            </field>
+        </record>
+
+        <!-- Action for Direct Form Creation -->
+        <record id="action_customer_forecast_revenue_new" model="ir.actions.act_window">
+            <field name="name">Forecast Revenue</field>
+            <field name="res_model">customer.forecast.revenue</field>
+            <field name="view_mode">form</field>
+            <field name="target">current</field>
+        </record>
+
+        <!-- Menu Item -->
+        <menuitem id="menu_customer_forecast_revenue"
+                  name="Forecast Revenue"
+                  parent="crm.crm_menu_sales"
+                  action="action_customer_forecast_revenue"
+                  sequence="2"/>
+
+        <menuitem
+        id="crm.crm_lead_menu_my_activities"
+        name="My Activities"
+        parent="crm.crm_menu_sales"
+        groups="sales_team.group_sale_salesman"
+        action="crm.crm_lead_action_my_activities"
+        sequence="3"/>
+
+        <menuitem
+        id="sale_crm.sale_order_menu_quotations_crm"
+        name="My Quotations"
+        action="sale.action_quotations"
+        parent="crm.crm_menu_sales"
+        sequence="4"/>
+
+        <menuitem
+        id="crm.sales_team_menu_team_pipeline"
+        name="Teams"
+        parent="crm.crm_menu_sales"
+        action="sales_team.crm_team_action_pipeline"
+        groups="sales_team.group_sale_manager"
+        sequence="5"/>
+
+        <menuitem
+        id="crm.res_partner_menu_customer"
+        name="Customers"
+        parent="crm.crm_menu_sales"
+        action="base.action_partner_form"
+        sequence="6"/>
+    </data>
+</odoo>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sale_team_performance_detail_wizard" model="ir.ui.view">
+        <field name="name">sale.team.performance.detail.wizard.form</field>
+        <field name="model">sale.team.performance.detail.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Detail Sales Team Performance by Revenue">
+                <group>
+                    <group>
+                        <field name="start_date" required="1"/>
+                        <field name="end_date" required="1"/>
+                        <field name="product_tmpl_ids" widget="many2many_tags" options="{'no_open': True, 'no_create': True}"/>
+                    </group>
+                    <group>
+                        <field name="user_ids" widget="many2many_tags" options="{'no_open': True, 'no_create': True}"/>
+                        <field name="currency_ids" widget="many2many_tags" options="{'no_open': True, 'no_create': True}"/>
+                        <field name="parent_categ_ids" widget="many2many_tags" options="{'no_open': True, 'no_create': True}"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="generate_xlsx" string="🖨️ Print XLSX" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sale_team_performance_detail" model="ir.actions.act_window">
+        <field name="name">Detail Sales Team Performance by Revenue</field>
+        <field name="res_model">sale.team.performance.detail.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_sale_team_performance_detail_wizard"/>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_sale_team_performance_detail_report" 
+        name="Detail Sales Team Performance by Revenue" 
+        parent="sale.menu_sale_report"
+        action="custom_sql_reports.action_sale_team_performance_detail"
+        sequence="60"
+        />
+</odoo>

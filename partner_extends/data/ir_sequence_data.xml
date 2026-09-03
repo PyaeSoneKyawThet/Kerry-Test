@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">  
+        <record id="seq_partner" model="ir.sequence">
+            <field name="name">Partner Reference Sequence</field>
+            <field name="code">partner.reference.sequence</field>
+            <field name="padding">6</field>
+            <field name="company_id" eval="False"></field>
+        </record>   
+    </data>     
+</odoo>

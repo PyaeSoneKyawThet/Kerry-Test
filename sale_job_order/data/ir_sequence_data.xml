@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">  
+        <record id="seq_job_order_transport" model="ir.sequence">
+            <field name="name">Job Order Transport</field>
+            <field name="code">job.order.ref.transport</field>
+            <field name="padding">5</field>
+            <field name="prefix">JTR-%(year)s-%(month)s-</field>
+            <field name="company_id" eval="False"></field>
+        </record>    
+
+        <record id="seq_job_order_warehouse" model="ir.sequence">
+            <field name="name">Job Order Warehouse</field>
+            <field name="code">job.order.ref.warehouse</field>
+            <field name="padding">5</field>
+            <field name="prefix">JWH-%(year)s-%(month)s-</field>
+            <field name="company_id" eval="False"></field>
+        </record> 
+
+        <record id="seq_job_order_dry_port" model="ir.sequence">
+            <field name="name">Job Order Dry Port</field>
+            <field name="code">job.order.ref.dry.port</field>
+            <field name="padding">5</field>
+            <field name="prefix">JCY-%(year)s-%(month)s-</field>
+            <field name="company_id" eval="False"></field>
+        </record> 
+
+        <record id="seq_job_order_freight" model="ir.sequence">
+            <field name="name">Job Order Freight</field>
+            <field name="code">job.order.ref.freight</field>
+            <field name="padding">5</field>
+            <field name="prefix">JFR-%(year)s-%(month)s-</field>
+            <field name="company_id" eval="False"></field>
+        </record> 
+    </data>     
+</odoo>

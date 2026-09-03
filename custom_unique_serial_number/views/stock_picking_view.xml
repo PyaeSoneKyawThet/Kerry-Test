@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<odoo>
+    <record id="view_picking_form_inherit_doc_location" model="ir.ui.view">
+        <field name="name">view.picking.form.inherit.doc.location</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml"> 
+            <xpath expr="//field[@name='backorder_id']" position="after">
+                <field name="staff_location_id" readonly="state in ['done']" invisible="0"/>
+            </xpath> 
+            <xpath expr="//field[@name='move_ids_without_package']//tree" position="inside">
+                <field name="staff_location_id" optional="hide" column_invisible="parent.picking_type_code != 'incoming'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_vpicktree_inherit_doc_location" model="ir.ui.view">
+        <field name="name">view.picking.list.inherit.doc.location</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.vpicktree"/>
+        <field name="arch" type="xml"> 
+            <xpath expr="//tree" position="inside">
+                <field name="staff_location_id" optional="hide"/>
+            </xpath> 
+        </field>
+    </record>
+</odoo> 

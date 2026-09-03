@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <t t-inherit="mail.Activity" t-inherit-mode="extension">
+        <t name="tools" position="replace">
+            <t t-set="userId" t-value="env.services.user.userId"/>
+            <t t-if="userId === activity.user_id[0]">
+                <t name="tools">
+                    <span class="o-mail-Activity-markDone btn btn-link btn-success p-0 me-3"
+                          t-on-click="onClickMarkAsDone"><i class="fa fa-check"/> Mark Done</span>
+                    <FileUploader t-if="activity.activity_category === 'upload_file'" onUploaded.bind="onFileUploaded">
+                        <t t-set-slot="toggler">
+                            <span class="btn btn-link text-action p-0 me-3"><i t-attf-class="fa {{ activity.icon }}"/><t
+                                    t-out="' ' + activity.display_name"/></span>
+                        </t>
+                    </FileUploader>
+                    <span class="o-mail-Activity-edit btn btn-link text-action p-0 me-3" t-on-click="edit"><i
+                            class="fa fa-pencil"/> Edit</span>
+                    <span class="btn btn-link btn-danger p-0" t-on-click="unlink"><i class="fa fa-times"/> Cancel</span>
+                </t>
+            </t>
+        </t>
+    </t>
+</odoo>

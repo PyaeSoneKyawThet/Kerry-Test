@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">  
+        <record id="seq_cash_advance_form" model="ir.sequence">
+            <field name="name">Cash Advance Form Sequence</field>
+            <field name="code">cash.advance.sequence</field>
+            <field name="padding">5</field>
+            <!-- <field name="prefix">%(year)s-%(month)s-</field> -->
+            <field name="company_id" eval="False"></field>
+        </record>   
+
+        <record id="seq_expense_form" model="ir.sequence">
+            <field name="name">Expense Form Sequence</field>
+            <field name="code">approval.expense.sequence</field>
+            <field name="padding">5</field>
+            <!-- <field name="prefix">%(year)s-%(month)s-</field> -->
+            <field name="company_id" eval="False"></field>
+        </record>   
+
+        <record id="seq_approval_payment_request_form" model="ir.sequence">
+            <field name="name">Approval Payment Request Form Sequence</field>
+            <field name="code">approval.payment.request.sequence</field>
+            <field name="padding">5</field>
+            <!-- <field name="prefix">%(year)s-%(month)s-</field> -->
+            <field name="company_id" eval="False"></field>
+        </record>
+
+        <record id="seq_po_comparison" model="ir.sequence">
+            <field name="name">PO Comparison Sequence</field>
+            <field name="code">po.comparison.sequence</field>
+            <field name="padding">5</field>
+            <!-- <field name="prefix">%(year)s-%(month)s-</field> -->
+            <field name="company_id" eval="False"></field>
+        </record> 
+    </data>     
+</odoo>

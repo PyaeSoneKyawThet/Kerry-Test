@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>         
+
+        <record id="paperformat_custom_ar_invoice" model="report.paperformat">
+            <field name="name">Ar Invoice</field>
+            <field name="default" eval="True" />
+            <field name="format">A4</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">30</field>
+            <field name="margin_bottom">25</field>
+            <field name="margin_left">7</field>
+            <field name="margin_right">7</field>
+            <field name="header_line" eval="False" />
+            <field name="header_spacing">25</field>
+            <field name="dpi">90</field>
+        </record>
+
+        <!-- QWeb Reports -->
+        <record id="ar_invoice_report" model="ir.actions.report">
+            <field name="name">Ar Invoice</field>
+            <field name="model">account.move</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">account_move_extends.ar_invoice_print</field>
+            <field name="report_file">account_move_extends.ar_invoice_print</field>
+            <field name="print_report_name">(object._get_report_base_filename())</field>
+            <field name="paperformat_id" ref="account_move_extends.paperformat_custom_ar_invoice"/>
+            <field name="attachment"/>           
+            <field name="binding_type">report</field>
+        </record>
+        
+
+    </data>
+</odoo>

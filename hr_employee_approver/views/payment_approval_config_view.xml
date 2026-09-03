@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- tree view -->
+    <record id="payment_approval_config_tree_view" model="ir.ui.view"> 
+        <field name="name">Payment Approval Config</field>
+        <field name="model">payment.approval.config</field>
+        <field name="arch" type="xml">
+            <tree string="Approval Config" editable="bottom">
+                <field name="sequence" widget="handle" />
+                <field name="from_amount"/>
+                <field name="to_amount"/>
+                <field name="need_approval"/>
+                <field name="currency_id" required="1"/>
+                <field name="payment_type" required="1"/>
+                <field name="account_payment_type_ids" widget="many2many_tags" required="1"/>
+                <field name="from_level" required="1"/>
+                <field name="to_level" required="1"/>
+            </tree>
+        </field> 
+    </record>
+
+    <!-- form view -->
+    <record id="payment_approval_config_form_view" model="ir.ui.view"> 
+        <field name="name">Payment Approval Config</field>
+        <field name="model">payment.approval.config</field>
+        <field name="arch" type="xml">
+            <form string="Approval Config">
+                <sheet>
+                    <group>
+                        <field name="from_amount"/>
+                        <field name="to_amount"/>
+                        <field name="currency_id" required="1"/>
+                        <field name="need_approval"/>
+                        <field name="from_level" required="1"/>
+                        <field name="to_level" required="1"/>
+                        <field name="payment_type"/>
+                        <field name="account_payment_type_ids" widget="many2many_tags" required="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field> 
+    </record>
+
+    <record id="action_payment_approval_config" model="ir.actions.act_window">
+        <field name="name">Payment Approval Config</field>
+        <field name="res_model">payment.approval.config</field>
+        <field name="view_mode">tree,form</field>
+        <field name="target">current</field>
+    </record>
+
+    <menuitem id="menu_payment_approval_config" 
+              name="Payment Approval Config" 
+              parent="account.menu_finance_configuration"
+              action="hr_employee_approver.action_payment_approval_config"
+              sequence="40"/>
+</odoo>

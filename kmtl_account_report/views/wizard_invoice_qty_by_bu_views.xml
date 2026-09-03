@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_wizard_invoice_qty_by_bu_form" model="ir.ui.view">
+        <field name="name">kmtl.invoice.qty.by.bu.wizard.form</field>
+        <field name="model">kmtl.invoice.qty.by.bu</field>
+        <field name="arch" type="xml">
+            <form string="Invoice Qty by BU">
+                <sheet>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="group_by"/>
+                    </group>
+                    <footer>
+                        <button string="Export XLSX" type="object" name="action_export_xlsx" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_invoice_qty_by_bu_wizard" model="ir.actions.act_window">
+        <field name="name">Invoice Qty by BU</field>
+        <field name="res_model">kmtl.invoice.qty.by.bu</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_wizard_invoice_qty_by_bu_form"/>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_kmtl_invoice_qty_by_bu"
+              name="Invoice Qty by BU"
+              parent="account.menu_finance_reports"
+              action="action_invoice_qty_by_bu_wizard"/>
+</odoo>

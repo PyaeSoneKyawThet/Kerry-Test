@@ -1,0 +1,62 @@
+<odoo>
+    <data>
+         <!-- kanban inherit -->
+        <record id="approvals.approval_category_action_new_request" model="ir.actions.act_window">
+            <field name="name">Dashboard</field>
+            <field name="res_model">approval.category</field>
+            <field name="view_mode">kanban</field>
+            <field name="domain">[('visible_in_kanban','=', True)]</field> 
+        </record>
+
+
+        <record id="approval_category_view_form_inherit" model="ir.ui.view">
+            <field name="name">approval.category.view.form</field>
+            <field name="model">approval.category</field>
+            <field name="inherit_id" ref="approvals.approval_category_view_form"/>
+            <field name="arch" type="xml">             
+                <xpath expr="//div[hasclass('oe_title')]" position="replace"> 
+                    <div class="row oe-title">
+                        <div class="col-6 ps-0">
+                            <label for="name" string="Approval Type"/>
+                            <h1>
+                                <field name="name" placeholder="e.g. Procurement"/>
+                            </h1>
+                        </div>
+                        <div class="col-6">
+                            <label for="visible_in_kanban" string="Visible in Kanban"/>
+                            <field name="visible_in_kanban" widget="boolean_toggle"/>
+                        </div>
+                    </div>
+                </xpath>   
+
+                <xpath expr="//page[@name='options']" position="after">                   
+                    <page string="Approval Process Config" name="approval_process_config" invisible="approval_type not in ['purchase_req', 'cash_advance', 'expense', 'payment_request']">
+                        <field name="approval_process_config_ids">
+                            <tree editable="bottom" string="Approval Process">
+                                <field name="from_amount"/>
+                                <field name="to_amount"/>
+                                <field name="currency_id" required="1"/>
+                                <field name="department_ids" widget="many2many_tags" column_invisible="parent.approval_type not in ['purchase_req', 'expense', 'cash_advance','payment_request']"/>
+                                <field name="expense_range" required="1" column_invisible="parent.approval_type not in ['expense']"/>
+                                <field name="need_approval" column_invisible="parent.approval_type not in ['expense', 'cash_advance','payment_request']"/>
+                                <field name="from_level" required="1"/>
+                                <field name="to_level" required="1"/>
+                            </tree>
+                        </field>
+                    </page>                                             
+                </xpath>              
+            </field>
+        </record>
+
+        <record id="approval_category_view_tree_inherit" model="ir.ui.view">
+            <field name="name">approval.category.view.tree.inherit</field>
+            <field name="model">approval.category</field>
+            <field name="inherit_id" ref="approvals.approval_category_view_tree"/>
+            <field name="arch" type="xml">     
+                <xpath expr="//tree" position="inside">
+                    <field name="visible_in_kanban" widget="boolean_toggle"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,22 @@
+<odoo>
+    <record id="action_job_location" model="ir.actions.act_window">
+        <field name="name">Job Location</field>
+        <field name="res_model">job.location</field>
+        <field name="view_mode">tree,form</field>
+        <field name="target">current</field>
+    </record>
+
+    <record id="view_staff_location_tree" model="ir.ui.view">
+        <field name="name">staff.location.tree</field>
+        <field name="model">staff.location</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="remark"/>
+            </tree>
+        </field>
+    </record>
+
+    
+</odoo>

@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<odoo>
+    <record id="sale_order_form_inherit_currency" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.currency</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml"> 
+            <xpath expr="//form[1]/header[1]/field[@name='state']" position="after">
+                <field name="revise_state" invisible="1"/>
+                <field name="is_vas" invisible="1"/>
+                <field name="is_vas_created" invisible="1"/>
+                <field name="is_renew_created" invisible="1"/>
+                <field name="address_incomplete" invisible="1"/>
+                <button string="Submit" name="action_submit" class="btn-primary" type="object" invisible="state in ['sale', 'cancel'] or approval_state in ['submitted', 'approved', 'rejected']"/>
+                <button string="Approve" name="action_approve" class="btn-primary" type="object" invisible="not enable_approve or state in ['sale', 'cancel'] or approval_state != 'submitted'"/>
+                <button string="Reject" name="action_reject" type="object" invisible="not enable_approve or state in ['sale', 'cancel'] or approval_state != 'submitted'"/>
+                <button string="Re-Submit" name="action_resubmit" class="btn-primary" type="object" invisible="state in ['sale', 'cancel'] or approval_state != 'rejected'"/>
+                <button string="Revise Request" name="action_revise_request" class="btn-primary" type="object" invisible="state not in ['sale'] or approval_state not in ['approved'] or revise_state in ['revise_requested','revise_approved']"/>
+                <button string="Revise Approve" name="action_revise_approve" class="btn-primary" type="object" invisible="not enable_approve or state not in ['sale'] or approval_state not in ['approved'] or revise_state not in ['revise_requested']"/>
+                <button string="Revise Reject" name="action_revise_reject" type="object" invisible="state not in ['sale', 'cancel'] or approval_state not in ['approved'] or revise_state not in ['revise_requested']  " />
+                <button string="Create VAS" name="action_VAS_create" class="btn-primary" type="object" 
+                        invisible="state not in ['sale'] or approval_state not in ['approved'] or revise_state in ['revise_approved']"
+                        confirm="Are you sure to create a new quotation?"/>
+                <button string="Renew" name="action_renew" class="btn-primary" type="object" 
+                        invisible="state not in ['sale'] or approval_state not  in ['approved'] or revise_state in ['revise_approved']"/>
+            </xpath>
+            <xpath expr="//button[@name='action_confirm'][1]" position="attributes">
+                <attribute name="invisible">state != 'sent' or approval_state != 'approved'</attribute>
+            </xpath>
+
+            <!-- remove only show in dev mode -->
+            <xpath expr="//div[hasclass('o_td_label')][1]" position="attributes">
+                <attribute name="groups"></attribute>
+            </xpath>
+            <xpath expr="//field[@name='date_order'][1]" position="attributes">
+                <attribute name="groups"></attribute>
+            </xpath>
+
+            <!-- change lable -->
+            <xpath expr="//div[hasclass('o_td_label')][1]/label" position="attributes">
+                <attribute name="string">Effective Date</attribute>
+            </xpath>
+            <xpath expr="//div[hasclass('o_td_label')][2]/label" position="attributes">
+                <attribute name="string">Effective Date</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_confirm'][2]" position="attributes">
+                <attribute name="invisible">state != 'draft' or approval_state != 'approved'</attribute>
+            </xpath>
+            <xpath expr="//header" position="after">
+                <div class="alert alert-info" role="alert" invisible="not address_incomplete">
+                    This customer’s address is incomplete.
+                </div>
+                <div class="alert alert-info" role="alert" invisible="state not in ['sale'] or approval_state not in ['approved'] or revise_state not in ['revise_approved']">
+                    Revised approved and a new quotation created!
+                </div>
+                <div class="alert alert-info" role="alert" invisible="state not in ['sale'] or approval_state not in ['approved'] or not is_vas_created">
+                    A new VAS quotation created!
+                </div>
+                <div class="alert alert-info" role="alert" invisible="state not in ['sale'] or approval_state not in ['approved'] or not is_renew_created">
+                    A new Renew quotation created!
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='order_line']//tree//field[@name='name']" position="attributes">
+                <attribute name="width">100px</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']//tree//field[@name='product_uom'][2]" position="attributes">
+                <attribute name="width">100px</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']//tree//field[@name='sequence']" position="before">
+                <field name="sequence_no"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']//tree//field[@name='product_id']" position="before">
+                <field name="available_categ_ids" column_invisible="1"/>
+                <field name="parent_categ_ids" column_invisible="1"/>
+                <field name="categ_id" string="Category" domain="[('id', 'in', parent_categ_ids)]" width="100px"
+                readonly="state not in ['draft', 'sent', 'cancel']" required="not display_type and state not in ['cancel']"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']//tree//field[@name='product_template_id']" position="attributes">
+                <attribute name="domain">[('sale_ok', '=', True), ('categ_id', '=', categ_id)]</attribute> 
+                <attribute name="width">100px</attribute>
+            </xpath>
+            <xpath expr="//group[@name='order_details']//div[@groups='product.group_product_pricelist']//field[@name='pricelist_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>             
+            <xpath expr="//field[@name='order_line']//tree//field[@name='price_unit']" position="after">
+                <field name="cost" width="100px"/>
+                <field name="gross_profit" readonly="1" width="100px"/>
+                <field name="inv_currency_id" string="Currency" width="100px"
+                required="not display_type and state not in ['cancel']"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']//tree" position="inside">
+                <field name="remark" width="100px"/>
+            </xpath>
+            <xpath expr="//field[@name='source_id']" position="after">
+                <field name="approval_state" readonly="1"/>
+                <field name="reject_reason" invisible="approval_state != 'rejected'"/>
+            </xpath>
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <field name="attention_to" readonly="state in ['sale']" />
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom_qty']" position="attributes">
+                <attribute name="column_invisible">True</attribute>
+            </xpath>  
+            <xpath expr="//field[@name='sale_order_template_id']" position="after"> 
+                <field name="category_ids" widget="many2many_tags" domain="[('show_in_quotation', '!=', False)]" options="{'no_create': True, 'no_create_edit': True}"/>           
+            </xpath>  
+            <xpath expr="//group[@name='note_group']/group[1]" position="before">
+                <group colspan="4">
+                    <field colspan="2" name="category_note" nolabel="1" placeholder="Category Notes..." readonly="state in ['sale']"/>
+                </group>
+            </xpath>  
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <field name="original_so_id" readonly="1" invisible="not original_so_id"/>
+            </xpath>    
+            <xpath expr="//page[@name='other_information']" position="after">
+                <page name="revise_reason" string="Revise Reasons" readonly="1">
+                    <field name="revise_reason_ids" readonly="1">
+                        <tree string="Revise Reasons">
+                            <field name="so_id" column_invisible="1"/>
+                            <field name="state"/>
+                            <field name="reason"/>
+                        </tree>                        
+                    </field>
+                </page>
+                 <page name="approval_reason" string="Approval Reasons" readonly="1">
+                    <field name="approval_reason_ids" readonly="1">
+                        <tree string="Approval Reasons">
+                            <field name="so_id" column_invisible="1"/>
+                            <field name="state"/>
+                            <field name="reason"/>
+                        </tree>                        
+                    </field>
+                </page>     
+            </xpath>    
+
+            <xpath expr="//page[@name='other_information']//group[@name='sales_person']//field[@name='user_id']" position="after">
+                <field name="prepared_by_id" invisible="1"/>
+                <field name="enable_approve" invisible="1"/>
+                <field name="available_approver_ids" widget="many2many_tags" invisible="1" />
+                <field name="sale_person_department_id"/>
+                <field name="approved_by_id" readonly="0" force_save="1" options="{'no_create': True, 'no_create_edit': True}"/>
+            </xpath>
+            <xpath expr="//button[@id='send_proforma_primary']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@id='send_proforma']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='payment_term_id']" position="attributes">
+                <attribute name="readonly">state == 'sale'</attribute>
+            </xpath>
+            <xpath expr="//field[@name='opportunity_ids']" position="attributes">
+                <attribute name="readonly">state == 'sale'</attribute>
+            </xpath>
+            <xpath expr="//field[@name='note']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='category_ids']" position="attributes">
+                <attribute name="readonly">state == 'sale'</attribute>
+            </xpath>
+            <xpath expr="//page[@name='other_information']//group[@name='sale_info']" position="inside">
+                <field name="remark"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_order_tree_sale_extend" model="ir.ui.view">
+        <field name="name">sale.order.tree.inherit.ext</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date_order']" position="attributes">
+                <attribute name="string">Effective Date</attribute>
+            </xpath>
+            <xpath expr="//field[@name='validity_date']" position="attributes">
+                <attribute name="string">Validity Date</attribute>
+            </xpath>
+            <xpath expr="field[@name='partner_id']" position="after">
+                <field name="attention_to" optional="show"/>
+                <field name="payment_term_id" optional="show"/>
+                <field name="category_ids" widget="many2many_tags" optional="show"/>
+                <field name="currency_id" optional="show"/>
+                <field name="sale_order_template_id" optional="hide"/>
+                <field name="prepared_by_id" optional="hide"/>
+                <field name="approved_by_id" optional="hide"/>
+                <field name="sale_person_department_id" optional="hide"/>
+                <field name="remark" optional="show"/>
+            </xpath>
+            <xpath expr="//field[@name='amount_untaxed']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>             
+            <xpath expr="//field[@name='amount_tax']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath> 
+            <xpath expr="//field[@name='amount_to_invoice']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath> 
+            <xpath expr="//field[@name='user_id']" position="before">
+                <field name="original_so_id" optional="hide"/>
+            </xpath>   
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="approval_state" optional="hide"/>
+                <field name="revise_state" optional="hide"/>
+                <field name="is_vas_created" optional="hide"/>
+                <field name="is_renew_created" optional="hide"/>
+            </xpath>   
+        </field>
+    </record>
+
+    <record id="view_quotation_tree_custom" model="ir.ui.view">
+        <field name="name">sale.quotation.tree.custom</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_quotation_tree_with_onboarding" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='create_date']" position="attributes">
+                <attribute name="string">Effective Date</attribute>
+            </xpath>
+            <xpath expr="//field[@name='validity_date']" position="attributes">
+                <attribute name="string">Validity Date</attribute>
+            </xpath>
+            <xpath expr="field[@name='partner_id']" position="after">
+                <field name="attention_to" optional="show"/>
+                <field name="payment_term_id" optional="show"/>
+                <field name="category_ids" widget="many2many_tags" optional="show"/>
+                <field name="currency_id" optional="show"/>
+                <field name="sale_order_template_id" optional="hide"/>
+                <field name="prepared_by_id" optional="hide"/>
+                <field name="approved_by_id" optional="hide"/>
+                <field name="sale_person_department_id" optional="hide"/>
+                <field name="remark" optional="show"/>
+            </xpath>
+            <xpath expr="//field[@name='amount_untaxed']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>             
+            <xpath expr="//field[@name='amount_tax']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath> 
+            <xpath expr="//field[@name='amount_to_invoice']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath> 
+            <xpath expr="//field[@name='user_id']" position="before">
+                <field name="original_so_id" optional="hide"/>
+            </xpath>   
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="approval_state" optional="hide"/>
+                <field name="revise_state" optional="hide"/>
+                <field name="is_vas_created" optional="hide"/>
+                <field name="is_renew_created" optional="hide"/>
+            </xpath>  
+        </field>
+    </record>
+    
+</odoo>

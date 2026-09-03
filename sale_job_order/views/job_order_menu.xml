@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>   
+   <data>
+        <!-- Job Orders -->
+        <record id="job_orders" model="ir.actions.act_window">
+            <field name="name">Job Orders</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+            <field name="context">{'default_is_job_order': 1}</field>
+            <field name="domain">[('is_job_order', '=', 'true')]</field>            
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create Job Order
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_job_order" name="Job Orders" parent="sale.sale_order_menu" sequence="25" action="sale_job_order.job_orders"            
+        />  
+        
+        <!-- Job Order For Sale  -->
+        <record id="job_order_for_sale" model="ir.actions.act_window">
+            <field name="name">Job Order For Sale </field>
+            <field name="res_model">sale.order</field>
+            <field name="view_mode">tree</field>
+            <field name="context">{'default_is_job_order': 1}</field>
+            <field name="domain">[('is_job_order', '=', 'true')]</field>  
+            <field name="view_id" ref="view_job_order_for_sale_tree"/>          
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create Job Order
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_job_order_for_sale" name="Job Order For Sale " parent="sale.sale_order_menu" sequence="26" action="sale_job_order.job_order_for_sale"            
+        />  
+        
+   </data>           
+</odoo>

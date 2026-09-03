@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="account_report_form_kmtl_header" model="ir.ui.view">
+        <field name="name">account.report.form.kmtl.header</field>
+        <field name="model">account.report</field>
+        <field name="inherit_id" ref="account_reports.account_report_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='active'][@widget='boolean_toggle']" position="after">
+                <field name="custom_report_type"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Full replacement of account_reports.pdf_export_main, used only by reports whose
+         custom_handler_model_id points to kmtl.account.report.header.handler
+         (see AccountReportCustomHandlerKmtlHeader._get_custom_display_config).
+         It reuses the standard sub-templates for filters/table/cells, and only
+         replaces the title + company info block with the KMTL left-aligned
+         statement header. -->
+    <template id="pdf_export_main_kmtl">
+        <html>
+            <head>
+                <base t-att-href="base_url"/>
+                <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+                <t t-call-assets="account_reports.assets_pdf_export" t-js="False"/>
+            </head>
+            <body t-att-dir="env['res.lang']._lang_get(lang or env.user.lang).direction or 'ltr'">
+                <div t-att-class="'o_content ' + options['css_custom_class']">
+                    <header>
+                        <t t-set="kmtl_header" t-value="report._get_custom_report_header_values(options)"/>
+                        <!-- <div class="row o_header_font">
+                            <div class="col-12">
+                                <div t-if="kmtl_header['report_name']" style="text-align: center; padding-bottom: 0.25rem;">
+                                    <h2><strong><t t-out="kmtl_header['report_name']"/></strong></h2>
+                                </div>
+                            </div>
+                        </div> -->
+                        <div class="row o_header_font">
+                            <div class="col-8">
+                                <div style="text-align: left;">
+                                    <strong t-out="kmtl_header['company_name']"/>
+                                </div>
+                                <div t-if="kmtl_header['statement_title']" style="text-align: left;">
+                                    <strong t-out="kmtl_header['statement_title']"/>
+                                </div>
+                                <div style="text-align: left;">
+                                    <strong t-out="kmtl_header['date_line']"/>
+                                </div>
+                                <div t-if="kmtl_header['unit_label']" style="text-align: left;">
+                                    <strong t-out="kmtl_header['unit_label']"/>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <!-- All filters and options -->
+                                <t t-call="{{custom_templates.get('pdf_export_filters', 'account_reports.pdf_export_filters')}}"/>
+                            </div>
+                        </div>
+                    </header>
+
+                    <table class="o_table">
+                        <!-- Header -->
+                        <t t-call="{{custom_templates.get('pdf_export_main_table_header', 'account_reports.pdf_export_main_table_header')}}"/>
+
+                        <!-- Body -->
+                        <tbody>
+                           <t t-if="lines">
+                               <t t-call="{{custom_templates.get('pdf_export_main_table_body', 'account_reports.pdf_export_main_table_body')}}"/>
+                           </t>
+                       </tbody>
+                    </table>
+
+                    <!-- Footnotes -->
+                    <ul class="o_footnote">
+                        <t t-foreach="footnotes" t-as="footnote">
+                           <li>
+                               <t t-out="str(footnote.get('number')) + '. ' + str(footnote.get('text'))"/>
+                           </li>
+                        </t>
+                    </ul>
+                </div>
+            </body>
+        </html>
+    </template>
+
+    <!-- PDF page header/footer without company name (KMTL P&amp;L / Balance Sheet) -->
+    <template id="internal_layout_kmtl" inherit_id="account_reports.internal_layout" primary="True">
+        <xpath expr="//div[hasclass('header')]//div[hasclass('col-2') and hasclass('offset-2')]" position="replace">
+            <div class="col-2 offset-2 text-center"/>
+        </xpath>
+    </template>
+
+</odoo>

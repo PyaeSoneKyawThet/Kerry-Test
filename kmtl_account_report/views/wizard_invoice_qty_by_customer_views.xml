@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_wizard_invoice_qty_by_customer_form" model="ir.ui.view">
+        <field name="name">kmtl.invoice.qty.by.customer.wizard.form</field>
+        <field name="model">kmtl.invoice.qty.by.customer</field>
+        <field name="arch" type="xml">
+            <form string="Invoice Qty by Customer Report">
+                <sheet>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <group>
+                        <field name="group_by"/>
+                    </group>
+                    <group>
+                        <field name="user_ids" widget="many2many_tags"/>
+                        <field name="partner_ids" widget="many2many_tags"/>
+                    </group>
+                    <footer>
+                        <button string="Export XLSX" type="object" name="action_export_xlsx" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_invoice_qty_by_customer_report_wizard" model="ir.actions.act_window">
+        <field name="name">Invoice Qty by Customer</field>
+        <field name="res_model">kmtl.invoice.qty.by.customer</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_wizard_invoice_qty_by_customer_form"/>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_kmtl_invoice_qty_by_customer_report" name="Invoice Qty by Customer" parent="menu_kmtl_reports_root" action="action_invoice_qty_by_customer_report_wizard"/>
+</odoo>

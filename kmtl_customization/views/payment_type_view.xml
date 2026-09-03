@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- tree view -->
+    <record id="payment_type_tree_view" model="ir.ui.view">  
+        <field name="name">Payment Type</field>
+        <field name="model">account.payment.type</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="code" string="Code"/>
+                <field name="name" string="Name" required="1"/>
+                <field name="journal_ids" string="Journal" widget="many2many_tags"/>
+                <field name="remark" string="Remark" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- form view -->
+    <record id="payment_type_form_view" model="ir.ui.view">
+        <field name="name">Payment Type</field>
+        <field name="model">account.payment.type</field>
+        <field name="arch" type="xml">
+            <form string="Payment Type">
+                <sheet>
+                    <group>
+                        <field name="code" string="Reference"/>
+                        <field name="name" string="Name" required="1"/>
+                        <field name="journal_ids" string="Journal" widget="many2many_tags"/>
+                        <field name="remark" string="Remark"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_payment_type" model="ir.actions.act_window">
+        <field name="name">Type</field>
+        <field name="res_model">account.payment.type</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+            Define Type for Payment
+          </p>
+      </field>
+    </record>
+
+    <menuitem action="action_payment_type" id="menu_action_payment_type" parent="account.account_invoicing_menu" name="Type" groups="account.group_account_manager" sequence="4"/>
+</odoo>

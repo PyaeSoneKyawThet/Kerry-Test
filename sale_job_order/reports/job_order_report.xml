@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>         
+
+        <record id="paperformat_custom_job_order" model="report.paperformat">
+            <field name="name">Custom invoice</field>
+            <field name="default" eval="True" />
+            <field name="format">A4</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">30</field>
+            <field name="margin_bottom">30</field>
+            <field name="margin_left">7</field>
+            <field name="margin_right">7</field>
+            <field name="header_line" eval="False" />
+            <field name="header_spacing">25</field>
+            <field name="dpi">90</field>
+        </record>
+
+        <!-- QWeb Reports -->
+        <record id="job_order_report" model="ir.actions.report">
+            <field name="name">Job Order</field>
+            <field name="model">sale.order</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">sale_job_order.report_job_order_new</field>
+            <field name="report_file">sale_job_order.report_job_order_new</field>
+            <field name="print_report_name">(object._get_report_base_filename())</field>
+            <field name="paperformat_id" ref="sale_job_order.paperformat_custom_job_order"/>
+            <field name="attachment"/>           
+            <!-- <field name="binding_model_id" ref="model_sale_order"/> -->
+            <field name="binding_type">report</field>
+            <field name="groups_id" eval="[(4, ref('account.group_account_invoice')),
+ (4, ref('account.group_account_readonly'))]"/>
+        </record>
+        
+
+    </data>
+</odoo>

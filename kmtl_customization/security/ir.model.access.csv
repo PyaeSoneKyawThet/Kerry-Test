@@ -1,0 +1,8 @@
+id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
+access_purchase_brand,access_purchase_brand,kmtl_customization.model_purchase_brand,base.group_user,1,1,1,1
+access_container_type,access_container_type,kmtl_customization.model_container_type,base.group_user,1,1,1,1
+access_job_location,access_job_location,kmtl_customization.model_job_location,base.group_user,1,1,1,1
+access_staff_location,access_staff_location,kmtl_customization.model_staff_location,base.group_user,1,1,1,1
+access_vehicle_type,access_vehicle_type,kmtl_customization.model_vehicle_type,base.group_user,1,1,1,1
+access_account_payment_type,access_account_payment_type,kmtl_customization.model_account_payment_type,base.group_user,1,1,1,1
+access_document_location_line,access_document_location_line,kmtl_customization.model_document_location_line,base.group_user,1,1,1,1

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- detail operation view -->
+    <record id="view_stock_move_line_detailed_operation_asset" model="ir.ui.view">
+        <field name="name">stock.move.line.asset.form</field>
+        <field name="model">stock.move.line</field>
+        <field name="inherit_id" ref="stock.view_stock_move_line_detailed_operation_tree"/>
+        <field name="arch" type="xml">
+            <header>
+                <button name="action_create_asset" type="object" string="Create Assets"/>
+            </header>
+            <xpath expr="//field[@name='product_uom_id']" position="after">
+                <field name="created_asset"/>
+            </xpath>
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="asset_id" column_invisible="1"/>
+                <field name="model_serial_no" force_save="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_move_line_tree_custom" model="ir.ui.view">
+        <field name="name">stock.move.line.custom.tree</field>
+        <field name="model">stock.move.line</field>
+        <field name="inherit_id" ref="stock.view_move_line_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <field name="created_asset" optional="hide"/>
+                <field name="asset_id" optional="hide"/>
+                <field name="model_serial_no" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

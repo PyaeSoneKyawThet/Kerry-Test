@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<odoo>
+    <record id="view_purchase_order_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.form.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/> 
+        <field name="arch" type="xml"> 
+            <xpath expr="header" position="inside">   
+                <field name="request_status" invisible="1"/>
+                <field name="user_status" invisible="1"/>
+
+                <button name="action_submit_purchase_order"
+                        type="object"
+                        string="Submit"
+                        class="oe_highlight"
+                        invisible="request_status != 'new' or state in ['cancel','posted']"/>
+
+                <button name="action_check_purchase_order" 
+                        string="Check" 
+                        type="object" 
+                        invisible="request_status in ['checked', 'approved', 'refused', 'cancel'] or user_status != 'to_check'" 
+                        class="btn-primary"
+                        data-hotkey="v"/>
+
+                <button name="action_approve_purchase_order" 
+                        string="Approve" 
+                        type="object" 
+                        invisible="request_status in ['approved', 'refused', 'cancel'] or user_status != 'pending'" 
+                        class="btn-primary" 
+                        data-hotkey="v"/>
+
+                <button name="action_refuse_purchase_order" 
+                        string="Refuse" 
+                        type="object" 
+                        invisible="request_status in ['approved', 'refused', 'cancel'] or user_status not in ['to_check', 'pending']" 
+                        data-hotkey="z"/>
+
+                <button name="action_cancel_purchase_order" 
+                        string="Cancel" 
+                        type="object" 
+                        invisible="request_status not in ['refused']"
+                        data-hotkey="x"/>
+            </xpath>
+
+            <xpath expr="//field[@name='date_order']" position="after"> 
+                <field name="vendor_quotation_date"/>
+                <field name="payment_term_id" readonly="invoice_status == 'invoiced' or state == 'done'" options="{'no_create': True}"/>
+                <field name="due_date"/>
+            </xpath> 
+
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="vendor_contact_person" readonly="state == 'purchase'"/>
+                <field name="vendor_quotation_no"/>
+                <field name="vendor_invoice_no"/>
+            </xpath> 
+            <xpath expr="//field[@name='effective_date']" position="after">
+                <field name="po_done_state" widget="boolean_toggle" readonly="state == 'done'"/>
+            </xpath> 
+
+            <xpath expr="sheet//group/group[1]" position="inside">  
+                <field name="prepared_department_id" string="Department"/>
+                <field name="staff_location_id"/>
+            </xpath>
+
+            <xpath expr="//field[@name='order_line']//tree//field[@name='name']" position="after">
+                <field name="brand_id"/>
+                <field name="vehicle_no"/>
+                <field name="bl_no"/>
+                <field name="reference_key"/>
+            </xpath> 
+
+            <xpath expr="//group[@name='other_info']//field[@name='user_id']" position="attributes">
+                <attribute name="string">Prepared By</attribute>
+            </xpath>
+
+            <xpath expr="//group[@name='invoice_info']//field[@name='payment_term_id']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
+            <xpath expr="//button[@name='button_confirm'][2]" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
+            <xpath expr="//button[@name='button_cancel']" position="attributes">
+                <attribute name="invisible">state not in ('draft', 'to approve', 'sent', 'purchase') or request_status not in ['approved','new']</attribute>
+            </xpath>
+
+            <xpath expr="//group[@name='other_info']" position="inside">
+                <field name="is_cancelled"/>
+            </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page name="approver" string="Approvers">
+                    <field name="purchase_approver_ids"  readonly="1">   
+                        <tree editable="bottom" decoration-success="status in ['checked', 'approved']" decoration-warning="status in ['pending', 'waiting', 'to_check']" decoration-danger="status=='refused'">
+                            <field name="sequence" widget="handle"/>
+                            <field name="approval_user_ids" string="Users" widget="many2many_tags" readonly="status != 'new'" options="{'no_create': True}" 
+                                           required="1"/>
+                            <field name="approval_employee_id" string="User" required="0" column_invisible="1"/>               
+                            <field name="status" />
+                            <field name="sequence" string="Level"/>
+                        </tree>                         
+                    </field>  
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Request for Quotation Menu -> View -->
+    <record id="view_purchase_order_tree_inherit_po_done" model="ir.ui.view">
+        <field name="name">purchase.order.tree.inherit.po.done</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_kpis_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date_order']" position="before">
+                <field name="vendor_quotation_date" optional="hide"/>
+                <field name="date_approve" optional="hide"/>
+                <field name="date_planned" optional="hide"/>
+                <field name="due_date" optional="hide"/>
+            </xpath>
+
+            <xpath expr="//field[@name='origin']" position="before">
+                <field name="vendor_contact_person" optional="hide"/>
+                <field name="staff_location_id" optional="hide"/>
+                <field name="vendor_invoice_no" optional="hide"/>
+                <field name="vendor_quotation_no" optional="hide"/>
+                <field name="currency_id" optional="hide"/>
+                <field name="prepared_department_id" optional="hide"/>
+                <field name="payment_term_id" optional="hide"/>
+                <field name="picking_type_id" optional="hide"/>
+                <field name="approved_by_id" optional="hide"/>
+            </xpath>
+            <xpath expr="//field[@name='amount_total']" position="after">
+                <field name="is_cancelled" optional="show"/>
+                <field name="po_done_state" widget="boolean_toggle" readonly="state == 'done'" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Purchase Order Menu -> View -->
+    <record id="purchase_order_view_tree_purchase_ext" model="ir.ui.view">
+        <field name="name">purchase.order.tree.inherit.ext</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_view_tree"/>
+        <field name="arch" type="xml"> 
+            <xpath expr="//field[@name='date_order']" position="before">
+                <field name="vendor_quotation_date" optional="hide"/>
+                <field name="date_approve" optional="hide"/>
+                <field name="date_planned" optional="hide"/>
+                <field name="due_date" optional="hide"/>
+            </xpath>
+
+            <xpath expr="//field[@name='origin']" position="before">
+                <field name="vendor_contact_person" optional="hide"/>
+                <field name="staff_location_id" optional="hide"/>
+                <field name="vendor_invoice_no" optional="hide"/>
+                <field name="vendor_quotation_no" optional="hide"/>
+                <field name="currency_id" optional="hide"/>
+                <field name="prepared_department_id" optional="hide"/>
+                <field name="payment_term_id" optional="hide"/>
+                <field name="picking_type_id" optional="hide"/>
+                <field name="approved_by_id" optional="hide"/>
+            </xpath>
+            
+            <xpath expr="//field[@name='amount_total']" position="after">
+                <field name="is_cancelled" optional="show"/>
+                <field name="po_done_state" widget="boolean_toggle" readonly="state == 'done'" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+</odoo> 

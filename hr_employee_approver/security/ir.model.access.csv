@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_approval_employee_line,access_approval_employee_line,model_approval_employee_line,base.group_user,1,1,1,1
+access_invoice_approver_line,access_invoice_approver_line,model_invoice_approver_line,base.group_user,1,1,1,1
+access_bill_approver_line,access_bill_approver_line,model_bill_approver_line,base.group_user,1,1,1,1
+access_vendor_payment_approver_line,access_vendor_payment_approver_line,model_vendor_payment_approver_line,base.group_user,1,1,1,1
+access_customer_payment_approver_line,access_customer_payment_approver_line,model_customer_payment_approver_line,base.group_user,1,1,1,1
+access_purchase_approver_line,access_purchase_approver_line,model_purchase_approver_line,base.group_user,1,1,1,1
+access_purchase_approval_config,access_purchase_approval_config,model_purchase_approval_config,base.group_user,1,1,1,1
+access_payment_approval_config,access_payment_approval_config,model_payment_approval_config,base.group_user,1,1,1,1
+
+

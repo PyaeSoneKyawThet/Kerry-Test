@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- wizard action form view -->
+        <record id="view_form_approval_reason_wizard" model="ir.ui.view">
+            <field name="name">form.approval.wizard</field>
+            <field name="model">wizard.approval.reason</field>            
+            <field name="arch" type="xml">
+                <form>
+                    <group>  
+                        <field name="sale_order_id" string="Sale Order" invisible="1"/> 
+                        <field name="state" string="State" invisible="1"/>                           
+                        <field name="reason" string="Reason" required="1"/>                                                                                                                                                       
+                    </group>   
+                    <footer>
+                        <button string="Confirm" type="object" name="action_confirm" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>                                                               
+                </form>
+            </field>
+        </record>
+
+    </data>
+</odoo>

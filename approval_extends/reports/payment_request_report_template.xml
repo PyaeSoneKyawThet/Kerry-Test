@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="custom_header_footer_payment_request_form">
+            <div class="header">
+                <div style="report_header_style">
+                    <div class="row">
+                        <div class="col-3"></div> 
+                        <div class="col-6 fw-bold py-4">
+                            <p class="text-center" style="font-size: 32px"> 
+                                <span>PAYMENT REQUEST</span>
+                            </p>
+                        </div>
+                        <div class="col-3 text-end">
+                            <span t-field="doc.company_id.logo"
+                                t-options="{'widget':'image', 'style': 'height:85px; width:130px'}" />
+                        </div>
+                    </div>
+
+                    <div class="row" t-if="report_type == 'pdf'" style="height:0px; width:100%; margin-left:10%;">
+                        <div class="col-6" name="watermark" t-if="doc.request_status in ['new', 'pending','checked']">
+                            <span style="-webkit-transform:rotate(-45deg); color:grey; font-size:12rem; text-align:center; position:absolute; opacity:0.3; padding-top:280px">
+                                DRAFT
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer" style="margin-bottom: -400px !important; border-top: 1px solid black;">
+                <div class="row">
+                    <div class="col-4">
+                        <span style="font-size: 15px;" t-if="doc.company_id.name" t-field="doc.company_id.name"></span>
+                    </div>
+                    <div class="col-4 text-center">
+                        <span style="font-size: 12px;">
+                            <span t-field="doc.name"/>
+                        </span>
+                    </div>
+                    <div class="col-4 text-end" style="height: 25px;">                        
+                        <p style="font-size: 12px;"><small>
+                            Page: <span class="page"/> / <span class="topage"/>
+                            <span class="ms-2" t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y %H:%M:%S')"/>
+                        </small></p>                                               
+                    </div> 
+                </div>
+            </div>
+                <!-- <div style="">
+                    <span t-if="doc.company_id.company_footer" t-field="doc.company_id.company_footer" 
+                    t-options="{'widget':'image','style': 'height:80px; width:100%'}"/>
+                </div>                                                    -->
+
+        </template>
+
+        <template id="payment_request_template">
+            <t t-call="web.external_layout">
+                <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)" />
+                <div class="page " >
+                    <div class="row" style="margin-top: -30px;">
+                        <div class="col-4" name="Information 1">
+                            <div class="row mb-1">
+                                <div class="col-5">
+                                    <strong>PRQ No</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-6" t-if="doc.name">
+                                    <span t-field="doc.name" />
+                                </div>
+                            </div>
+                            <div class="row mb-1">
+                                <div class="col-5">
+                                    <strong>PRQ Date</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-6" t-if="doc.date">
+                                    <span t-field="doc.date" />
+                                </div>
+                            </div>
+                            <div class="row mb-1">
+                                <div class="col-5">
+                                    <strong>Value Date</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-7" t-if="doc.value_date">
+                                    <span t-field="doc.value_date" />
+                                </div>
+                            </div>
+                            <div class="row mb-1">
+                                <div class="col-5">
+                                    <strong>Currency</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-6" t-if="doc.currency_id.name">
+                                    <span t-field="doc.currency_id.name" />
+                                </div>
+                            </div>
+                            <div class="row mb-1">
+                                <div class="col-5">
+                                    <strong>Vendor Invoice Number</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-6" t-if="doc.vendor_invoice_no">
+                                    <span t-field="doc.vendor_invoice_no" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-4" name="Information 2">
+                            <div class="row mb-1">
+                                <div class="col-3">
+                                    <strong>Vendor Code</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-8" t-if="doc.partner_id.ref">
+                                    <span t-field="doc.partner_id.ref" />
+                                </div>
+                            </div>
+                            <div class="row mb-1">
+                                <div class="col-3">
+                                    <strong>Vendor Name</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-8" t-if="doc.partner_id.name">
+                                    <span t-field="doc.partner_id.name" />
+                                </div>
+                            </div>  
+                            <div class="row mb-1">
+                                <div class="col-3">
+                                    <strong>PR No</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-8" t-if="doc.request_id">
+                                    <span t-field="doc.request_id" />
+                                </div>
+                            </div>
+                            <div class="row mb-1">
+                                <div class="col-3">
+                                    <strong>PO No</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-8" t-if="doc.purchase_order_id">
+                                    <span t-field="doc.purchase_order_id" />
+                                </div>
+                            </div>
+                            <div class="row mb-1">
+                                <div class="col-3">
+                                    <strong>GRN No</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-8" t-if="doc.grn_no">
+                                    <span t-field="doc.grn_no" />
+                                </div>
+                            </div>  
+                        </div>
+
+                        <div class="col-4" name="Information 3">
+                            <div class="row mb-1">
+                                <div class="col-4">
+                                    <strong>Pay To</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-7" >
+                                    <t t-if="doc.pay_to_id">
+                                        <span t-field="doc.pay_to_id"/>
+                                    </t>
+                                    <t t-if="doc.pay_to_id and doc.pay_to_external">
+                                        <span>,</span>
+                                    </t>
+                                    <t t-if="doc.pay_to_external">
+                                        <span t-field="doc.pay_to_external"/>
+                                    </t>
+                                </div>
+                            </div>
+
+                            <div class="row mb-1">
+                                <div class="col-4">
+                                    <strong>Prepared By</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-7" t-if="doc.request_owner_id">
+                                    <span t-field="doc.request_owner_id" />
+                                </div>
+                            </div>
+
+                            <div class="row mb-1">
+                                <div class="col-4">
+                                    <strong>PO Approved By</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-7" t-if="doc.purchase_order_id.approved_by_id">
+                                    <span t-field="doc.purchase_order_id.approved_by_id" />
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-1">
+                                <div class="col-4">
+                                    <strong>PR Approved By</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-7" t-if="doc.request_id.approver_ids">
+                                    <t t-if="doc.request_id.approver_ids[-1].status == 'approved'">
+                                        <span t-field="doc.request_id.approver_ids[-1].user_id" />
+                                    </t>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-1">
+                                <div class="col-4">
+                                    <strong>PRQ Approved By</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-7" t-if="doc.approver_ids">
+                                    <t t-if="doc.approver_ids[-1].status == 'approved'">
+                                        <span t-field="doc.approver_ids[-1].user_id"/> 
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- payment request line table -->
+                    <t t-if="doc.payment_request_line_ids">
+                        <table class="table table-borderless border-0 mt-3">
+                            <thead>
+                                <tr class="border border-dark border-start-0 border-end-0 " style="border-top: 2px solid black !important;">
+                                    <th class="border-0 text-end" style="text-transform: capitalize;">No</th>
+                                    <th class="border-0 text-start" style="text-transform: capitalize;">Description</th>
+                                    <th class="border-0 text-end" style="text-transform: capitalize;">QTY</th>
+                                    <th class="border-0 text-end" style="text-transform: capitalize;">Unit Price</th>
+                                    <th class="border-0 text-end" style="text-transform: capitalize;">Base Amount</th>
+                                    <th class="border-0 text-start" style="text-transform: capitalize;">Tax Rate</th>
+                                    <th class="border-0 text-end" style="text-transform: capitalize;">Tax Amount</th>
+                                    <th class="border-0 text-end" style="text-transform: capitalize;">Total Amount</th>
+                                    <th class="border-0 text-start" style="text-transform: capitalize;padding-left: 10px;" width='250px;'>Account Description</th>
+                                </tr>
+                            </thead>
+                            <tbody class="border-none">
+                                <t t-set="grouped_lines" t-value="doc._get_grouped_payment_lines()"/>
+                                <t t-set="index_no" t-value="1"/>
+                                <t t-foreach="grouped_lines" t-as="line">
+                                    <tr>
+                                        <td class="border-0 text-end"><span t-esc="index_no"/></td>
+                                        <td class="border-0"><span t-esc="line['description']"/></td>
+                                        <td class="border-0 text-end"><span t-esc="line['quantity']" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/></td>
+                                        <td class="border-0 text-end"><span t-esc="line['unit_price']" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/></td>
+                                        <td class="border-0 text-end"><span t-esc="line['base_amount']" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/></td>
+                                        <td class="border-0 text-start">
+                                            <t t-foreach="line['tax_names']" t-as="tax">
+                                                <span t-esc="tax"/><br/>
+                                            </t>
+                                        </td>
+                                        <td class="border-0 text-end"><span t-esc="line['tax_amount']" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/></td>
+                                        <td class="text-end border-0">
+                                            <t t-if="line['tax_amount']">
+                                                <span t-esc="line['total_included_amount_currency']" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>
+                                            </t>
+                                            <t t-else="">
+                                                <span t-esc="line['total_amount_currency']" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>
+                                            </t>
+                                        </td>
+                                        <td class="border-0" style="background-color:#fff;color:#585759 !important;"><span t-if="line['analytic_distribution']" t-esc="line['analytic_distribution']"/>
+                                            <span t-if="not line['analytic_distribution']">-</span></td>
+                                    </tr>
+                                    <t t-set="index_no" t-value="index_no + 1"/>
+                                </t>
+                                <tr name="Total Row" class="border border-dark border-2 border-start-0 border-end-0" >
+                                    <td colspan="5" class="border-0 text-center">
+                                        <span>Total Amount</span>
+                                    </td>
+                                    <td colspan="2" class="border-0 text-end">
+                                        <span t-out="doc.currency_id.name"/>
+                                    </td>
+                                    <td class="border-0 text-end">
+                                        <span t-out="doc.total_amount" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>
+                                    </td>
+                                    <td class="border-0"></td>
+                                    <td class="d-none"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </t>
+
+                    <t t-if="doc.cash_advance_ids or doc.payment_ids">
+                        <div style="border-top: 2px solid black;border-bottom: 2px solid black;" class="my-3">
+                            <div class="my-2" style="margin-right: 250px;">
+                                <p class="mb-2">Payment</p>
+        
+                                <t t-if="doc.cash_advance_ids">
+                                    <div class="row" name="advance_paid" style="padding-right: 6px;">
+                                        <div class="col-5">
+                                            <span>Advance Paid</span>
+                                        </div>
+                                        <div class="col-3 text-center"  style="padding-right: 15px;">
+                                            <span t-out="doc.cash_advance_ids[:1].date_confirmed" t-options="{'widget': 'date'}"/>
+                                        </div>
+                                        <div class="col-4 text-end">
+                                            <span t-out="doc.cash_advance_amount" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>
+                                        </div>
+                                    </div>
+                                </t>
+                                
+                                <t t-foreach="doc.payment_ids.filtered(lambda p: p.state != 'cancel')" t-as="payment">
+                                    <div class="row" name="payable" style="padding-right: 6px;">
+                                        <div class="col-5">
+                                            <span>Payable</span>
+                                            <t t-if="payment.ref"><span>(</span></t>
+                                            <span t-out="payment.ref"/>
+                                            <t t-if="payment.ref"><span>)</span></t>
+                                        </div>
+                                        <div class="col-3 text-center" style="padding-right: 15px;">
+                                            <span t-out="payment.date" t-options="{'widget': 'date'}"/>
+                                        </div>
+                                        <div class="col-4 text-end">
+                                            <span t-out="payment.amount" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </t>
+                    
+                    
+
+                    <div class="row">
+                        <span>Note: </span>
+                        <span t-out="doc.narration"/>
+                    </div>
+
+                    <div class="row mt-3">
+                        <span>Amount In Words: </span>
+                        <span t-out="doc.amount_in_words"/>
+                    </div>
+
+                    <div class="row mt-3">
+                        <span>Remark: </span>
+                        <span t-out="doc.reason"/>
+                    </div>
+
+                </div>
+            </t>
+        </template>
+
+        <template id="payment_request_print">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="approval_extends.custom_header_footer_payment_request_form" />
+                    <t t-set="lang" t-value="doc.partner_id.lang" />
+                    <t t-call="approval_extends.payment_request_template" t-lang="lang" />
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

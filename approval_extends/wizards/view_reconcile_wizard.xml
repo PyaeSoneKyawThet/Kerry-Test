@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_account_reconcile_wizard_approval_inherit" model="ir.ui.view">
+        <field name="name">account.reconcile.wizard.form.approval</field>
+        <field name="model">account.reconcile.wizard</field>
+        <field name="inherit_id" ref="account_accountant.view_account_reconcile_wizard"/> 
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='account_id']" position="after"> 
+                <field name="expense_id" invisible="payment_request_id"/>
+                <field name="payment_request_id" invisible="expense_id"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

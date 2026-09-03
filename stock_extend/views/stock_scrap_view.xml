@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<odoo>
+    <record id="stock_scrap_form_view_inherit_doc_location" model="ir.ui.view">
+        <field name="name">stock.scrap.form.inherit</field>
+        <field name="model">stock.scrap</field>
+        <field name="inherit_id" ref="stock.stock_scrap_form_view"/>
+        <field name="arch" type="xml"> 
+            <xpath expr="//group//group[1]" position="inside">
+                <field name="staff_location_id" readonly="state in ['done']" invisible="0"/>
+            </xpath> 
+        </field>
+    </record>
+</odoo> 

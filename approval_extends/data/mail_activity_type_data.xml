@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="mail_activity_data_cash_advance_kmtl" model="mail.activity.type">
+            <field name="name">Approval</field>
+            <field name="icon">fa-check-circle</field>
+            <field name="sequence">4</field>
+            <field name="active">False</field>
+            <field name="res_model">cash.advance.form</field>
+        </record>
+
+        <record id="mail_activity_data_approval_expense_kmtl" model="mail.activity.type">
+            <field name="name">Approval</field>
+            <field name="icon">fa-check-circle</field>
+            <field name="sequence">4</field>
+            <field name="active">False</field>
+            <field name="res_model">approval.expense</field>
+        </record>
+
+        <record id="mail_activity_data_approval_payment_request_kmtl" model="mail.activity.type">
+            <field name="name">Approval</field>
+            <field name="icon">fa-check-circle</field>
+            <field name="sequence">4</field>
+            <field name="active">False</field>
+            <field name="res_model">approval.payment.request</field>
+        </record>
+    </data>
+</odoo>

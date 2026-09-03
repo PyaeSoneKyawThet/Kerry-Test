@@ -1,0 +1,54 @@
+<odoo>
+    <record id="action_staff_location" model="ir.actions.act_window">
+        <field name="name">Document Location</field>
+        <field name="res_model">staff.location</field>
+        <field name="view_mode">tree,form</field>
+        <field name="target">current</field>
+    </record> 
+
+    <record id="view_staff_location_tree" model="ir.ui.view">
+        <field name="name">staff.location.tree</field>
+        <field name="model">staff.location</field>
+        <field name="arch" type="xml">
+            <tree >
+                <field name="code"/>
+                <field name="name"/>
+                <field name="remark"/>
+                <field name="expense_journal_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>                
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_staff_location_form" model="ir.ui.view">
+        <field name="name">staff.location.form</field>
+        <field name="model">staff.location</field>
+        <field name="arch" type="xml">
+            <form >
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="remark"/>
+                            <field name="expense_journal_ids" widget="many2many_tags" options="{'color_field': 'color'}"/> 
+                        </group>                     
+                    </group>
+                    <notebook>
+                        <page string="Document Location Detail">
+                                <field name="document_location_line_ids" mode="tree,kanban" >
+                                    <tree editable="bottom" >
+                                        <field name="staff_location_prefix"/>
+                                        <field name="operation_type"/>
+                                        <field name="sequence_id" readonly="operation_type in ['fixed_asset']"/>
+                                    </tree>
+                                </field>
+                            </page>
+                    </notebook>
+                </sheet>              
+            </form>
+        </field>
+    </record>
+
+</odoo>

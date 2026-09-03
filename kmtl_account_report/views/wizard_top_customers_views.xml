@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_wizard_top_customers_form" model="ir.ui.view">
+        <field name="name">kmtl.top.customers.wizard.form</field>
+        <field name="model">kmtl.top.customers</field>
+        <field name="arch" type="xml">
+            <form string="Top Customers">
+                <sheet>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="limit"/>
+                    </group>
+                    <footer>
+                        <button string="Export XLSX" type="object" name="action_export_xlsx" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_top_customers_wizard" model="ir.actions.act_window">
+        <field name="name">Top Customers</field>
+        <field name="res_model">kmtl.top.customers</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_wizard_top_customers_form"/>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_kmtl_top_customers" name="Top Customers" parent="menu_kmtl_reports_root" action="action_top_customers_wizard"/>
+
+</odoo>

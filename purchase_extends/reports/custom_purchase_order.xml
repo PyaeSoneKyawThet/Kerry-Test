@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="custom_header_footer">
+            <div class="header">
+                <div>
+                <div class="row" style="report_header_style">
+                    <div class="col-3">
+                    </div>                     
+                    <div class="col-6 text-center pt-3">
+                        <h1 style="font-size:30px; font-weight: bold; color:#000000;">
+                            <span t-if="o.state in ['draft', 'sent', 'to approve']">REQUEST FOR QUOTATION</span>
+                            <span t-if="o.state in ['purchase', 'done']">PURCHASE ORDER</span>
+                            <span t-if="o.state == 'cancel'">CANCELLED PURCHASE ORDER</span>                        
+                        </h1>
+                    </div>
+                    <div class="col-3 text-end">
+                        <span t-field="o.company_id.logo" t-options="{'widget':'image', 'style': 'max-height:150px; max-width:150px; height:auto; width:auto;'}"/>
+                    </div>
+                </div>
+                <t t-set="print_count" t-value="o._get_print_count()"/>
+                    <div class="row" style="width: 100%; height: 900px;position: relative;" t-if="print_count == 1 and o.state == 'purchase'">
+                        <div style="margin-top: 250px;">
+                            <span style="-webkit-transform:rotate(-45deg); color:grey; font-size:10rem; text-align:center; position:absolute; opacity:0.3;font-weight:normal;font-family: Arial">ORIGINAL</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row" t-if="report_type == 'pdf'" style="height:0px; width:100%; margin-left:1%;">
+                    <div class="col-6" name="watermark" t-if="o.state in ['draft', 'sent', 'to approve']">
+                        <span style="-webkit-transform:rotate(-45deg); color:grey; font-size:12rem; text-align:center; position:absolute; opacity:0.3; padding-top:280px">
+                            DRAFT
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer" style="margin-bottom: -400px  !important;">
+                <p style="font-size: 14px; height: 15px;width:900px;">
+                    Make all payable to KM Terminal and Logistics Limited. 10% Late fees applied for late payments after 3 days past due date.
+                    If you have any clarification, please contact to MM.KMTL.FnA.BillingnReceipt@kerrylogistics.com
+                </p>     
+                <br/><br/><br/><br/>   
+                <div style="border-top: 1px solid black;">
+                    <span t-if="o.company_id.invoice_footer" t-field="o.company_id.invoice_footer" 
+                    t-options="{'widget':'image','style': 'height:80px; width:900px'}"/>
+                </div> 
+                <div class="row text-end" style="height: 25px;">                        
+                    <p><small>
+                        Page: <span class="page"/> / <span class="topage"/>
+                        <span class="ms-2" t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y %H:%M:%S')"/>
+                    </small></p>                                               
+                </div>                                                    
+            </div>
+            
+        </template>        
+
+        <template id="custom_report_purchaseorder_document">
+            <t t-call="web.external_layout">                
+                <div class="page">
+                    <div class="oe_structure"/> 
+                    <div class="row">
+                        <div class="col-9"></div>
+                        <div class="col-3 text-end">
+                            <strong>PO No:</strong>
+                            <span t-field="o.name" class="m-0"/> 
+                        </div>
+                    </div>    
+
+                    <div id="informations" class="row mt-4 mb32">                        
+                        <div class="col-auto">
+                            <strong>Contact Person</strong>
+                            <p t-if="o.vendor_contact_person" t-field="o.vendor_contact_person" class="m-0"/>
+                        </div>
+                        <div class="col-auto">
+                            <strong>P.O Issuing Date</strong>
+                            <p t-if="o.create_date" t-field="o.create_date" class="m-0" t-options='{"widget": "date"}'/>
+                        </div>
+                        <div class="col-auto">
+                            <strong>Delivery Date</strong>
+                            <p t-if="o.date_planned" t-field="o.date_planned" class="m-0" t-options='{"widget": "date"}'/>
+                        </div>
+                        <div class="col-auto">
+                            <strong>Payment Terms</strong>
+                            <p t-if="o.payment_term_id" t-field="o.payment_term_id" class="m-0"/>
+                        </div>
+                        <div class="col-auto">
+                            <strong>Due Date</strong>
+                            <p t-if="o.date_order" t-field="o.date_order" class="m-0" t-options='{"widget": "date"}'/>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-9">
+                            <strong>Quotation Number:</strong> <span t-field="o.vendor_quotation_no"/>
+                        </div>
+                        <div class="col-3">
+                            <strong>Quotation Date:</strong> <span t-field="o.vendor_quotation_date"/>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-9">
+                            <strong>Purchase From:</strong> <span t-field="o.partner_id"/>
+                        </div>
+                        <!-- <div class="col-auto">
+                            <strong>PR No:</strong><span t-field="o.purchase_request_no"/>
+                        </div> -->
+                        <div class="col-3">
+                            <strong>Currency:</strong> <span t-field="o.currency_id"/>
+                        </div>
+                    </div>
+                    <table class="table table-sm mt-2" style="border:1px solid black; width:100%; border-collapse: collapse;">
+                        <thead>
+                        <tr style="border:1px solid black;">
+                            <th style="border:1px solid black; text-align: center;">No</th>
+                            <th style="border:1px solid black; text-align: center;">Description</th>
+                            <th style="border:1px solid black; text-align: center;">Qty</th>
+                            <th style="border:1px solid black; text-align: right;">Unit Price</th>
+                            <th style="border:1px solid black; text-align: right;">Amount</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <t t-set="line_index" t-value="0"/>
+                        <t t-foreach="o.order_line" t-as="line">
+                            <tr>
+                            <td style="border:1px solid black; text-align: center;">
+                                <span t-esc="line_index + 1"/>
+                            </td>
+                            <td style="border:1px solid black;">
+                                <span t-field="line.name"/>
+                            </td>
+                            <td style="border:1px solid black;" class="text-center">
+                                <span t-esc="int(line.product_qty)"/>
+                            </td>
+                            <td style="border:1px solid black;" class="text-end">
+                                <span t-esc="'{:,.2f}'.format(line.price_unit)"/>
+                            </td>
+                            <td style="border:1px solid black;background-color: white;" class="text-end">
+                                <span t-esc="'{:,.2f}'.format(line.price_subtotal)"/>
+                            </td>
+                            </tr>
+                            <t t-set="line_index" t-value="line_index + 1"/>
+                        </t>
+                        <tr>
+                            <td colspan="4" class="text-end" style="padding-right:5px;">
+                                <strong>Subtotal</strong>
+                            </td>
+                            <td colspan="2" class="text-end" style="background-color: white;">
+                                <span t-if="o.tax_totals['amount_untaxed'] != 0" t-esc="'{:,.2f}'.format(o.tax_totals['amount_untaxed'])"/>
+                            </td>
+                        </tr>
+                        <t t-if="o.tax_totals['groups_by_subtotal']['Untaxed Amount']">
+                        <t t-foreach="o.tax_totals['groups_by_subtotal']['Untaxed Amount']" t-as="amount_by_group">
+                        <tr>
+                            <td colspan="4" class="text-end" style="padding-right:5px;">
+                                <strong t-esc="amount_by_group['tax_group_name']"/>
+                            </td>
+                            <td colspan="2" class="text-end" style="background-color: white;">
+                                <span t-out="amount_by_group['formatted_tax_group_amount'].replace(o.currency_id.name, '').replace(',', '').strip()"/>
+                            </td>
+                        </tr>
+                        </t>
+                        </t>
+                            <!-- <tr>
+                                <td colspan="4" class="text-end" style="padding-right:5px;">
+                                    <strong>Tax</strong>
+                                </td>
+                                <td colspan="2" class="text-end" style="background-color: white;">
+                                    <span t-if="o.tax_totals['amount_total'] != 0" t-out="o.tax_totals['formatted_amount_total'].replace(o.currency_id.name, '').replace(',', '').strip()"/>
+                                </td>
+                            </tr> -->
+                        <tr>
+                            <td colspan="4" class="text-end" style="padding-right:5px;">
+                                <strong>Grand Total</strong>
+                            </td>
+                            <td colspan="2" class="text-end" style="background-color: white;">
+                                <span t-if="o.tax_totals['amount_total'] != 0" t-esc="'{:,.2f}'.format(o.tax_totals['amount_total'])"/>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+        
+                    <!-- <div id="total" class="row justify-content-end">
+                        <div class="col-4">
+                            <table class="table table-sm table-borderless">
+                                <t t-set="tax_totals" t-value="o.tax_totals"/>
+                                <t t-call="purchase.document_tax_totals"/>
+                            </table>
+                        </div>
+                    </div> -->
+                    <p class="lh-sm" t-if="o.company_id.display_invoice_amount_total_words">
+                        <span style="font-weight: bold">Total amount in words(<span t-out="o.currency_id.name"/>) :</span>
+                        <span class="lh-sm"><span t-field="o.amount_total_words">Thirty one dollar and Five cents</span></span>
+                    </p>
+                    <strong>PR No:</strong>
+                    <span>
+                    <t t-set="pr_raw" t-value="o.order_line.mapped('purchase_request_line_id.approval_request_id')"/>
+                    <t t-set="pr_lines" t-value="[]"/>
+                    <t t-foreach="pr_raw" t-as="pr">
+                        <t t-if="pr">
+                        <t t-set="pr_lines" t-value="pr_lines + [pr]"/>
+                        </t>
+                    </t>
+                    <t t-set="total" t-value="len(pr_lines)"/>
+                    <t t-set="i" t-value="0"/>
+                    <t t-foreach="pr_lines" t-as="pr">
+                        <t t-set="i" t-value="i + 1"/>
+                        <t t-esc="pr.name"/>
+                        <t t-if="i != total">, </t>
+                    </t>
+                    </span>
+                    <br/><br/>
+
+
+                    <solid>Remark:</solid>
+                    
+                    <p t-field="o.notes"/>
+                
+                    <table style="width: 100%; border: 1px solid white; background-color: white; margin-top:70px;">
+                        <tr style="border: none;">
+                            <td style="width: 20%; border: none; padding: 6px 0;">Ordered By</td>
+                            <td style="width: 1%; border: none; padding: 6px 0;">:</td>
+                            <td style="border: none; background-color: white; padding: 6px 0;">
+                                <t t-if="o.rfq_id.request_owner_id.name">
+                                    <span t-esc="o.rfq_id.request_owner_id.name"/>
+                                    <t t-if="o.rfq_id.date_confirmed">, </t>
+                                </t>
+                                <t t-if="o.rfq_id.date_confirmed">
+                                    <span t-field="o.rfq_id.date_confirmed" t-options='{"widget": "date"}'/>
+                                </t>
+                            </td>
+                        </tr>
+                        <!-- Checked By -->
+                        <tr style="border: none;">
+                        <td style="border: none; padding: 6px 0;">Checked By</td>
+                        <td style="border: none; padding: 6px 0;">:</td>
+                        <td style="border: none; background-color: white; padding: 6px 0;">
+
+                            <t t-set="po_checkers" t-value="[a for a in o.purchase_approver_ids if a.status == 'checked']"/>
+                            <t t-set="po_approvers" t-value="[a for a in o.purchase_approver_ids if a.status == 'approved']"/>
+                            <t t-set="rfq_checkers" t-value="[a for a in o.rfq_id.approver_ids if a.status == 'checked']"/>
+                            <t t-set="rfq_approvers" t-value="[a for a in o.rfq_id.approver_ids if a.status == 'approved']"/>
+
+                            <t t-set="final_checkers" t-value="po_checkers if po_checkers else (po_approvers if po_approvers else (rfq_checkers if rfq_checkers else rfq_approvers))"/>
+                            <t t-set="checker" t-value="final_checkers and final_checkers[-1]"/>
+
+                            <t t-if="checker">
+                            <t t-if="'approval_employee_id' in checker._fields and checker.approval_employee_id">
+                                <span t-field="checker.approval_employee_id"/>
+                            </t>
+                            <t t-elif="'user_id' in checker._fields and checker.user_id">
+                                <span t-field="checker.user_id"/>
+                            </t>
+
+                            <t t-if="(checker in po_checkers or checker in po_approvers) and o.date_order">
+                                , <span t-field="o.date_order" t-options='{"widget": "date"}'/>
+                            </t>
+                            <t t-elif="(checker in rfq_checkers or checker in rfq_approvers) and o.rfq_id.request_approved_date">
+                                , <span t-field="o.rfq_id.request_approved_date" t-options='{"widget": "date"}'/>
+                            </t>
+                            </t>
+
+                        </td>
+                        </tr>
+
+                        <!-- Approved By -->
+                        <tr style="border: none;">
+                        <td style="border: none; padding: 6px 0;">Approved By</td>
+                        <td style="border: none; padding: 6px 0;">:</td>
+                        <td style="border: none; background-color: white; padding: 6px 0;">
+
+                            <t t-set="po_approvers" t-value="[a for a in o.purchase_approver_ids if a.status == 'approved']"/>
+                            <t t-set="rfq_approvers" t-value="[a for a in o.rfq_id.approver_ids if a.status == 'approved']"/>
+                            <t t-set="approver" t-value="po_approvers and po_approvers[-1] or rfq_approvers and rfq_approvers[-1]"/>
+                            <t t-if="approver">
+                            <t t-if="'approval_employee_id' in approver._fields and approver.approval_employee_id">
+                                <span t-field="approver.approval_employee_id"/>
+                            </t>
+                            <t t-elif="'user_id' in approver._fields and approver.user_id">
+                                <span t-field="approver.user_id"/>
+                            </t>
+
+                            <t t-if="(approver in po_approvers) and o.po_approved_date">
+                                , <span t-field="o.po_approved_date" t-options='{"widget": "date"}'/>
+                            </t>
+                            <t t-elif="(approver in rfq_approvers) and o.rfq_id.request_approved_date">
+                                , <span t-field="o.rfq_id.request_approved_date" t-options='{"widget": "date"}'/>
+                            </t>
+                            </t>
+
+                        </td>
+                        </tr>
+                    </table>
+
+                    <br/><br/><br/><br/>
+                    <p>This is computer-generated Purchase Order, and no signature is required.</p>
+
+                </div>
+            </t>
+        </template>     
+
+        <template id="report_purchaseorder_new">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="purchase_extends.custom_header_footer"/>
+                    <t t-call="purchase_extends.custom_report_purchaseorder_document" t-lang="o.partner_id.lang"/>
+                </t>
+            </t>
+        </template>
+</data>
+</odoo>

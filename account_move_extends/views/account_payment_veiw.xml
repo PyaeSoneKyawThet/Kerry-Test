@@ -1,0 +1,206 @@
+<odoo>
+    <data>
+        <record id="view_account_payment_form_inherit" model="ir.ui.view">
+            <field name="name">account.payment.form.inherit</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_form"/> 
+            <field name="arch" type="xml">                
+                <xpath expr="//header" position="inside"> 
+                    <button name="action_print_official_receipt" string="Official Receipt Print" type="object" class="oe_highlight" 
+                        invisible="reconciled_invoices_count == 0 or payment_type == 'outbound' or partner_type == 'supplier'"/>
+                    <button name="action_print_receipt_voucher" string="Receipt Voucher Print" type="object" class="oe_highlight" 
+                        invisible="payment_type == 'outbound' or partner_type == 'supplier'"/>
+
+                    <!-- Vendor Payment -->
+                    <button name="action_print_payment_voucher" string="Payment Voucher Print" type="object" class="oe_highlight" 
+                        invisible="payment_type == 'inbound' or partner_type == 'customer'"/>
+                </xpath>  
+
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <field name="vendor_bill_ids" invisible="1"/>
+                    <button name="button_open_vendor_bills"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-bars"
+                            invisible="not vendor_bill_ids or partner_type != 'supplier'">
+                        <div class="o_stat_info">
+                            <span class="o_stat_text">Vendor Bills</span>
+                        </div>
+                    </button>
+                    <field name="invoice_ids" invisible="1"/>
+                    <button name="button_open_customer_invoices"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-bars"
+                            invisible="not invoice_ids or partner_type != 'customer'">
+                        <div class="o_stat_info">
+                            <span class="o_stat_text">Invoices</span>
+                        </div>
+                    </button>
+                </xpath>
+
+                <xpath expr="//group[@name='group2']//field[@name='journal_id']" position="before">
+                    <field name="receipt_voucher_no" readonly="1" invisible="partner_type == 'supplier'"/> 
+                    <field name="official_receipt_no" readonly="1" invisible="partner_type == 'supplier'"/>
+                    <field name="official_receipt_date" readonly="1" invisible="partner_type == 'supplier'"/>
+                    <field name="account_payment_type_id" readonly="state != 'draft'" string="Type"/>
+                    <field name="payment_type_available_journal_ids" invisible="1"/>
+                </xpath>         
+                <xpath expr="//group[@name='group2']//field[@name='journal_id']" position="replace">
+                    <field name="journal_id"
+                            domain="[('id', 'in', payment_type_available_journal_ids)]"
+                            readonly="state != 'draft'"/>
+                    <field name="bank_account_no" invisible="not bank_account_no"></field>
+                </xpath>  
+                <!-- <xpath expr="//group[@name='group1']" position="inside">
+                    <field name="staff_location_id" required="1"/>
+                </xpath>  -->
+                <xpath expr="//group[@name='group2']" position="inside">
+                    <field name="cheque_no" readonly="state != 'draft'"/>
+                    <field name="invoice_ids" 
+                           readonly="state != 'draft'" 
+                           widget="many2many_tags" 
+                           invisible="partner_type != 'customer'" 
+                           domain="[('partner_id', '=', partner_id),('state', '=', 'posted'), ('move_type', 'in', ['out_invoice','out_refund']), ('payment_state', 'not in', ('in_payment','paid'))]"/>
+                </xpath>           
+
+                <xpath expr="//group[@name='group1']" position="inside">
+                    <field name="staff_location_id" required="1" readonly="state != 'draft'"/>
+                    <field name="vendor_bill_ids" readonly="state != 'draft'" widget="many2many_tags" 
+                    invisible="partner_type != 'supplier'" domain="[('partner_id', '=', partner_id),('state', '=', 'posted'), ('move_type', 'in', ['in_invoice','in_refund']), ('payment_state', 'not in', ('in_payment','paid'))]"/>
+                </xpath>  
+
+                <!-- add approver in bill -->
+                <xpath expr="//button[@name='action_post']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+            
+                <xpath expr="//button[@name='action_post']" position="before">
+                    <field name="request_status" invisible="1"/>
+                    <field name="user_status" invisible="1"/>
+                    <button name="action_submit_payment"
+                            type="object"
+                            string="Submit"
+                            class="oe_highlight"
+                            invisible="request_status != 'new' or state in ['cancel','posted']"/>
+
+                    <button name="action_check_payment" 
+                            string="Check" 
+                            type="object" 
+                            invisible="request_status in ['checked', 'approved', 'refused', 'cancel'] or user_status != 'to_check'" 
+                            class="btn-primary"
+                            data-hotkey="v"/>
+
+                    <button name="action_approve_payment" 
+                            string="Approve" 
+                            type="object" 
+                            invisible="request_status in ['approved', 'refused', 'cancel'] or user_status != 'pending'" 
+                            class="btn-primary" 
+                            data-hotkey="v"/>
+
+                    <button name="action_refuse_payment" 
+                            string="Refuse" 
+                            type="object" 
+                            invisible="request_status in ['approved', 'refused', 'cancel'] or user_status not in ['to_check', 'pending']" 
+                            data-hotkey="z"/>
+
+                    <button name="action_cancel_payment" 
+                            string="Cancel" 
+                            type="object" 
+                            invisible="request_status not in ['new','refused','approved','cancel'] or state != 'draft'"
+                            data-hotkey="x"/>
+                </xpath>
+
+                <xpath expr="//button[@name='action_cancel']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <!-- <xpath expr="//button[@name='action_draft']" position="attributes">
+                    <attribute name="invisible">request_status not in ['cancel']</attribute>
+                </xpath> -->
+
+                <xpath expr="//sheet" position="inside">
+                    <notebook name="approver_notebook">
+                        <page name="approver" string="Approvers">
+                            <field name="vendor_payment_approver_ids"  readonly="1" invisible="payment_type in ['inbound']">   
+                                <tree editable="bottom" decoration-success="status in ['checked', 'approved']" decoration-warning="status in ['pending', 'waiting', 'to_check']" decoration-danger="status=='refused'">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="approval_user_ids" string="Users" widget="many2many_tags" readonly="1" options="{'no_create': True}" 
+                                           required="1"/>
+                                    <field name="approval_employee_id" string="User" required="0" column_invisible="1"/>               
+                                    <field name="status" />
+                                    <field name="sequence" string="Level"/>
+                                </tree>                         
+                            </field>  
+                            <field name="customer_payment_approver_ids"  readonly="1" invisible="payment_type in ['outbound']">   
+                                <tree editable="bottom" decoration-success="status in ['checked', 'approved']" decoration-warning="status in ['pending', 'waiting', 'to_check']" decoration-danger="status=='refused'">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="approval_user_ids" string="Users" widget="many2many_tags" readonly="1" options="{'no_create': True}" 
+                                           required="1"/>
+                                    <field name="approval_employee_id" string="User" required="0" column_invisible="1"/>               
+                                    <field name="status" />
+                                    <field name="sequence" string="Level"/>
+                                </tree>                         
+                            </field>
+                        </page>
+                    </notebook>
+                </xpath>  
+            <!-- end -->
+            </field>
+        </record>
+        
+        <record id="view_account_supplier_payment_tree_inherit_approval" model="ir.ui.view">
+            <field name="name">account.supplier.payment.tree.inherit.approval</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header" position="inside">
+                    <button name="action_print_receipt_voucher" type="object" string="Receipt Voucher Print" />
+                </xpath>
+
+                <xpath expr="//tree" position="inside">
+                    <field name="request_status" widget="badge" optional="hide"
+                    decoration-info="request_status == 'new'" decoration-warning="request_status == 'refused'" decoration-success="request_status == 'approved'" decoration-danger="state == 'cancel'"/>
+                    <field name="ref" string="Memo" optional="hide"/>
+                </xpath>  
+
+                <xpath expr="//tree//field[@name='partner_id']" position="after">
+                    <field name="staff_location_id" optional="hide"/>
+                    <field name="receipt_voucher_no" optional="hide"/>
+                    <field name="official_receipt_no" optional="hide"/>
+                    <field name="official_receipt_date" optional="hide"/>
+                    <field name="account_payment_type_id" string="Type" optional="hide"/>
+                    <field name="invoice_ids" widget="many2many_tags" optional="hide"/>
+                    <field name="partner_bank_id" optional="hide"/>
+                    <field name="cheque_no" optional="hide"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_account_supplier_payment_tree_inherit_view" model="ir.ui.view">
+            <field name="name">account.supplier.payment.tree.inherit.view</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_supplier_payment_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header//button[@name='action_print_receipt_voucher']" position="replace">
+                    <button name="action_print_payment_voucher" type="object" string="Payment Voucher Print"/>
+                </xpath>
+                <xpath expr="//tree//field[@name='partner_id']" position="after">
+                    <field name="vendor_bill_ids" widget="many2many_tags" optional="hide"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="account_payment_tree_inherit_account_batch_payment_extend" model="ir.ui.view">
+            <field name="name">account.payment.tree.inherit.account.batch.view</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account_batch_payment.view_account_payment_tree_inherit_account_batch_payment"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='batch_payment_id']" position="replace">
+                    <field name="batch_payment_id" column_invisible="1"/>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

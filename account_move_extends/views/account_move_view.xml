@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_move_form_inherit_custom" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.custom</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form" /> 
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_print_ar_invoice"
+                    type="object"
+                    string="AR Invoice Print"
+                    invisible="move_type not in ['out_invoice', 'out_refund']"
+                />
+                <button name="action_print_ap_invoice"
+                    type="object"
+                    string="AP Invoice Print"
+                    invisible="move_type not in ['in_invoice', 'in_refund']"
+                />
+            </xpath>
+
+            <xpath expr="//group[@id='header_left_group']" position="inside">
+                <field name="attention_to" readonly="0" force_save="1"/>
+                <field name="account_payment_type_id" string="Type"/>
+                <field name="company_currency_id" invisible="1"/>
+                <field name="available_reverse_ids" widget="many2many_tags" invisible="1"/>
+                <field name="reversed_entry_id" readonly="state == 'posted'" invisible="move_type not in ('out_refund', 'in_refund')"
+                domain="[('id', 'in', available_reverse_ids)]"/>
+            </xpath>
+            
+            <xpath expr="//page[@id='invoice_tab']" position="after">
+                <page name="customer_invoice_format" string="Invoice Print Lines"
+                    invisible="move_type == 'entry'" readonly="state not in ('draft')">
+                    <field name="customer_invoice_format_line_ids" readonly="0"> 
+                        <tree editable="bottom" string="Invoice Print Lines">
+                            <field name="sequence" widget="handle" />
+                            <field name="product_id" readonly="parent.state not in ('draft')" />
+                            <field name="name" readonly="parent.state not in ('draft')" />
+                            <field name="account_id" readonly="parent.state not in ('draft')" />
+                            <field name="analytic_distribution" widget="analytic_distribution"
+                                groups="analytic.group_analytic_accounting" optional="show"
+                                options="{'product_field': 'product_id', 'account_field': 'account_id', 'amount_field': 'price_subtotal'}"
+                                business_domain_compute="parent.move_type in ['out_invoice', 'out_refund', 'out_receipt'] and 'invoice' or parent.move_type in ['in_invoice', 'in_refund', 'in_receipt'] and 'bill' or 'general'" />
+                            <field name="quantity" readonly="parent.state not in ('draft')" />
+                            <!-- <field name="product_uom_id" readonly="1" /> -->
+                            <!-- <field name="price_unit" readonly="1" /> -->
+                            <field name="tax_ids" widget="many2many_tags"
+                                readonly="parent.state not in ('draft')" />
+                            <field name="price_subtotal" string="Total"/>
+                            <field name="price_total" optional="hide"/>
+                            <field name="currency_id" column_invisible="True" />
+                        </tree>
+                        <form string="Invoice Print Lines">
+                            <sheet>
+                                <group>
+                                    <field name="product_id" />
+                                    <field name="name" />
+                                    <field name="account_id" />
+                                </group>
+                                <group>
+                                    <field name="quantity" />
+                                    <field name="product_uom_id" />
+                                    <field name="price_unit" />
+                                    <field name="tax_ids" widget="many2many_tags" />
+                                    <field name="price_subtotal" />
+                                    <field name="price_total" />
+                                    <field name="currency_id" />
+                                </group>
+                            </sheet>
+                        </form>
+                    </field>
+                </page>
+            </xpath>
+            <xpath expr="//field[@name='payment_reference']" position="before"> 
+                <field name="internal_reference" invisible="move_type == 'entry'" readonly="state == 'posted'"/>
+                <field name="vendor_quotation_no" invisible="move_type not in ['in_invoice', 'in_refund']" readonly="state in ['posted']"/>
+                <field name="vendor_invoice_no" invisible="move_type not in ['in_invoice', 'in_refund']" readonly="state in ['posted']"/>
+            </xpath>
+            <xpath expr="//group[@id='header_right_group']" position="inside">
+                <field name="is_internal_wrong" invisible="move_type not in ['out_refund','in_refund']" readonly="state in ['posted']"/>
+            </xpath>
+
+            <xpath expr="//group[@id='header_right_group']//field[@name='invoice_date']" position="after">
+                <field name="bill_type" invisible="move_type not in ['in_invoice']" readonly="1" required="1"/>
+                <field name="debit_note_type" invisible="move_type not in ['in_refund']" readonly="state in ['posted']" required="1"/>
+            </xpath>
+
+            <!-- 
+            Fields used for multi approver feature in invoice,bill Task:2775
+            -->
+            <xpath expr="//header//button[2]" position="after">
+                <field name="request_status" invisible="1"/>
+                <field name="user_status" invisible="1"/>
+                <field name="move_type" invisible="1"/>
+            </xpath>
+
+            <xpath expr="//button[@name='action_post'][2]" position="attributes">
+                <attribute name="invisible">hide_post_button or move_type == 'entry' or display_inactive_currency_warning or move_type in ['in_refund','out_refund','in_invoice','out_invoice','entry']</attribute>
+            </xpath>
+
+            <!-- if entry is linked to payment, hide buttons -->
+            <xpath expr="//button[@name='action_post'][1]" position="attributes">
+                <attribute name="invisible">hide_post_button or move_type != 'entry' or payment_id</attribute>
+            </xpath>
+
+            <xpath expr="//button[@name='button_cancel'][1]" position="attributes">
+                <attribute name="invisible">not id or state != 'draft' or move_type != 'entry' or payment_id</attribute>
+            </xpath>
+
+            <xpath expr="//button[@name='button_draft']" position="attributes">
+                <attribute name="invisible">not show_reset_to_draft_button or payment_id</attribute>
+            </xpath>
+
+            <xpath expr="//button[@name='%(account.action_view_account_move_reversal)d']" position="attributes">
+                <attribute name="invisible">move_type != 'entry' or state != 'posted' or payment_state == 'reversed' or payment_id</attribute>
+            </xpath>            
+            <!-- end -->
+            
+            <!-- <xpath expr="//button[@name='button_cancel'][2]" position="attributes">
+                <attribute name="invisible">not id or state != 'draft' or move_type == 'entry' or request_status not in ['approved','new']</attribute>
+            </xpath> -->
+            <xpath expr="//button[@name='button_cancel'][2]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        
+            <xpath expr="//button[@name='button_cancel']" position="before">
+                <button name="action_submit"
+                        type="object"
+                        string="Submit"
+                        class="oe_highlight"
+                        invisible="request_status != 'new' or move_type in ['entry'] or state in ['cancel']"/>
+
+                <button name="action_check" 
+                        string="Check" 
+                        type="object" 
+                        invisible="request_status in ['checked', 'approved', 'refused', 'cancel'] or user_status != 'to_check' or move_type in ['entry']" 
+                        class="btn-primary"
+                        data-hotkey="v"/>
+
+                <button name="action_approve" 
+                        string="Approve" 
+                        type="object" 
+                        invisible="request_status in ['approved', 'refused', 'cancel'] or user_status != 'pending'" 
+                        class="btn-primary" 
+                        data-hotkey="v"/>
+
+                <button name="action_refuse" 
+                        string="Refuse" 
+                        type="object" 
+                        invisible="request_status in ['approved', 'refused', 'cancel'] or user_status not in ['to_check', 'pending']" 
+                        data-hotkey="z"/>
+
+                <button name="action_cancel" 
+                        string="Cancel" 
+                        type="object" 
+                        invisible="request_status not in ['refused', 'new'] or move_type == 'entry'" 
+                        data-hotkey="x"/>
+            </xpath>
+            
+            <xpath expr="//page[@id='other_tab']" position="after">
+                <page name="approver" string="Approvers" invisible="move_type in ['entry']">
+                    <field name="bill_approver_ids"  readonly="1" invisible="move_type not in ['in_invoice', 'in_refund']">   
+                        <tree editable="bottom" decoration-success="status in ['checked', 'approved']" decoration-warning="status in ['pending', 'waiting', 'to_check']" decoration-danger="status=='refused'">
+                            <field name="sequence" widget="handle"/>
+                            <field name="approval_user_ids" string="Users" widget="many2many_tags" readonly="1" options="{'no_create': True}" 
+                                           required="1"/>
+                            <field name="approval_employee_id" string="User" required="0" column_invisible="1"/>               
+                            <field name="status" />
+                            <field name="sequence" string="Level"/>
+                        </tree>                         
+                    </field>  
+                    <field name="invoice_approver_ids" readonly="1" invisible="move_type not in ['out_invoice', 'out_refund']">   
+                        <tree editable="bottom" decoration-success="status in ['checked', 'approved']" decoration-warning="status in ['pending', 'waiting', 'to_check']" decoration-danger="status=='refused'">
+                            <field name="sequence" widget="handle"/>
+                            <field name="approval_user_ids" string="Users" widget="many2many_tags" readonly="1" options="{'no_create': True}" 
+                                           required="1"/>
+                            <field name="approval_employee_id" string="User" required="0" column_invisible="1"/>               
+                            <field name="status" />
+                            <field name="sequence" string="Level"/>
+                        </tree>                         
+                    </field>  
+                </page>
+            </xpath>
+
+            <xpath expr="//field[@name='invoice_line_ids']" position="attributes">
+                <attribute name="readonly">state != 'draft' or request_status != 'new'</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_move_tree_inherit_extend" model="ir.ui.view">
+        <field name="name">approval.account.move.tree</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_invoice_tree"/> 
+        <field name="arch" type="xml"> 
+            <xpath expr="//tree//field[@name='amount_total_in_currency_signed']" position="attributes">
+                <attribute name="sum">Total</attribute>
+            </xpath>
+            <xpath expr="//tree//field[@name='amount_untaxed_signed']" position="before">
+                <field name="internal_reference" optional="hide"/>
+                <field name="journal_id" optional="hide"/>
+                <field name="staff_location_id" optional="hide"/>
+            </xpath>
+            <xpath expr="//tree//field[@name='invoice_date']" position="before">
+                <field name="attention_to" optional="hide"/>
+                <field name="account_payment_type_id" string="Type" optional="hide"/>
+            </xpath>
+            <xpath expr="//tree" position="inside">
+                <field name="request_status" widget="badge" optional="hide"
+                decoration-info="request_status == 'new'" decoration-warning="request_status == 'refused'" decoration-success="request_status == 'approved'" decoration-danger="state == 'cancel'"/>
+            </xpath>  
+        </field> 
+    </record>
+
+    <record id="view_acc_move_tree_inherit_kmtl" model="ir.ui.view">
+        <field name="name">account.move.tree.inherit.kmtl</field>
+        <field name="model">account.move.line</field>
+        <field name="inherit_id" ref="account.view_move_line_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="internal_reference" optional="hide"/>
+                <field name="payment_reference" optional="hide"/>
+                <field name="invoice_payment_term_id" optional="hide"/>
+                <field name="attention_to" optional="hide"/>
+                <field name="quantity" optional="hide"/>
+                <field name="price_unit" string="Price" optional="hide"/>
+                <field name="price_subtotal" string="Tax excl." optional="hide"/>
+                <field name="price_total" string="Tax incl." optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_move_tree_inherit2" model="ir.ui.view">
+        <field name="name">account.move.tree.inherit2</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_tree"/> 
+        <field name="arch" type="xml"> 
+            <xpath expr="//field[@name='ref']" position="after">
+                <field name="internal_reference" optional="hide"/>
+            </xpath>
+        </field> 
+    </record>    
+</odoo>

@@ -1,0 +1,570 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="custom_header_footer">
+            <t t-if="not o" t-set="o" t-value="docs" />
+                <t t-set="company" t-value="company_id" />
+                <div class="header">
+                        <div>
+                        <div class="row" style="report_header_style">
+                            <div class="col-3"></div>                    
+                            <div class="col-6 text-center">
+                                <h1 style="font-size:40px; font-weight: bold; color:#000000;">
+                                    <span t-if="not proforma"></span>
+                                    <span t-else="">PROFORMA</span>
+                                    <span t-if="o.move_type == 'out_invoice' and o.state == 'posted'">INVOICE</span>
+                                    <span t-elif="o.move_type == 'out_invoice' and o.state == 'draft'">DRAFT INVOICE</span>
+                                    <span t-elif="o.move_type == 'out_invoice' and o.state == 'cancel'">CANCELLED INVOICE</span>
+                                    <span t-elif="o.move_type == 'out_refund' and o.state == 'posted'">CREDIT NOTE</span>
+                                    <span t-elif="o.move_type == 'out_refund' and o.state == 'draft'">DRAFT CREDIT NOTE</span>
+                                    <span t-elif="o.move_type == 'out_refund' and o.state == 'cancel'">CANCELLED CREDIT NOTE</span>
+                                    <span t-elif="o.move_type == 'in_refund'">VENDOR CREDIT NOTE</span>
+                                    <span t-elif="o.move_type == 'in_invoice'">VENDOR BILL</span>                            
+                                </h1>
+                            </div>                    
+                            <div class="col-3 text-end">
+                                <span t-field="o.company_id.logo"
+                                        t-options="{'widget':'image', 'style': 'max-height:120px; max-width:130px; height:auto; width:auto;'}"/>
+                            </div>
+                        </div>
+                        <t t-set="print_count" t-value="o._get_print_count()"/>
+                            <div class="row" style="width: 100%; height: 900px;position: relative;" t-if="print_count == 1 and o.state == 'posted'">
+                                <div style="margin-top: 250px;">
+                                    <span style="-webkit-transform:rotate(-45deg); color:grey; font-size:10rem; text-align:center; position:absolute; opacity:0.3;font-weight:normal;font-family: Arial">ORIGINAL</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" t-if="report_type == 'pdf'" style="height:0px; width:100%; margin-left:1%;">
+                            <div class="col-6" name="watermark" t-if="o.state in ['draft']">
+                                <span style="-webkit-transform:rotate(-45deg); color:grey; font-size:12rem; text-align:center; position:absolute; opacity:0.3; padding-top:280px">
+                                    DRAFT
+                                </span>
+                            </div>
+                        </div>
+                       
+                </div>                 
+                
+                
+                <div class="footer" style="margin-top: 40px !important; margin-bottom: 50px !important;">
+                    <div> 
+                        <p style="font-size: 14px; height: 15px;width:900px;">
+                            Make all payable to KM Terminal and Logistics Limited. 10% Late fees applied for late payments after 3 days past due date.
+                            If you have any clarification, please contact to MM.KMTL.FnA.BillingnReceipt@kerrylogistics.com
+                        </p>     
+                        <br/><br/><br/><br/>              
+                        <span t-if="o.company_id.invoice_footer" t-field="o.company_id.invoice_footer"  
+                            t-options="{'widget':'image','style': 'height:50px; width:900px'}"/>  
+
+                        <div class="row text-end" style="height: 25px;">                        
+                            <p><small>
+                                Page: <span class="page"/> / <span class="topage"/>
+                                <span class="ms-2" t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')"/>
+                            </small></p>   
+                        </div>  
+                    </div>
+                </div>
+                <div class="article" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+                    <t t-out="0"/>
+                </div>       
+            
+        </template>        
+
+        <template id="custom_report_invoice">     
+            <t t-call="web.html_container">  
+            <t t-foreach="docs" t-as="o">    
+                <t t-call="sale_job_order.custom_header_footer">                 
+                    <div class="page">
+                        <div class="">
+                            <div class="my-4">
+                                <div class="row" style="margin-bottom: 20px;">                            
+                                    <span style="font-size: 18px; font-weight: bold;">Bill To</span>
+                                </div>
+                    
+                                <div class="row" name="customer_detail" id="informations">                               
+                                    <div class="col-7">
+                                        <!-- Customer Code -->
+                                        <div class="row">
+                                            <div class="col-3">
+                                                <strong>Customer Name</strong>
+                                            </div>
+                                            <div style="width:13px;" class="col-1">
+                                                <span>:</span>
+                                            </div>
+                                            <div class="col-8">
+                                                <span t-field="o.partner_id.name"/> 
+                                            </div>                                         
+                                        </div>                    
+                                        <!-- Address -->
+                                        <div class="row">
+                                            <div class="col-3">
+                                                <strong>Address</strong>
+                                            </div>
+                                            <div style="width:13px;" class="col-1">
+                                                <span>:</span>
+                                            </div>
+                                            <div class="col-8">
+                                                <span t-field="o.partner_id.contact_address_complete"/>
+                                            </div>                    
+                                        </div>
+                                        <!-- Attention to -->
+                                        <div class="row" >
+                                            <div class="col-3">
+                                                <strong>Attention To</strong>
+                                            </div>
+                                            <div style="width:13px;" class="col-1">
+                                                <span>:</span>
+                                            </div>
+                                            <div class="col-8">
+                                                <span t-field="o.attention_to"/>
+                                            </div>  
+                                        </div>
+                                        <!-- Email Address -->
+                                        <div class="row">
+                                            <div class="col-3">
+                                                <strong>Email Address</strong>
+                                            </div>
+                                            <div style="width:13px;" class="col-1">
+                                                <span>:</span>
+                                            </div>
+                                            <div class="col-8">
+                                                <span t-field="o.partner_id.email"/> 
+                                            </div>                      
+                                        </div>
+                                    </div>                
+                                    
+                                    <div class="col-5" name="order_detail">
+                                        
+                                        <!-- Contact Person -->
+                                        <div class="row">
+                                            <div class="col-4">
+                                                <strong>Contact Person</strong>
+                                            </div>
+                                            <div class="col-1" style="width:13px;">
+                                                <span>:</span>
+                                            </div>
+                                            <div class="col-8">
+                                                <span t-field="o.submit_user_id.name" />
+                                            </div>                      
+                                        </div>
+                                        <!-- Contact Phone Number -->
+                                        <div class="row">
+                                            <div class="col-4">
+                                                <strong>Contact Ph No</strong>
+                                            </div>
+                                            <div class="col-1" style="width:13px;">
+                                                <span>:</span>
+                                            </div>
+                                            <div class="col-8">
+                                                <span t-field="o.submit_user_id.employee_id.work_phone"/>
+                                            </div>                                           
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                                <div class="row" style="margin-bottom: 25px;"></div> 
+        
+                                <div class="oe_structure"></div>
+                                <div id="informations" class="row mt-3 mb-1">
+                                    <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2" t-if="o.invoice_date" name="invoice_date">
+                                        <t t-if="o.move_type == 'out_invoice'"><strong>Invoice Date:</strong></t>
+                                        <t t-elif="o.move_type == 'out_refund'"><strong>Credit Note Date:</strong></t>
+                                        <t t-elif="o.move_type == 'out_receipt'"><strong>Receipt Date:</strong></t>
+                                        <t t-else=""><strong>Date:</strong></t><br/>
+                                        <span t-field="o.invoice_date">2023-09-12</span>
+                                    </div>
+                                    <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2" t-if="o.name" name="name">
+                                        <strong>Invoice No:</strong><br/>
+                                        <span t-field="o.name"/>
+                                    </div>
+                                    <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2" t-if="o.invoice_date_due and o.move_type == 'out_invoice' and o.state == 'posted'" name="due_date">
+                                        <strong>Due Date:</strong><br/>
+                                        <span t-field="o.invoice_date_due">2023-10-31</span>
+                                    </div>
+                                    <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-4" t-if="o.invoice_payment_term_id" name="invoice_payment_term_id">
+                                        <strong>Payment Term:</strong><br/>
+                                        <span t-field="o.invoice_payment_term_id"/>
+                                    </div>
+                                    <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2" t-if="o.delivery_date" name="delivery_date">
+                                        <strong>Delivery Date:</strong><br/>
+                                        <span t-field="o.delivery_date">2023-09-25</span>
+                                    </div>                           
+                                    <!-- <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2" t-if="o.ref" name="reference">
+                                        <strong>Reference:</strong><br/>
+                                        <span t-field="o.ref">INV/2023/00001</span>
+                                    </div> -->
+                                    <div t-attf-class="#{'col-auto col-3 mw-100' if report_type != 'html' else 'col'} mb-2" t-if="o.invoice_incoterm_id" name="incoterm_id">
+                                        <strong>Incoterm:</strong><br/>
+                                        <p t-if="o.incoterm_location">
+                                            <span t-field="o.invoice_incoterm_id.code"/> <br/>
+                                            <span t-field="o.incoterm_location"/>
+                                        </p>
+                                        <span t-else="" t-field="o.invoice_incoterm_id.code" class="m-0"/>
+                                    </div>
+                                </div>
+        
+                                <t t-set="display_discount" t-value="any(l.discount for l in o.invoice_line_ids)"/>
+
+                                <div class="oe_structure"></div>
+                                <table class="table table-sm o_main_table table-borderless" name="invoice_line_table" style="border:1px;">
+                                    <thead style="background-color:#fff; color: black; border:1px solid black;">
+                                        <tr>
+                                            <th name="no" class="text-center" style="border:1px solid black; color: black;">
+                                                <span style="text-transform: capitalize;">No</span>
+                                            </th> 
+                                            <th name="th_description" colspan="2" class="text-center" style="text-transform: capitalize;border:1px solid black; color: black;"><span>Description</span></th>
+                                            <th name="th_quantity" class="text-center" style="border:1px solid black; color: black;">
+                                                <span style="text-transform: capitalize;">Qty</span>
+                                            </th>
+                                            <th name="th_amount_none_ct" class="text-center" style="border:1px solid black; color: black;min-width:70px; max-width: 70px;">
+                                                <span style="text-transform: capitalize;">Advance<br/>(Non-CT)</span>
+                                            </th>
+                                            <th name="th_amount_none_ct" class="text-center" style="border:1px solid black; color: black;min-width:70px; max-width: 70px;">
+                                                <span style="text-transform: capitalize;">Amount<br/>(Non-CT)</span>
+                                            </th>
+                                            <th name="th_amount_ct" class="text-center" style="border:1px solid black; color: black;min-width:70px; max-width: 70px;">
+                                                <span style="text-transform: capitalize;">
+                                                Amount<br/>(CT)</span>
+                                            </th>                                                                    
+                                            <th name="th_subtotal" class="text-center" style="text-transform: capitalize;border:1px solid black; color: black;min-width:100px; white-spance: nowrap;">
+                                                <span>Total <br/> Amount</span>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="border:none;">
+                                        <t t-set="advance_none_ct_total" t-value="0"/>
+                                        <t t-set="ct_total" t-value="0"/>
+                                        <t t-set="non_ct_total" t-value="0"/>
+                                        <t t-set="subtotal" t-value="0"/>
+                                        <t t-set="lines" t-value="o.customer_invoice_format_line_ids.sorted(key=lambda l: (-l.sequence, -l.id), reverse=True)"/>
+        
+                                        <t t-foreach="lines" t-as="line">
+                                            <tr t-att-class="'o_line_section'" style="border:none;">
+                                                <t name="account_invoice_line_accountable" style="border:none;">
+                                                    <td name="no" class="text-end" style="border:none; white-space:nowrap;">
+                                                        <span t-esc="str(line_index + 1) + '.'"/>
+                                                    </td>
+                                                    <td name="account_invoice_line_name" colspan="2" style="border:none;">
+                                                        <span t-if="line.name" t-field="line.name" t-options="{'widget': 'text'}">Bacon Burger</span>
+                                                    </td>
+                                                    <td name="td_quantity" class="text-end" style="border:none;">
+                                                        <span t-field="line.quantity">3.00</span>                            
+                                                    </td>
+                                                    
+                                                    <t t-if="line.product_id.is_advance">
+                                                        <td name="td_amount_advance_none_ct" class="text-end" style="border:none;" >   
+                                                            <span t-esc="line.price_subtotal" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>                                                                
+                                                        </td> 
+                                                        <t t-set="advance_none_ct_total" t-value="advance_none_ct_total + line.price_subtotal"/> <!--get the Advance Non-ct Total value -->
+                                                        <td name="td_amount_none_ct" class="text-end" style="border:none;" >                                                   
+                                                        </td> 
+                                                        <td name="td_amount_ct" class="text-end" style="border:none;" > 
+                                                        </td>                                                
+                                                    </t>
+                                                    <t t-elif="line.tax_ids and not line.product_id.is_advance">
+                                                        <td name="td_amount_advance_none_ct" class="text-end" style="border:none;" >                                                   
+                                                        </td> 
+                                                        <td name="td_amount_none_ct" class="text-end" style="border:none;" >                                                   
+                                                        </td> 
+                                                        <td name="td_amount_ct" class="text-end" style="border:none;" > 
+                                                            <span t-esc="line.price_subtotal" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>                
+                                                        </td>    
+                                                        <t t-set="ct_total" t-value="ct_total + line.price_subtotal"/>  <!--get the CT Total value -->                                      
+                                                    </t>
+                                                    <t t-else="">
+                                                        <td name="td_amount_advance_none_ct" class="text-end" style="border:none;" >                                                   
+                                                        </td>
+                                                        <td name="td_amount_none_ct" class="text-end" style="border:none;" >
+                                                            <span t-esc="line.price_subtotal" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>           
+                                                        </td>   
+                                                        <td name="td_amount_ct" class="text-end" style="border:none;" >
+                                                        </td>
+                                                        <t t-set="non_ct_total" t-value="non_ct_total + line.price_subtotal"/> <!--get the Non-CT Total value -->    
+                                                    </t>   
+                                                    <td name="td_subtotal" class="text-end " style="border:none;">
+                                                        <span  t-field="line.price_subtotal" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}">27.00</span>
+                                                    </td>
+                                                </t>
+                                                <!-- <t t-elif="line.display_type == 'line_section'">
+                                                    <td colspan="99">
+                                                        <span t-field="line.name" t-options="{'widget': 'text'}">A section title</span>
+                                                    </td>
+                                                    <t t-set="current_section" t-value="line"/>
+                                                    <t t-set="current_subtotal" t-value="0"/>
+                                                </t>
+                                                <t t-elif="line.display_type == 'line_note'">
+                                                    <td colspan="99">
+                                                        <span t-field="line.name" t-options="{'widget': 'text'}">A note, whose content usually applies to the section or product above.</span>
+                                                    </td>
+                                                </t> -->
+                                            </tr>
+        
+                                            <!-- <t t-if="current_section and (line_last or lines[line_index+1].display_type == 'line_section')">
+                                                <tr class="is-subtotal text-end">
+                                                    <td colspan="99">
+                                                        <strong class="mr16">Subtotal</strong>
+                                                        <span
+                                                            t-out="current_subtotal"
+                                                            t-options='{"widget": "monetary", "display_currency": o.currency_id}'
+                                                        >31.05</span>
+                                                    </td>
+                                                </tr>
+                                            </t> -->
+                                        </t>
+
+                                        <tr style="height: 60px"></tr>
+                                        
+                                        
+                                        <!-- subtotal row -->
+                                        <tr margin-top="100px">      
+                                            <td></td>                                                                              
+                                            <td colspan="3" class="text-end">
+                                                <strong>
+                                                    Subtotal
+                                                    (<span t-out="o.currency_id.name"/>)  
+                                                </strong>
+                                            </td>   
+                                            <t t-if="o.customer_invoice_format_line_ids">        
+                                                <td class="text-end" style="border: none; border-top:1px solid black; border-bottom:1px solid black; white-spance: nowrap; min-width: 100px;">
+                                                    <span t-out="advance_none_ct_total" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>
+                                                </td>          
+                                                <td class="text-end" style="border: none; border-top:1px solid black; border-bottom:1px solid black; white-spance: nowrap; min-width: 100px;">
+                                                    <span t-out="non_ct_total" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>
+                                                </td>
+                                                <td class="text-end" style="border: none; border-top:1px solid black; border-bottom:1px solid black; white-spance: nowrap; min-width: 100px;">
+                                                    <span t-out="ct_total" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>
+                                                </td>
+                                                <t t-set="subtotal" t-value="advance_none_ct_total + non_ct_total + ct_total"/> <!-- get the Subtotal vale -->
+                                                <td class="text-end" style="border: none; border-top:1px solid black; border-bottom:1px solid black; white-spance: nowrap; min-width: 100px;">
+                                                    <span t-out="subtotal" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>
+                                                </td>
+                                            </t>
+                                            <t t-else="">
+                                                <td class="text-end" style="border: none; border-top:1px solid black; border-bottom:1px solid black; white-spance: nowrap; min-width: 100px;"></td>
+                                                <td class="text-end" style="border: none; border-top:1px solid black; border-bottom:1px solid black; white-spance: nowrap; min-width: 100px;"></td>
+                                                <td class="text-end" style="border: none; border-top:1px solid black; border-bottom:1px solid black; white-spance: nowrap; min-width: 100px;"></td>
+                                                <td class="text-end" style="border: none; border-top:1px solid black; border-bottom:1px solid black; white-spance: nowrap; min-width: 100px;"></td>
+                                            </t>
+                                        </tr>                                                                               
+                                        <!-- Tax Rows -->
+                                        <t t-set="tax_totals" t-value="0"/><!-- get tax total-->
+
+                                        <t t-if="o.tax_totals['groups_by_subtotal']['Untaxed Amount']">
+                                            <t t-foreach="o.tax_totals['groups_by_subtotal']['Untaxed Amount']" t-as="amount_by_group">
+                                                <tr class="border-0">
+                                                    <td></td>                                                                                                      
+                                                    <td class="border-0 text-end" colspan="3">
+                                                        <strong t-esc="amount_by_group['tax_group_name']">Tax 5%</strong>
+                                                    </td>
+                                                    <t t-if="o.customer_invoice_format_line_ids">    
+                                                        <td class="text-end" style="border: none; border-top:1px solid black;border-bottom:1px solid black;white-spance: nowrap; min-width: 100px;">
+                                                            <span t-out="o.advance_non_ct_tax_total" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}">476.20 K</span>
+                                                        </td>
+                                                        <td class="" style="border: none; border-top:1px solid black;border-bottom:1px solid black;white-spance: nowrap; min-width: 100px;"></td>
+                                                        <td class="text-end" style="border: none; border-top:1px solid black;border-bottom:1px solid black;white-spance: nowrap; min-width: 100px;">
+                                                            <span t-out="o.ct_tax_total" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}">476.20 K</span>
+                                                        </td>
+                                                        <td class="text-end" style="border: none; border-top:1px solid black;border-bottom:1px solid black;white-spance: nowrap; min-width: 100px;">
+                                                            <span t-esc="amount_by_group['tax_group_amount']" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}">476.20 K</span>
+                                                        </td>
+                                                        <t t-set="tax_totals" t-value="tax_totals + amount_by_group['tax_group_amount']"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <td class="" style="border: none; border-top:1px solid black;border-bottom:1px solid black;white-spance: nowrap; min-width: 100px;"></td>
+                                                        <td class="" style="border: none; border-top:1px solid black;border-bottom:1px solid black;white-spance: nowrap; min-width: 100px;"></td>
+                                                        <td class="text-end" style="border: none; border-top:1px solid black;border-bottom:1px solid black;white-spance: nowrap; min-width: 100px;"></td>
+                                                        <td class="text-end" style="border: none; border-top:1px solid black;border-bottom:1px solid black;white-spance: nowrap; min-width: 100px;"></td>
+                                                    </t>
+                                                </tr>
+                                            </t>
+                                        </t>
+                                        <t t-else="">
+                                            <tr class="border-0">
+                                                <td></td>                                                                                               
+                                                <td class="border-0 text-end" colspan="3">
+                                                    <strong >Commercial Tax</strong>
+                                                </td>                                               
+                                                <td class="text-end" style="border: none; border-top:1px solid black;border-bottom:1px solid black;white-spance: nowrap; min-width: 100px;"></td>
+                                                <td class="text-end" style="border: none; border-top:1px solid black;border-bottom:1px solid black;white-spance: nowrap; min-width: 100px;"></td>
+                                                <td class="text-end" style="border: none; border-top:1px solid black;border-bottom:1px solid black;white-spance: nowrap; min-width: 100px;"></td>
+                                                <td class="text-end" style="border: none; border-top:1px solid black;border-bottom:1px solid black;white-spance: nowrap; min-width: 100px;"></td>                                                
+                                            </tr>
+                                        </t>
+                                        
+                                        <!-- grand total row -->
+                                        <t t-set="grand_total" t-value="tax_totals + subtotal"/><!-- get tax total-->
+                                        <tr class="border-0">
+                                            <td></td>                                                                                      
+                                            <td class="border-0 text-end" colspan="3">
+                                                <strong>
+                                                    Grand Total
+                                                    (<span t-out="o.currency_id.name"/>)  
+                                                </strong>
+                                            </td>
+                                            <t t-if="o.customer_invoice_format_line_ids">    
+                                                <td class="text-end" style="border: none; border-top:1px solid black; white-spance: nowrap; min-width: 100px;">
+                                                    <!-- <span t-esc="o.advance_non_ct_total + o.advance_non_ct_tax_total" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/> -->
+                                                </td>
+                                                <td class="text-end" style="border: none; border-top:1px solid black; white-spance: nowrap; min-width: 100px;">
+                                                    <!-- <span t-out="o.non_ct_total" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/> -->
+                                                </td>
+                                                <td class="text-end" style="border: none; border-top:1px solid black; white-spance: nowrap; min-width: 100px;">
+                                                    <!-- <span t-esc="o.ct_total + o.ct_tax_total" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/> -->
+                                                </td>
+                                                <td class="text-end" style="border: none; border-top:1px solid black; white-spance: nowrap; min-width: 100px;"> 
+                                                    <span t-out="grand_total" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}" />
+                                                    <div style="border-bottom: 1px solid black;margin-bottom:3px;margin-top:3px;width:100%;"></div>
+                                                    <div style="border-bottom: 1px solid black;"></div>
+                                                </td>
+                                            </t>
+                                            <t t-else="">
+                                                <td class="text-end" style="border: none; border-top:1px solid black; white-spance: nowrap; min-width: 100px;"></td>
+                                                <td class="text-end" style="border: none; border-top:1px solid black; white-spance: nowrap; min-width: 100px;"></td>
+                                                <td class="text-end" style="border: none; border-top:1px solid black; white-spance: nowrap; min-width: 100px;"></td>
+                                                <td class="text-end" style="border: none; border-top:1px solid black; white-spance: nowrap; min-width: 100px;"></td>
+                                            </t>            
+                                        </tr>
+                                        
+                                    </tbody>
+        
+                                </table>                              
+        
+                                <div>
+                                    <div id="right-elements" t-attf-class="#{'col-6' if report_type != 'html' else 'col-12 col-md-6'} ms-5 d-inline-block float-end">
+                                        <div id="total" class="clearfix row">
+                                            <div class="ms-auto">
+                                                <table class="table table-sm table-borderless avoid-page-break-inside" style="border: none">
+                        
+                                                    <!--Tax totals-->
+                                                    <!-- <t t-set="tax_totals" t-value="o.tax_totals"/> -->
+                                                    <!-- <t t-call="account_move_extends.document_tax_totals_custom"/> -->
+                                                    
+                                                    
+                        
+                                                    <!--Payments--> 
+                                                    <t t-if="print_with_payments">
+                                                        <t t-if="o.payment_state != 'invoicing_legacy'">
+                                                            <t t-set="payments_vals" t-value="o.sudo().invoice_payments_widget and o.sudo().invoice_payments_widget['content'] or []"/>
+                                                            <t t-foreach="payments_vals" t-as="payment_vals">
+                                                                <tr t-if="payment_vals['is_exchange'] == 0">
+                                                                    <td>
+                                                                        <i class="oe_form_field text-end oe_payment_label">Paid on <t t-out="payment_vals['date']" t-options='{"widget": "date"}'>2021-09-19</t></i>
+                                                                    </td>
+                                                                    <td class="text-end">
+                                                                        <span t-out="payment_vals['amount']" t-options='{"widget": "monetary", "display_currency": o.currency_id}'>20.00</span>
+                                                                    </td>
+                                                                </tr>
+                                                            </t>
+                                                            <t t-if="len(payments_vals) > 0">
+                                                                <tr class="border-black fw-bold">
+                                                                    <td>Amount Due</td>
+                                                                    <td class="text-end">
+                                                                        <span t-field="o.amount_residual">11.05</span>
+                                                                    </td>
+                                                                </tr>
+                                                            </t>
+                                                        </t>
+                                                    </t>
+        
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>                           
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Amount in words -->
+                        <div class="row mt-5">
+                            <p class="lh-sm" t-if="o.company_id.display_invoice_amount_total_words">
+                                <span style="font-weight: bold">Total amount in words(<span t-out="o.currency_id.name"/>) :</span>
+                                <t t-if="o.customer_invoice_format_line_ids">
+                                <span class="lh-sm"><span t-field="o.amount_total_words">Thirty one dollar and Five cents</span> Only</span>
+                                </t>
+                            </p>
+                        </div>  
+                        
+                        <div style="page-break-inside: avoid;">
+                            <div class="row mb-1">
+                                <div style="font-weight: bold">Notes:</div>                
+                            </div>   
+                            <!-- <div class="row my-1">
+                                <div t-field="o.narration"/>
+                            </div> -->
+
+                            <div class="row mt-2">
+                                <div class="col-2">
+                                    <span>Job Date Between</span>
+                                </div>
+
+                                <div class="col-1" style="width: 12px;">
+                                    <span>:</span>
+                                </div>
+                                <div class="col-9" style="width: 780px;">
+                                    <span t-field="o.job_date"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-2">
+                                    <span>Job Number</span>
+                                </div>
+                                <div class="col-1" style="width: 12px;">
+                                    <span>:</span>
+                                </div>
+                                <div class="col-9" style="width: 780px;">
+                                    <span t-esc="', '.join(sorted(set(line.job_order_id.name for line in o.invoice_line_ids if line.job_order_id)))" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-2">
+                                    <span>Container No</span>
+                                </div>
+                                <div class="col-1" style="width: 12px;">
+                                    <span>:</span>
+                                </div>
+                                <div class="col-9" style="width: 780px;">
+                                    <span t-esc="', '.join(sorted(set(line.container_no for line in o.invoice_line_ids if line.container_no)))" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-2">
+                                    <span>BL No</span>
+                                </div>
+                                <div class="col-1" style="width: 12px;">
+                                    <span>:</span>
+                                </div>
+                                <div class="col-9" style="width: 780px;"> 
+                                    <span t-esc="', '.join(sorted(set(line.bl_no for line in o.invoice_line_ids if line.bl_no)))" />
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-2">
+                                    <span>Remark</span>
+                                </div>
+                                <div class="col-1" style="width: 12px;">
+                                    <span>:</span>
+                                </div>
+                                <div class="col-9" style="width: 780px;">
+                                    <span t-field="o.remark"/>
+                                </div>               
+                            </div> 
+                        </div>  
+                    </div>   
+                </t>
+            </t>
+            </t>    
+        </template>       
+        
+
+        <!-- <template id="report_invoice_new">
+            <t t-call="web.html_container">                
+                <t t-foreach="docs" t-as="o">                   
+                    <t t-set="lang" t-value="o.partner_id.lang"/>
+                    <t t-if="o._get_name_invoice_report() == 'account.report_invoice_document'"
+                       t-call="account_move_extends.custom_report_invoice"
+                       t-lang="lang"/>
+                </t>
+            </t>
+        </template> -->
+</data>
+</odoo>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">  
+        <record id="seq_doc_location_job_order" model="ir.sequence">
+            <field name="name">Job Order(Doc Location)</field>
+            <field name="code">doc.location.job.order</field>
+            <field name="padding">5</field>
+            <field name="prefix">-%(year)s-</field>
+            <field name="company_id" eval="False"></field>
+        </record>    
+
+        <record id="seq_doc_location_invoice" model="ir.sequence">
+            <field name="name">Invoie(Doc Location)</field>
+            <field name="code">doc.location.invoice</field>
+            <field name="padding">5</field>
+            <field name="prefix">-%(year)s-</field>
+            <field name="company_id" eval="False"></field>
+        </record>    
+
+        <record id="seq_doc_location_invoice_credit_note" model="ir.sequence">
+            <field name="name">Invoice Credit Note(Doc Location)</field>
+            <field name="code">doc.location.credit.note</field>
+            <field name="padding">5</field>
+            <field name="prefix">-%(year)s-</field>
+            <field name="company_id" eval="False"></field>
+        </record>    
+        
+        <record id="seq_doc_location_official_receipt" model="ir.sequence"> 
+            <field name="name">Official Receipt(Doc Location)</field>
+            <field name="code">doc.location.official.receipt</field>
+            <field name="padding">5</field>
+            <field name="prefix">-%(year)s-</field>
+            <field name="company_id" eval="False"></field>
+        </record>    
+
+        <record id="seq_doc_location_vendor_bill" model="ir.sequence">
+            <field name="name">Vendor Bill(Doc Location)</field>
+            <field name="code">doc.location.vendor.bill</field>
+            <field name="padding">5</field>
+            <field name="prefix">-%(year)s-</field>
+            <field name="company_id" eval="False"></field>
+        </record>    
+
+        <record id="seq_doc_location_vendor_credit_note" model="ir.sequence">
+            <field name="name">Vendor Credit Note(Doc Location)</field>
+            <field name="code">doc.location.vendor.credit.note</field>
+            <field name="padding">5</field>
+            <field name="prefix">-%(year)s-</field>
+            <field name="company_id" eval="False"></field>
+        </record>    
+
+        <record id="seq_doc_location_petty_cash" model="ir.sequence">
+            <field name="name">Petty Cash(Doc Location)</field>
+            <field name="code">doc.location.petty.cash</field>
+            <field name="padding">5</field>
+            <field name="prefix">-%(year)s-</field>
+            <field name="company_id" eval="False"></field>
+        </record>  
+
+        <record id="seq_doc_location_petty_cash_with_ca" model="ir.sequence">
+            <field name="name">Petty Cash With CA(Doc Location)</field>
+            <field name="code">doc.location.petty.cash.with.ca</field>
+            <field name="padding">5</field>
+            <field name="prefix">-%(year)s-</field>
+            <field name="company_id" eval="False"></field>
+        </record> 
+
+        <record id="seq_doc_location_cash_advance" model="ir.sequence">
+            <field name="name">Cash Advance(Doc Location)</field>
+            <field name="code">doc.location.cash.advance</field>
+            <field name="padding">5</field>
+            <field name="prefix">-%(year)s-</field>
+            <field name="company_id" eval="False"></field>
+        </record>    
+
+        <record id="seq_doc_location_internal_credit_note" model="ir.sequence">
+            <field name="name">Internal Credit Note(Doc Location)</field>
+            <field name="code">doc.location.internal.credit.note</field>
+            <field name="padding">5</field>
+            <field name="prefix">-%(year)s-</field>
+            <field name="company_id" eval="False"></field>
+        </record> 
+
+        <record id="seq_doc_location_debit_note" model="ir.sequence">
+            <field name="name">Debit Note(Doc Location)</field>
+            <field name="code">doc.location.debit.note</field>
+            <field name="padding">5</field>
+            <field name="prefix">-%(year)s-</field>
+            <field name="company_id" eval="False"></field>
+        </record>
+
+        <record id="seq_doc_location_inernal_debit_note" model="ir.sequence">
+            <field name="name">Internal Debit Note(Doc Location)</field>
+            <field name="code">doc.location.internal.debit.note</field>
+            <field name="padding">5</field>
+            <field name="prefix">-%(year)s-</field>
+            <field name="company_id" eval="False"></field>
+        </record>
+
+        <record id="seq_doc_location_petty_cash_debit_note" model="ir.sequence">
+            <field name="name">Petty Cash Debit Note(Doc Location)</field>
+            <field name="code">doc.location.petty.cash.debit.note</field>
+            <field name="padding">5</field>
+            <field name="prefix">-%(year)s-</field>
+            <field name="company_id" eval="False"></field>
+        </record>
+    </data>     
+</odoo>

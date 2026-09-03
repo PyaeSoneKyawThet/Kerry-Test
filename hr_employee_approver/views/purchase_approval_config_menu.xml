@@ -1,0 +1,9 @@
+<odoo>
+
+    <menuitem id="menu_purchase_approval_config" 
+              name="Purchase Approval Config" 
+              parent="purchase.menu_purchase_config"
+              action="hr_employee_approver.action_purchase_approval_config"
+              sequence="40"/>
+
+</odoo>

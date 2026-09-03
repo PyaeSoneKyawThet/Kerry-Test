@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<odoo>
+    <record id="view_move_form_inherit_approval" model="ir.ui.view">
+        <field name="name">approval.account.move.joborder</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/> 
+        <field name="arch" type="xml"> 
+            <xpath expr="//tree//field[@name='vehicle_no']" position="after">
+                <field name="brand_id" column_invisible="parent.move_type in ['out_invoice', 'out_refund']"/>
+                <field name="reference_key" string="Reference Key" column_invisible="parent.move_type not in ['in_invoice', 'in_refund']"/>
+            </xpath>
+            <xpath expr="//group//group[@id='header_left_group']" position="inside">
+                <field name="auto_reconciled" invisible="1"/>
+                <field name="approval_payment_request_id" invisible="move_type not in ['in_invoice', 'in_refund', 'entry']" readonly="state in ['posted']"/> 
+                <field name="approval_payment_request_date" invisible="move_type not in ['in_invoice', 'in_refund']" readonly="state in ['posted']"/>               
+                <field name="request_id" invisible="move_type not in ['in_invoice', 'in_refund', 'entry']" readonly="state in ['posted']"/>               
+                <field name="purchase_id" invisible="1"/> 
+                <field name="approval_expense_id" string="PC No" invisible="move_type not in ['in_invoice', 'in_refund']" readonly="1"/>
+                <field name="expense_id" string="PC No" invisible="not expense_id" readonly="1"/> <!-- show expense no: if write-off from expense Task: 7362-->
+                <field name="fmis_petty_cash_document_no" invisible="move_type not in ['in_invoice', 'in_refund', 'entry']" readonly="state in ['posted']"/>                               
+                <field name="pay_to_id" invisible="move_type not in ['in_invoice', 'in_refund', 'entry']" readonly="state in ['posted']"/>               
+                <field name="pay_to_external" invisible="move_type not in ['in_invoice', 'in_refund', 'entry']" readonly="state in ['posted']"/>               
+                <field name="grn_no" invisible="move_type not in ['in_invoice', 'in_refund']" readonly="state in ['posted']"/>
+                <field name="reason" invisible="move_type not in ['out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'entry']" readonly="state in ['posted']"/>
+                <field name="cash_advance_id" invisible="move_type not in ['in_invoice', 'in_refund']" readonly="state in ['posted']"/>                                                                                                                                                                        
+            </xpath>
+            <xpath expr="//field[@name='payment_reference']" position="before">                        
+                <field name="vendor_invoice_date" invisible="move_type not in ['in_invoice', 'in_refund']" readonly="state in ['posted']"/>               
+                <field name="vendor_bank_info" invisible="move_type not in ['in_invoice', 'in_refund']" readonly="state in ['posted']"/>               
+            </xpath>
+            <xpath expr="//group//group[@id='header_right_group']" position="inside">
+                <field name="is_expense_cancel" readonly="1" invisible="not approval_expense_id"/>
+                <field name="is_payment_request_cancel" readonly="1" invisible="not approval_payment_request_id"/>
+            </xpath>
+        </field> 
+    </record>
+
+    <record id="view_move_tree_inherit_approval" model="ir.ui.view">
+        <field name="name">approval.account.move.tree</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_tree"/> 
+        <field name="arch" type="xml"> 
+            <xpath expr="//field[@name='journal_id']" position="after">
+                <field name="reason" optional="show"/>
+                <field name="request_id" optional="hide"/>
+                <field name="approval_payment_request_id" optional="hide"/>
+                <field name="approval_expense_id" optional="hide"/>
+                <field name="cash_advance_id" optional="hide"/>
+            </xpath>
+        </field> 
+    </record>
+
+    <record id="view_out_invoice_tree_inherit_approval2" model="ir.ui.view">
+        <field name="name">account.move.inherit.view.currency.rate</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_out_invoice_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='journal_id']" position="after">
+                <field name="reason" optional="show"/>
+            </xpath>
+            <xpath expr="//field[@name='ref']" position="after">
+                <field name="payment_reference" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_in_invoice_tree_inherit" model="ir.ui.view">
+        <field name="name">view_in_invoice_tree_inherit</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_in_invoice_bill_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_date']" position="after">
+                <field name="bill_type" optional="hide"/>
+                <field name="vendor_quotation_no" optional="hide"/>
+                <field name="vendor_invoice_no" optional="hide"/>
+                <field name="vendor_invoice_date" optional="hide"/>
+                <field name="vendor_bank_info" optional="hide"/>
+                <field name="partner_bank_id" optional="hide"/>
+                <field name="approval_payment_request_date" optional="hide"/>
+                <field name="fmis_petty_cash_document_no" optional="hide"/>
+                <field name="reason" optional="show"/>
+                <field name="request_id" optional="hide"/>
+                <field name="approval_payment_request_id" optional="hide"/>
+                <field name="approval_expense_id" optional="hide"/>
+                <field name="cash_advance_id" optional="hide"/>
+                <field name="pay_to_id" optional="hide"/>
+                <field name="pay_to_external" optional="hide"/>
+                <field name="grn_no" optional="hide"/>
+                <field name="job_date" optional="hide"/>
+            </xpath>
+        </field>
+    </record> 
+
+    <!-- search view -->
+    <record id="view_account_invoice_filter_inherit" model="ir.ui.view">
+        <field name="name">account.invoice.filter.inherit</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="before">
+                <field name="request_id"/>
+                <field name="approval_payment_request_id"/>
+                <field name="approval_expense_id"/>
+                <field name="cash_advance_id"/>
+            </xpath>        
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_account_payment_form_inherit_kmtl" model="ir.ui.view">
+            <field name="name">account.payment.inherit.view.form</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='payment_type']" position="before">
+                    <field name="is_currency_change" readonly="state != 'draft'"/>
+                </xpath>
+                <xpath expr="//form[1]/sheet[1]/group[@name='main_group']/group[@name='group1']/div[@name='amount_div']/field[@name='currency_id']" position="attributes">
+                    <attribute name="force_save">1</attribute>
+                    <attribute name="readonly">not is_currency_change or state != 'draft'</attribute>
+                </xpath>
+                <xpath expr="//field[@name='date']" position="before">
+                    <field name="company_currency_id" invisible="1"/>  
+                    <label for="report_amount"/>
+                    <div name="report_amount_div" class="o_row">
+                        <field name="report_amount" readonly="0 or state != 'draft'"/>
+                        <field name="report_currency_id"
+                                options="{'no_create': True, 'no_open': True}"
+                                required="1"
+                                force_save="1"
+                                readonly="is_currency_change or state != 'draft'"
+                                groups="base.group_multi_currency"/>
+                    </div>
+                </xpath>
+                <xpath expr="//group[@name='group2']" position="inside">
+                    <field  name="credit_refund_move_ids" widget="many2many_tags"
+                            string="Credit Notes"
+                            domain="[ ('partner_id','=', partner_id),
+                                      ('move_type','=','out_refund'),
+                                      ('state','=','posted'),
+                                      ('linked_payment_id','=',False)]"
+                            readonly="state != 'draft'"
+                            invisible="partner_type != 'customer'"/>
+                    
+                    <field  name="credit_refund_move_ids" widget="many2many_tags"
+                            string="Refunds"
+                            domain="[ ('partner_id','=', partner_id),
+                                      ('move_type','=','in_refund'),
+                                      ('state','=','posted'),
+                                      ('linked_payment_id','=',False)]"
+                            readonly="state != 'draft'"
+                            invisible="partner_type != 'supplier'"/>
+
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_account_payment_tree_inherit_kmtl" model="ir.ui.view">
+            <field name="name">account.payment.tree.inherit.kmtl</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree//field[@name='amount_signed'][@groups='base.group_multi_currency']" position="attributes">
+                    <attribute name="sum">Total</attribute>
+                </xpath>
+
+                <xpath expr="//tree//field[@name='amount_signed'][@groups='!base.group_multi_currency']" position="attributes">
+                    <attribute name="sum">Total</attribute>
+                </xpath>
+                
+                <xpath expr="//tree//field[@name='amount_signed']" position="before">
+                    <field name="currency_rate" optional="hide"/>
+                </xpath>  
+
+                <xpath expr="//tree//field[@name='state']" position="before">
+                    <field name="report_amount" optional="hide"/>
+                    <field name="credit_refund_move_ids" optional="hide"/>
+                </xpath>  
+
+            </field>
+        </record>
+
+    </data>
+</odoo>

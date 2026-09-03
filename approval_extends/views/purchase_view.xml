@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<odoo>
+    <record id="view_purchase_order_inherit_approval" model="ir.ui.view">
+        <field name="name">purchase.order.form.inherit.approval</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml"> 
+            <xpath expr="//header" position="inside">
+                <button name="action_revise" type="object" string="Revise" class="oe_highlight" invisible="state not in ['purchase', 'done']"/>
+            </xpath>
+
+            <xpath expr="//field[@name='partner_ref']" position="after">
+                <field name="original_purchase_order_id" readonly="1"/>
+                <field name="approval_request_ids" widget="many2many_tags" domain="[('approval_type', '=', 'purchase_req'), ('request_status', '=', 'approved')]" 
+                readonly="state == 'purchase'" required="1" invisible="1"/>   
+                <field name="rfq_id" readonly="state == 'purchase'"/>
+                <field name="purchase_request_no" readonly="state == 'purchase'" invisible="True"/>             
+            </xpath> 
+            <xpath expr="//field[@name='picking_type_id']" position="after">
+                <field name="value_date" readonly="state == 'purchase'"/>
+                <field name="pay_to_id" readonly="state == 'purchase'"/>
+                <field name="pay_to_external" readonly="state == 'purchase'"/>
+            </xpath>
+            <xpath expr="//tree//field[@name='product_id']" position="before">
+                <field name="purchase_request_line_id" readonly="state == 'purchase'" domain="[('request_status', '=', 'approved'),('without_PO', '=', False), ('pr_done', '!=', True)]"
+                widget="many2one_barcode" string="PR No" options="{'no_create': True, 'no_create_edit': True}"/>
+            </xpath>
+            
+            <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+                <button name="action_view_revised_po" type="object" class="oe_stat_button" icon="fa-pencil-square-o" invisible="revised_po_count == 0">
+                    <field name="revised_po_count" widget="statinfo" string="Revised PO"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="purchase_order_tree_inherit_approval" model="ir.ui.view">
+        <field name="name">purchase.order.tree.inherit.approval</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_tree"/>
+        <field name="arch" type="xml"> 
+            <xpath expr="//field[@name='state']" position="attributes">
+                <attribute name="widget">badge</attribute>
+                <attribute name="decoration-success">state == 'purchase' or state == 'done'</attribute>
+                <attribute name="decoration-warning">state == 'to approve'</attribute>
+                <attribute name="decoration-info">state == 'draft' or state == 'sent'</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Request for Quotation Menu -> View -->
+    <record id="purchase_order_kpis_tree_approval" model="ir.ui.view">
+        <field name="name">purchase.order.tree.kpis.apprval</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_kpis_tree"/>
+        <field name="arch" type="xml">            
+            <xpath expr="//field[@name='origin']" position="before">
+                <field name="original_purchase_order_id" optional="hide"/>
+                <field name="rfq_id" optional="hide"/>
+                <field name="pay_to_id" optional="hide"/>
+                <field name="pay_to_external" optional="hide"/>
+            </xpath>
+
+            <xpath expr="//field[@name='date_order']" position="after">
+                <field name="value_date" optional="hide"/>
+            </xpath>
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="request_status" widget="badge" optional="show"
+                decoration-info="request_status == 'new'" decoration-warning="request_status == 'refused'" decoration-success="request_status == 'approved'" decoration-danger="request_status == 'cancel'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Purchase Order Menu -> View -->
+    <record id="purchase_order_view_tree_approval" model="ir.ui.view">
+        <field name="name">purchase.order.tree.inherit.custom</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_view_tree"/>
+        <field name="arch" type="xml"> 
+            <xpath expr="//field[@name='origin']" position="before">
+                <field name="original_purchase_order_id" optional="hide"/>
+                <field name="rfq_id" optional="hide"/>
+                <field name="pay_to_id" optional="hide"/>
+                <field name="pay_to_external" optional="hide"/>
+            </xpath>
+
+            <xpath expr="//field[@name='date_order']" position="after">
+                <field name="value_date" optional="hide"/>
+            </xpath>
+
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="request_status" widget="badge" optional="show"
+                decoration-info="request_status == 'new'" decoration-warning="request_status == 'refused'" decoration-success="request_status == 'approved'" decoration-danger="request_status == 'cancel'"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

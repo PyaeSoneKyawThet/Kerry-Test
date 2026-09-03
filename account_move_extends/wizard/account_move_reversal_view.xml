@@ -1,0 +1,14 @@
+<odoo>
+    <data>
+        <record id="view_account_move_reversal_inherit" model="ir.ui.view">
+            <field name="name">view.account.move.reversal.inherit</field>
+            <field name="model">account.move.reversal</field>
+            <field name="inherit_id" ref="account.view_account_move_reversal"/> 
+            <field name="arch" type="xml">                
+                <xpath expr="//group[1]//field[@name='date']" position="after">
+                    <field name="is_internal_wrong"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
