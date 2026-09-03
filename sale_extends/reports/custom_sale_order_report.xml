@@ -345,7 +345,7 @@
                                 </div> 
                                 <div>
                                     <span>Title:</span>
-                                    <span t-field="doc.approved_by_id.employee_id.department_id.name"/> 
+                                    <span t-field="doc.approved_by_id.employee_id.job_id.name"/> 
                                 </div> 
                             </div>
                         </div>

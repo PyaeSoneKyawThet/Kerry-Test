@@ -48,6 +48,42 @@ class PurchaseOrder(models.Model):
     submit_user_id = fields.Many2one('res.users',string="Submit User", copy=False)
     po_done_state = fields.Boolean(string="PO Done", compute="compute_po_status", readonly=False, store=True, copy=False)
     print_count = fields.Integer(string="Printed Purchase No", default=0,copy=False)
+    is_cancelled = fields.Boolean(string="Cancelled", copy=False, tracking=True)
+
+    @api.onchange('is_cancelled')
+    def _onchange_is_cancelled(self):
+        if not self.is_cancelled:
+            return
+        if any(line.qty_received > 0 for line in self.order_line):
+            self.is_cancelled = False
+            return {
+                'warning': {
+                    'title': _('Warning'),
+                    'message': _('Cannot cancel: Products have already been received'),
+                }
+            }
+        active_bills = self.invoice_ids.filtered(lambda inv: inv.state != 'cancel')
+        if active_bills:
+            self.is_cancelled = False
+            return {
+                'warning': {
+                    'title': _('Warning'),
+                    'message': _('Cannot cancel: Active vendor bill exists. Please cancel the bill first'),
+                }
+            }
+
+    @api.constrains('is_cancelled')
+    def _check_is_cancelled(self):
+        for order in self:
+            if not order.is_cancelled:
+                continue
+            if any(line.qty_received > 0 for line in order.order_line):
+                raise ValidationError(_('Cannot cancel: Products have already been received'))
+            active_bills = order.invoice_ids.filtered(lambda inv: inv.state != 'cancel')
+            if active_bills:
+                raise ValidationError(
+                    _('Cannot cancel: Active vendor bill exists. Please cancel the bill first')
+                )
 
     @api.onchange('partner_id')
     def get_vendor_contact_person(self):

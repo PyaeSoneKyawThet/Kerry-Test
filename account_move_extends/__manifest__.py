@@ -2,7 +2,7 @@
     'name' : 'Account Move Extends',
     'summary': 'Invoice Report Customize',
     'license': 'LGPL-3',
-    'version': '0.4',
+    'version': '0.8',
     'description': """
             Inherit Account module. 
             Add custom field on report.

@@ -48,13 +48,24 @@ Business Workflow Summary (Project Handover – PSM, 04-05-2026)
 =======================================
     | Attachments are linked to Sale Order and copied to related records when needed.
 
-10. Additional Customizations
+10. For Additional Request & Change Request - MPP
 =======================================
     | New Menu for "Job Order for Sale" 
-        | Number, Date, Customer, Revenue, Sale PIC, Status Columns
-            | Number - order reference ( name )
-            | Date - Job Date (job_date)
-            | Customer - customer ( partner_id )
-            | Revenue - Total ( amount_total )
-            | Sale PIC - sale_pic_id of partner_id 
-            | Status - invoiced_state
+    |    | Number, Date, Customer, Revenue, Sale PIC, Status Columns
+    |    |   | Number - order reference ( name )
+    |    |   | Date - Job Date (job_date)
+    |    |   | Customer - customer ( partner_id )
+    |    |   | Revenue - Total ( amount_total )
+    |    |   | Sale PIC - sale_pic_id of partner_id 
+    |    |   | Status - invoiced_state
+    |
+    | To set Quotation Ref Expired Date with Job Order Date[TASK:6401]
+    |   | Validate Quotation Expiry (Validity Date) against the selected Job Order Date instead of Today's Date
+    |   | Set Job Date default value to Today's Date
+    |   | Support backdated Job Orders while maintaining quotation validity checks
+    |
+    | Add Remark Field on Header and Detail Line in Job Order [TASK:6734]
+    | Add Remark field in the Other Info tab of the Job Order Form
+    |   | Display Remark as a column in the Job Order List View
+    |   | Add Remark column to Job Order Lines
+    |   | Support rich text formatting (e.g., bold and multi-line) similar to the Quotation Detail Line Remark field

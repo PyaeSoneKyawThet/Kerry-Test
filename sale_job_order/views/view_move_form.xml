@@ -28,6 +28,7 @@
 
             <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='name']" position="after">
                 <field name="job_order_id" column_invisible="parent.move_type in ['in_invoice']" widget="many2one_barcode" options="{'no_create': True, 'no_create_edit': True}"/>
+                <field name="quotation_salesperson_id" string="Quotation Salesperson" widget="many2one_avatar_user" options="{'no_create': True}" column_invisible="parent.move_type in ['in_invoice']" width="100px"/>
                 <field name="fmis_job_no" required="parent.job_order_type in ('transport')" width="100px"/>   
                 <field name="bl_no" required="0" width="100px"/> 
                 <field name="job_date" width="100px"/>              
@@ -94,6 +95,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='name']" position="after">
                 <field name="job_order_id"/>
+                <field name="quotation_salesperson_id"/>
                 <field name="fmis_job_no"/>
                 <field name="bl_no"/>
                 <field name="job_date"/>

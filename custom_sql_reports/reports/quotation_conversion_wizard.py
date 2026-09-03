@@ -46,11 +46,21 @@ class QuotationConversionWizard(models.TransientModel):
                 ui.user_name AS sale_person,
                 so.user_id AS user_id,
 
-                COUNT(*) AS quotation,
+                COUNT(*) FILTER (
+                    WHERE so.state = 'sale'
+                ) AS approved_quotation,
 
                 COUNT(*) FILTER (
                     WHERE so.state = 'sale'
-                    AND COALESCE(so.revise_state, '') != 'revise_approved'
+                    AND EXISTS (
+                        SELECT 1
+                        FROM crm_lead_sale_order_rel rel
+                        JOIN crm_lead cl ON cl.id = rel.crm_lead_id
+                        JOIN crm_stage cs ON cs.id = cl.stage_id
+                        WHERE rel.sale_order_id = so.id
+                        AND cs.is_won = TRUE
+                    )
+                    AND COALESCE(so.revise_state, '') <> 'revise_approved'
                 ) AS accepted_quotation
 
             FROM sale_order so 
@@ -73,9 +83,14 @@ class QuotationConversionWizard(models.TransientModel):
         user_ids = tuple(self.user_ids.ids)
         currency_ids = tuple(self.currency_ids.ids)
 
+        start_utc, end_utc = odoo_datetime_helper.local_date_range_to_utc(
+            self.start_date,
+            self.end_date,
+            self.env.user.tz or 'Asia/Yangon',
+        )
         params = {
-            "start_date": datetime.combine(self.start_date, time.min),
-            "end_date": datetime.combine(self.end_date, time.max),
+            "start_date": start_utc,
+            "end_date": end_utc,
             "user_ids": user_ids,
             "currency_ids": currency_ids,
         }
@@ -150,7 +165,7 @@ class QuotationConversionWizard(models.TransientModel):
         headers = [
             "No",
             "Sale Rep",
-            "Total Quotations",
+            "Approved Quotations",
             "Accepted Quotations",
             "Conversion Rate"
         ]
@@ -162,38 +177,37 @@ class QuotationConversionWizard(models.TransientModel):
         row += 1
         index = 1
 
-        total_quotation = 0
+        total_approved_quotation = 0
         total_accepted_quotation = 0
 
         #Data rows
         for data in performance_data:
             sale_person = data.get('sale_person') or ""
-            quotation = float(data.get('quotation') or 0)
+            approved_quotation = float(data.get('approved_quotation') or 0)
             accepted_quotation = float(data.get('accepted_quotation') or 0)
 
             conversion_rate = (
-                f"{(accepted_quotation / quotation * 100):.2f} %"
-                if quotation else "0.00 %"
+                f"{(accepted_quotation / approved_quotation * 100):.2f} %"
+                if approved_quotation else "0.00 %"
             )
-            
 
             sheet.write(row, 0, index, cell_style_center)
             sheet.write(row, 1, sale_person, cell_style)
-            sheet.write(row, 2, quotation, number_style)
+            sheet.write(row, 2, approved_quotation, number_style)
             sheet.write(row, 3, accepted_quotation, number_style)
             sheet.write(row, 4, conversion_rate, number_style)
             row += 1
             index += 1
 
-            total_quotation += quotation
+            total_approved_quotation += approved_quotation
             total_accepted_quotation += accepted_quotation
         
         # show total
-        total_conversion_rate = (f"{(total_accepted_quotation / total_quotation * 100):.2f} %"
-                                    if total_quotation else "0.00 %")
+        total_conversion_rate = (f"{(total_accepted_quotation / total_approved_quotation * 100):.2f} %"
+                                    if total_approved_quotation else "0.00 %")
         
         sheet.write_merge(row, row, 0, 1, 'Total', header_style)
-        sheet.write(row, 2, total_quotation, number_style)
+        sheet.write(row, 2, total_approved_quotation, number_style)
         sheet.write(row, 3, total_accepted_quotation, number_style)
         sheet.write(row, 4, total_conversion_rate, number_style)
 

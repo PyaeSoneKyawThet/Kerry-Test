@@ -434,15 +434,20 @@ class ApprovalRequest(models.Model):
     @api.depends_context('uid')
     @api.depends('approver_ids.status', 'approver_ids.user_ids')
     def _compute_user_status(self):
+        single_approver_approvals = self.env['approval.request']
         for approval in self:
-            if approval.category_id.approval_type != 'purchase_req':
-                super()._compute_user_status()
-                continue
-
             approvers = approval.approver_ids.filtered(
                 lambda approver: self.env.user in approver.user_ids
             )
-            approval.user_status = approvers[:1].status if approvers else False
+            if len(approvers) == 1:
+                single_approver_approvals |= approval
+            elif len(approvers) > 1:
+                approval.user_status = approvers[0].status
+            else:
+                approval.user_status = False
+
+        if single_approver_approvals:
+            super(ApprovalRequest, single_approver_approvals)._compute_user_status()
 
     #Multi-approver for each level feature TASK:4529
     @api.constrains('approver_ids')

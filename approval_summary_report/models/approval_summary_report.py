@@ -18,7 +18,11 @@ class ApprovalSummary(models.Model):
     rfq_pay = fields.Char(string="RFQ's Payment Request No", readonly=True)
     request_exp = fields.Char(string="Expense No", readonly=True)
     cash_advance = fields.Char(string="Cash Advance No", readonly=True)
-    pr_type = fields.Char(string="PR Type", readonly=True)
+    pr_type = fields.Selection([('cash_advance', 'Cash Advance'), ('expense', 'Expense'), 
+                                ('payment_request', 'Payment without PO'),
+                                ('payment_with_po', 'Payment with PO'),
+                                ('long_contract', 'Payment with PO(Long Contract)')], 
+                                string="PR Type", readonly=True)
     partner_id = fields.Many2one("res.partner", string="Vendor", readonly=True)
     doc_location_id = fields.Many2one("staff.location", string="Doc Location", readonly=True)
     payment_type_id = fields.Many2one("account.payment.type", string="Type", readonly=True)
@@ -53,10 +57,7 @@ class ApprovalSummary(models.Model):
                     STRING_AGG(DISTINCT rfq_pay.name, ', ')::CHARACTER VARYING rfq_pay,
                     STRING_AGG(DISTINCT req_exp.name, ', ')::CHARACTER VARYING request_exp,
                     STRING_AGG(DISTINCT cash.name, ', ')::CHARACTER VARYING cash_advance,
-                    CASE WHEN LOWER(request."PR_type")='cash_advance' THEN 'Cash Advance'
-						WHEN LOWER(request."PR_type")='expense' THEN 'Expense'
-						WHEN LOWER(request."PR_type")='payment_request' THEN 'Payment Without PO'
-						WHEN LOWER(request."PR_type")='payment with po' THEN 'Payment With PO' ELSE '' END pr_type,
+                    LOWER(REPLACE(request."PR_type", ' ', '_')) AS pr_type,
                     request.partner_id,request.staff_location_id doc_location_id,request.location,request.reference,
                     request.vendor_invoice_no,request."without_PO",request.est_delivery_date,request.request_approved_date,request.value_date,request.pay_to_id,
                     request.pay_to_external,request.payment_type_id,request.currency_id,SUM(request.amount) amount,

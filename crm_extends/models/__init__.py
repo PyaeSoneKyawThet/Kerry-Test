@@ -5,3 +5,4 @@ from . import res_company
 from . import crm_stage
 from . import crm_lead
 from . import sale_order
+from . import customer_forecast_revenue

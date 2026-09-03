@@ -552,7 +552,7 @@ class ApprovalPaymentRequest(models.Model):
                         'product_id': order_line.product_id.id,
                         'description': order_line.name,
                         'brand_id': order_line.brand_id.id,
-                        'analytic_distribution': order_line.analytic_distribution,
+                        # 'analytic_distribution': order_line.analytic_distribution,
                         'vehicle_no': order_line.vehicle_no,
                         'bl_no': order_line.bl_no,
                         'reference_key': order_line.reference_key,
@@ -640,7 +640,7 @@ class ApprovalPaymentRequest(models.Model):
                         'job_date': line.job_date, 
                         'bl_no': line.bl_no,
                         'brand_id': line.brand_id.id,
-                        'analytic_distribution': line.analytic_distribution,
+                        # 'analytic_distribution': line.analytic_distribution,
                         'tax_ids': line.tax_ids.ids,
                         'purchase_line_id': line.purchase_line_id.id,
                         'reference_key': line.reference_key

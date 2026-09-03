@@ -24,6 +24,7 @@ class AccountPayment(models.Model):
                                 copy=False
                             )
     
+    # method only use for table relation update
     def _update_linked_payment(self):
         old_moves = self.env['account.move'].search([('linked_payment_id', '=', self.id)])
         if old_moves:
@@ -38,7 +39,8 @@ class AccountPayment(models.Model):
             self._update_linked_payment()
         return res
 
-    # get write-off journal, that is related to payment
+    #REPORT: Receipt Voucher & Payment Voucher
+    #( eg: invoice used:3000, paymnet:5000, write-off:2000 )
     def _get_write_off_journal(self):
         reconciled_lines = self.move_id.line_ids._reconciled_lines()
         write_off_line = self.env['account.move.line'].search([('id','in', reconciled_lines)]).filtered(lambda line: line.is_write_off)
@@ -62,6 +64,8 @@ class AccountPayment(models.Model):
             else:
                 rec.report_amount = rec.amount
 
+    #REPORT: Offical Receipt, Receipt Voucher & Payment Voucher
+    #---to show credit_note or refund values which are linked to this payment---
     def _get_credit_refund_value(self):
         """Return credit note info grouped by original invoice (reversed_entry_id) with total per invoice."""
         result = {}
@@ -96,6 +100,8 @@ class AccountPayment(models.Model):
 
         return result
     
+    #REPORT: Offical Receipt, Receipt Voucher & Payment Voucher
+    #---to show invoices grouped by currency---
     def _get_grouped_invoice(self):
         self.ensure_one()
         grouped = []
@@ -107,6 +113,8 @@ class AccountPayment(models.Model):
             })
         return grouped
     
+    #REPORT: Offical Receipt, Receipt Voucher & Payment Voucher
+    #---to show bills grouped by currency---
     def _get_grouped_bill(self):
         self.ensure_one()
         grouped = []

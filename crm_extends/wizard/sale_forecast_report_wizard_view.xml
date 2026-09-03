@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_sale_forecast_report_wizard_form" model="ir.ui.view">
+            <field name="name">sale.forecast.report.wizard.form</field>
+            <field name="model">sale.forecast.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Sale Forecast Report">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="as_of_date"/>
+                                <field name="fc_months"/>
+                                <field name="parent_category_id" options="{'no_create': True, 'no_edit': True, 'no_open': True}"/>
+                                <field name="category_id" options="{'no_create': True, 'no_edit': True, 'no_open': True}"/>
+                            </group>
+                            <group>
+                                <field name="sale_pic_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                                <field name="currency_id" options="{'no_create': True, 'no_edit': True, 'no_open': True}"/>
+                                <field name="excel_file" invisible="1"/>
+                                <field name="file_name" invisible="1"/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="action_print" string="Print" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_sale_forecast_report_wizard" model="ir.actions.act_window">
+            <field name="name">Sale Forecast Report</field>
+            <field name="res_model">sale.forecast.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</odoo>

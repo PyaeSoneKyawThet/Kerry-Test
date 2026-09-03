@@ -11,7 +11,8 @@
                         <field name="department_id" options="{'no_create': True, 'no_create_edit': True}"/>
                         <field name="old_fixe_asset"/>
                         <field name="lot_name" string="Fixed Asset (FA) Tag"/>
-                        <field name="model_serial_no" />
+                        <field name="model_serial_no"/>
+                        <field name="remark"/>
                     </group>
                     <group invisible="state == 'model'" name="receipt_info" string="Receipts Info">
                         <field name="picking_id" readonly="state == 'open'" domain="[('picking_type_code', '=', 'incoming')]"
@@ -68,6 +69,7 @@
                     <field name="old_fixe_asset" optional="hide"/>
                     <field name="department_id" optional="hide"/>
                     <field name="employee_id" optional="hide"/>
+                    <field name="remark" optional="hide"/>
                 </xpath>
 
                 <xpath expr="//tree//field[@name='acquisition_date']" position="before">

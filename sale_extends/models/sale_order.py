@@ -84,6 +84,27 @@ class SaleOrder(models.Model):
         if self.partner_id:
             self.attention_to = self.partner_id.contact_person
 
+    @api.onchange('sale_order_template_id')
+    def _onchange_sale_order_template_id(self):
+        """Keep existing lines and validity date; update Terms & Conditions only when template changes."""
+        validity_date = self._origin.validity_date or self.validity_date
+        if not self.sale_order_template_id:
+            self.validity_date = validity_date
+            return
+
+        template = self.sale_order_template_id.with_context(lang=self.partner_id.lang)
+        if not is_html_empty(template.note):
+            self.note = template.note
+
+        # Existing quotation lines: do not replace products/prices/qty from template.
+        if self.order_line:
+            self.validity_date = validity_date
+            return
+
+        res = super()._onchange_sale_order_template_id()
+        self.validity_date = validity_date
+        return res
+
     # @api.depends('approved_by_id')
     # @api.depends_context('uid')
     # def _compute_has_access_to_request(self):
@@ -95,6 +116,10 @@ class SaleOrder(models.Model):
     def _compute_validity_date(self):
         today = fields.Date.context_today(self)
         for order in self:
+            # Keep an already filled validity date (e.g. when quotation template changes).
+            if order.validity_date:
+                order.validity_date = order.validity_date
+                continue
             if order.is_job_order:
                 days = order.company_id.quotation_validity_days
                 if days > 0:

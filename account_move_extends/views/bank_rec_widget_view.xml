@@ -1,11 +1,17 @@
 <?xml version='1.0' encoding='utf-8'?>
 <odoo>
-    <!-- inherit widget view -->
+    <!-- inherit New Transaction popup (Accounting Dashboard) -->
     <record id="view_bank_statement_line_form_bank_rec_widget_inherit_ref" model="ir.ui.view">
         <field name="name">account.bank.statement.bank_rec_widget.ref</field>
         <field name="model">account.bank.statement.line</field>
         <field name="inherit_id" ref="account_accountant.view_bank_statement_line_form_bank_rec_widget"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="staff_location_id"
+                         string="Doc Location"
+                         options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"
+                         />
+            </xpath>
             <xpath expr="//field[@name='journal_id']" position="after">
                 <field name="ref"/>
             </xpath>

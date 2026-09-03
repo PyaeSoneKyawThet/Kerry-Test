@@ -199,7 +199,7 @@
                                     <field name="description"/> 
                                     <field name="account_id" required="1"/>
                                     <field name="brand_id"/>
-                                    <field name="analytic_distribution" widget="analytic_distribution" required="1"
+                                    <field name="analytic_distribution" widget="analytic_distribution" required="0"
                                     groups="analytic.group_analytic_accounting"/>
                                     <field name="fmis_job_no" string="FMIS Job Number"/>
                                     <field name="job_date"/>

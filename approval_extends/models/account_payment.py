@@ -42,7 +42,7 @@ class AccountPayment(models.Model):
                 to_write.append((1, line.id, {
                                             'bl_no': rec.bl_no,
                                             'reference_key': rec.reference_key,
-                                            'analytic_distribution': rec.analytic_distribution,
+                                            # 'analytic_distribution': rec.analytic_distribution,
                                             'fmis_job_no' : rec.fmis_job_no,
                                             'job_date' : rec.job_date,
                                             'invoice_date': rec.vendor_invoice_date,

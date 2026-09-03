@@ -44,4 +44,11 @@
         groups="sales_team.group_sale_manager"
         sequence="13"/>
 
+    <menuitem
+        id="menu_sale_forecast_report"
+        name="Sale Forecast Report"
+        parent="crm.crm_menu_report"
+        action="action_sale_forecast_report_wizard"
+        sequence="20"/>
+
 </odoo>

@@ -12,7 +12,7 @@ class AccountAsset(models.Model):
     picking_id = fields.Many2one('stock.picking', string='Receipt No', copy=False)
     product_id = fields.Many2one('product.product', string='Product', copy=False)
     location_dest_id = fields.Many2one('stock.location', string='Dest Location', copy=False)
-    staff_location_id = fields.Many2one('staff.location', string='Doc Location', copy=False,)
+    staff_location_id = fields.Many2one('staff.location', string='Doc Location', copy=False)
     account_move_line_id = fields.Many2one('account.move.line', string='Bill No', copy=False)
     bill_date = fields.Date(string='Bill Date', copy=False)
     partner_id = fields.Many2one('res.partner', string='Partner', copy=False)
@@ -20,6 +20,7 @@ class AccountAsset(models.Model):
     picking_id = fields.Many2one('stock.picking', string='Receipt No', copy=False)
     lot_name = fields.Char('Lot Name')
     model_serial_no = fields.Char(string="Model Serial No")
+    remark = fields.Text(string="Remark")
 
     def _get_disposal_moves(self, invoice_lines_list, disposal_date):
         move_ids = super()._get_disposal_moves(invoice_lines_list, disposal_date)

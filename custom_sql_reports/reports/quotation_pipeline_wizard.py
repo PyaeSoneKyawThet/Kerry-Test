@@ -97,9 +97,14 @@ class QuotationPipelineWizard(models.TransientModel):
 
         user_ids = tuple(self.user_ids.ids)
 
+        start_utc, end_utc = odoo_datetime_helper.local_date_range_to_utc(
+            self.start_date,
+            self.end_date,
+            self.env.user.tz or 'Asia/Yangon',
+        )
         params = {
-            "start_date": datetime.combine(self.start_date, time.min),
-            "end_date": datetime.combine(self.end_date, time.max),
+            "start_date": start_utc,
+            "end_date": end_utc,
             "user_ids": user_ids,
         }
 

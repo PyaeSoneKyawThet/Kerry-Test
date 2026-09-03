@@ -216,6 +216,17 @@
             </field>
         </record>
 
+        <!-- inherit crm_iap_mine kanban view to add forecast button -->
+        <record id="crm_case_kanban_view_leads_inherit_forecast" model="ir.ui.view">
+            <field name="name">crm.lead.kanban.inherited.forecast</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm_iap_mine.crm_case_kanban_view_leads"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='action_generate_leads']" position="after">
+                    <button name="%(action_customer_forecast_revenue_new)d" type="action" class="btn-secondary" string="Forecast Revenue" display="always"/>
+                </xpath>
+            </field>
+        </record>
 
     </data>
 </odoo>

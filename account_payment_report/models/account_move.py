@@ -11,13 +11,15 @@ class AccountMove(models.Model):
         compute='_compute_report_invoice_payments_widget', 
         string="Report Payments Widget"
     )
-
+    # field only use for table relation update
     linked_payment_id = fields.Many2one(
                             'account.payment',
                             string="Linked Payment (Credit/Refund)",
                             store=True
                         )
 
+    #REPORT: Offical Receipt, Receipt Voucher & Payment Voucher
+    #---to show payment detail amount from reconciled lines---
     @api.depends('move_type', 'line_ids.amount_residual')
     def _compute_report_invoice_payments_widget(self):
         for move in self:
@@ -68,6 +70,8 @@ class AccountMove(models.Model):
             # Store data in JSON format for report
             move.report_invoice_payments_widget = json.dumps(payments_widget_vals) if payments_widget_vals['content'] else False
     
+    #REPORT: Receipt Voucher & Payment Voucher
+    #( eg: invoice used:5000, paymnet:3000, write-off:2000 )
     def _get_write_off_journal(self,payment_id):
         self.ensure_one()
         if self.state == 'posted' and self.is_invoice(include_receipts=True):
@@ -88,6 +92,8 @@ class AccountMove(models.Model):
 
         return {'write_off_moves': self.env['account.move']} 
     
+    #REPORT: Receipt Voucher & Payment Voucher
+    #---to show write-off value value only account is is_wht_tax_account only---
     def _is_show_wirte_off_value(self):
         self.ensure_one()
         show_write_off = False

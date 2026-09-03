@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_wizard_received_money_by_customer_form" model="ir.ui.view">
+        <field name="name">kmtl.received.money.by.customer.wizard.form</field>
+        <field name="model">kmtl.received.money.by.customer</field>
+        <field name="arch" type="xml">
+            <form string="Received money by Customer">
+                <sheet>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="group_by"/>
+                        <field name="partner_ids" widget="many2many_tags"/>
+                        <field name="user_ids" widget="many2many_tags"/>
+                        <field name="currency_id"/>
+                    </group>
+                    <footer>
+                        <button string="Export XLSX" type="object" name="action_export_xlsx" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_received_money_by_customer_wizard" model="ir.actions.act_window">
+        <field name="name">Received money by Customer</field>
+        <field name="res_model">kmtl.received.money.by.customer</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_wizard_received_money_by_customer_form"/>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_kmtl_received_money_by_customer" name="Received money by Customer" parent="kmtl_account_report.menu_kmtl_reports_root" action="action_received_money_by_customer_wizard"/>
+
+</odoo>

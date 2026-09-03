@@ -22,10 +22,10 @@ class AccountMove(models.Model):
     # contact_person = fields.Char(string="Contact Person", related="partner_id.contact_person")    
     advance_non_ct_total = fields.Monetary(string='Advance Non CT Total', compute='_compute_advance_non_ct_amount', store=True)
     non_ct_total = fields.Monetary(string='Non CT Total', compute='_compute_non_ct_amount', store=True)
-    ct_total = fields.Monetary(string='CT Total',compute='_compute_ct_amount', store=True)
+    ct_total = fields.Monetary(string='CT Total',compute='_compute_ct_amount', store=True) #for reporting purpose, only use in invoice report
 
-    advance_non_ct_tax_total = fields.Monetary(string='Advance non ct tax total', compute="_compute_advance_non_ct_tax_total")
-    ct_tax_total = fields.Monetary(string='Advance ct tax total',compute="_compute_ct_tax_total")
+    advance_non_ct_tax_total = fields.Monetary(string='Advance non ct tax total', compute="_compute_advance_non_ct_tax_total") #for reporting purpose, only use in invoice report
+    ct_tax_total = fields.Monetary(string='Advance ct tax total',compute="_compute_ct_tax_total") #for reporting purpose, only use in invoice report
 
     customer_invoice_format_line_ids = fields.One2many('account.customer.move.line', 'move_id', string='Invoice Print Lines', copy=True, readonly=True)
     account_payment_type_id = fields.Many2one('account.payment.type', string="Custom Payment Type", copy=False)

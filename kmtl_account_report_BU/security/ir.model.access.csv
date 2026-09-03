@@ -1,4 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_account_trial_balance_business_name,access_account_trial_balance_business_name,model_account_trial_balance_business_name,base.group_user,1,1,1,1
+access_selling_rate_analysis_wizard,access_selling_rate_analysis_wizard,model_selling_rate_analysis_wizard,sales_team.group_sale_manager,1,1,1,1
 
 

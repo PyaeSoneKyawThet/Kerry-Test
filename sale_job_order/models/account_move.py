@@ -78,6 +78,13 @@ class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
     job_order_id = fields.Many2one('sale.order', string='Job Order')
+    quotation_salesperson_id = fields.Many2one(
+        'res.users',
+        string='Quotation Salesperson',
+        compute='_compute_quotation_salesperson_id',
+        readonly=True,
+    )
+
     fmis_job_no = fields.Char(string="FMIS Job No")
     bl_no = fields.Char(string="BL No")
     vehicle_no = fields.Char(string="Vehicle No")
@@ -95,7 +102,29 @@ class AccountMoveLine(models.Model):
     """ job_date from expense and payment_request: carry date from expense_line and payment_request_line
         job_order_id is only show in invoice: carry date from job_order_line
     """
+    def _get_quotation_salesperson(self):
+        self.ensure_one()
+        if not self.job_order_id:
+            return self.env['res.users']
+
+        quotation_users = self.job_order_id.quotation_ref_ids.mapped('user_id')
+        if quotation_users:
+            return quotation_users[:1]
+        if self.job_order_id.so_id and self.job_order_id.so_id.user_id:
+            return self.job_order_id.so_id.user_id
+        if self.job_order_id.user_id:
+            return self.job_order_id.user_id
+        return self.env['res.users']
+
+    @api.depends('job_order_id', 'job_order_id.quotation_ref_ids', 'job_order_id.so_id', 'job_order_id.user_id')
+    def _compute_quotation_salesperson_id(self):
+        for rec in self:
+            rec.quotation_salesperson_id = rec._get_quotation_salesperson()
+
     @api.onchange('job_order_id')
     def _onchange_job_order_id(self):
         if self.job_order_id:
             self.job_date = self.sale_line_ids[:1].job_date if self.sale_line_ids and self.sale_line_ids[:1].job_date else self.job_order_id.job_date
+            self.quotation_salesperson_id = self._get_quotation_salesperson()
+        else:
+            self.quotation_salesperson_id = False

@@ -85,6 +85,10 @@
                 <attribute name="invisible">state not in ('draft', 'to approve', 'sent', 'purchase') or request_status not in ['approved','new']</attribute>
             </xpath>
 
+            <xpath expr="//group[@name='other_info']" position="inside">
+                <field name="is_cancelled"/>
+            </xpath>
+
             <xpath expr="//notebook" position="inside">
                 <page name="approver" string="Approvers">
                     <field name="purchase_approver_ids"  readonly="1">   
@@ -127,6 +131,7 @@
                 <field name="approved_by_id" optional="hide"/>
             </xpath>
             <xpath expr="//field[@name='amount_total']" position="after">
+                <field name="is_cancelled" optional="show"/>
                 <field name="po_done_state" widget="boolean_toggle" readonly="state == 'done'" optional="show"/>
             </xpath>
         </field>
@@ -158,6 +163,7 @@
             </xpath>
             
             <xpath expr="//field[@name='amount_total']" position="after">
+                <field name="is_cancelled" optional="show"/>
                 <field name="po_done_state" widget="boolean_toggle" readonly="state == 'done'" optional="show"/>
             </xpath>
         </field>

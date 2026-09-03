@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_wizard_receive_history_report_form" model="ir.ui.view">
+        <field name="name">kmtl.receive.history.report.wizard.form</field>
+        <field name="model">kmtl.receive.history.report</field>
+        <field name="arch" type="xml">
+            <form string="Receive History Report">
+                <sheet>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <group>
+                        <field name="partner_ids" widget="many2many_tags"/>
+                        <field name="currency_ids" widget="many2many_tags"/>
+                        <field name="report_currency_ids" widget="many2many_tags"/>
+                        <field name="account_payment_type_ids" widget="many2many_tags"/>
+                        <field name="journal_ids" widget="many2many_tags"/>
+                        <field name="staff_location_ids" widget="many2many_tags"/>
+                    </group>
+                    <footer>
+                        <button string="Export XLSX" type="object" name="action_export_xlsx" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_receive_history_report_wizard" model="ir.actions.act_window">
+        <field name="name">Receive History Report</field>
+        <field name="res_model">kmtl.receive.history.report</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_wizard_receive_history_report_form"/>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_kmtl_receive_history_report" name="Receive History Report" parent="menu_kmtl_reports_root" action="action_receive_history_report_wizard"/>
+</odoo>
