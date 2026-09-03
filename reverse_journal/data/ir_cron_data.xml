@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--  Scheduled cron job for journal reverse.-->
+    <record id="ir_cron_reverse_journal" model="ir.cron">
+        <field name="name">Automatically Reverse Journal</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field> 
+        <field name="doall" eval="False"/>
+        <field name="model_id" ref="model_account_move"/>
+        <field name="state">code</field>
+        <field name="active">True</field>
+        <field name="code">model.auto_reverse_journal()</field>
+    </record>
+</odoo>

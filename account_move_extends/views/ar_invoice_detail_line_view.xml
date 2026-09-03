@@ -1,0 +1,23 @@
+<odoo>
+    <data>
+        <record id="action_ar_invoice_detail_line" model="ir.actions.act_window">
+            <field name="name">AR Invoice Detail Line</field>
+            <field name="res_model">account.move.line</field>
+            <field name="view_mode">tree,pivot,graph,kanban</field>
+            <field name="view_id" ref="account.view_move_line_tree"/>
+            <field name="search_view_id" ref="account.view_account_move_line_filter"/>
+            <field name="domain">[('move_id.move_type','=','out_invoice')]</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No AR Invoice Line found.
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="menu_ar_invioice_detail_line" 
+                name="AR Invoice Detail Line" 
+                parent="account.menu_finance_receivables"
+                action="account_move_extends.action_ar_invoice_detail_line"
+                sequence="190"/>
+    </data>
+</odoo>

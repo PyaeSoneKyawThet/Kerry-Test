@@ -1,0 +1,289 @@
+<odoo>
+    <data>
+        <!--search view -->
+        <record id="approval_request_search_view" model="ir.ui.view">
+            <field name="name">approval.request.view.search</field>
+            <field name="model">approval.request</field>
+            <field name="arch" type="xml">
+                <search string="Approval Payment Request">
+                    <field name="name"/>
+                    <field name="request_owner_id"/>
+                    <field name="partner_id"/>
+                    <field name="reference" string="Vendor Quotation No"/>
+                    <field name="vendor_invoice_no"/>
+                    <field name="department_id" filter_domain="[('department_id', 'child_of', raw_value)]"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="approval_request_inherit_tree" model="ir.ui.view">
+            <field name="name">approval.request.inherit.tree</field>
+            <field name="model">approval.request</field>
+            <field name="inherit_id" ref="approvals.approval_request_view_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree" position="attributes">
+                    <attribute name="create">true</attribute>
+                </xpath>
+                <xpath expr="//tree" position="inside">
+                    <header>
+                       <button name="action_create_PO" type="object" string="Create RFQ" />
+                    </header>
+                </xpath> 
+                <xpath expr="//field[@name='request_status']" position="attributes">                   
+                    <attribute name="decoration-success">request_status in ['checked','approved']</attribute>                   
+                </xpath> 
+                <xpath expr="//field[@name='request_status']" position="after">
+                    <!-- This part is for Cash Advance priority -->
+                    <field name="cash_advance_approved_ids" widget="many2many_tags" optional="show"/> 
+                    <field name="cash_advance_state" optional="show" decoration-info="cash_advance_state == 'new'" decoration-warning="cash_advance_state == 'pending'" 
+                    decoration-success="cash_advance_state in ['checked', 'approved']" decoration-danger="cash_advance_state in ['refused', 'cancel']" widget="badge"/>
+                    <field name="cash_advance_payment_ids" widget="many2many_tags" optional="show"/> 
+                    <field name="cash_advance_payment_state" optional="show" decoration-info="cash_advance_payment_state == 'draft'" 
+                    decoration-success="cash_advance_payment_state in ['posted']" decoration-danger="cash_advance_payment_state in ['cancel']" widget="badge"/>
+                    <!-- This part is for Expense priority -->
+                    <field name="expense_approved_ids" widget="many2many_tags" optional="show"/> 
+                    <field name="expense_state" optional="show" decoration-info="expense_state == 'new'" decoration-warning="expense_state == 'pending'" 
+                    decoration-success="expense_state in ['checked', 'approved']" decoration-danger="expense_state in ['refused', 'cancel']" widget="badge"/>
+                    <field name="expense_bill_state" optional="show" decoration-info="expense_bill_state == 'draft'" 
+                    decoration-success="expense_bill_state in ['posted']" decoration-danger="expense_bill_state in ['cancel']" widget="badge"/>
+                    <field name="expense_payment_status" decoration-danger="expense_payment_status == 'not_paid'"
+                    decoration-warning="expense_payment_status in ('partial', 'in_payment')" 
+                    decoration-success="expense_payment_status in ('paid', 'reversed')" widget="badge" />
+                    <!-- This part is for Payment Request priority -->
+                    <field name="pay_req_approved_ids" widget="many2many_tags" optional="show"/> 
+                    <field name="pay_req_state" optional="show" decoration-info="pay_req_state == 'new'" decoration-warning="pay_req_state == 'pending'" 
+                    decoration-success="pay_req_state in ['checked', 'approved']" decoration-danger="pay_req_state in ['refused', 'cancel']" widget="badge"/>
+                    <field name="req_pay_bill_state" optional="show" decoration-info="req_pay_bill_state == 'draft'" 
+                    decoration-success="req_pay_bill_state in ['posted']" decoration-danger="req_pay_bill_state in ['cancel']" widget="badge"/>
+                    <field name="req_pay_status" decoration-danger="req_pay_status == 'not_paid'"
+                    decoration-warning="req_pay_status in ('partial', 'in_payment')" 
+                    decoration-success="req_pay_status in ('paid', 'reversed')" widget="badge" />
+                </xpath>
+
+                <xpath expr="//field[@name='category_id']" position="after">   
+                    <field name="request_approved_date" string="Approved Date"/>
+                    <field name="date"/>
+                    <field name="est_delivery_date" optional="hide"/>  
+                    <field name="department_id" optional="hide"/>   
+                    <field name="partner_id" string="Vendor"/> 
+                    <field name="reference" string="Vendor Quotation No" optional="hide"/>
+                    <field name="vendor_invoice_no" optional="hide"/>
+                    <field name="location" string="Delivery Location" optional="hide"/>
+                    <field name="currency_id"/>
+                    <field name="payment_type_id"/> 
+                    <field name="amount" optional="hide"/>
+                    <field name="staff_location_id" optional="hide"/>  
+                    <field name="pay_to_id" optional="hide"/>
+                    <field name="pay_to_external" optional="hide"/> 
+                    <field name="created_po" widget="boolean_toggle" readonly="1"/>
+                    <field name="pr_done" optional="hide"/>
+                </xpath> 
+            </field>
+        </record>
+
+        <record id="approval_request_view_form_inherit_kmtl" model="ir.ui.view">
+            <field name="name">approval.request.form.inherit</field>
+            <field name="model">approval.request</field>
+            <field name="inherit_id" ref="approvals.approval_request_view_form"/>
+            <field name="arch" type="xml"> 
+                <xpath expr="//form" position="attributes">
+                    <attribute name="create">true</attribute>
+                </xpath>
+
+                <field name="category_id" position="attributes">
+                    <attribute name="readonly">1</attribute>
+                </field>
+
+                <xpath expr="//sheet" position="inside">
+                    <field name="has_payment_request" invisible="1"/>
+                    <field name="has_cash_advance" invisible="1"/>
+                    <field name="has_expense" invisible="1"/>
+                    <field name="has_purchase_order" invisible="1"/>
+                    <field name="cash_advance_state" invisible="1"/>
+                    <field name="expense_state" invisible="1"/>
+                    <field name="pay_req_state" invisible="1"/>
+                </xpath>
+
+                <xpath expr="//button[@name='action_get_attachment_view']" position="after"> 
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_cash_advance_form" type="object" class="oe_stat_button" icon="fa-pencil-square-o" invisible="cash_advance_count == 0">
+                            <field name="cash_advance_count" widget="statinfo" string="Cash Advances"/>
+                        </button>
+                        <button name="action_view_expense" type="object" class="oe_stat_button" icon="fa-pencil-square-o" invisible="expense_count == 0">
+                            <field name="expense_count" widget="statinfo" string="Expenses"/>
+                        </button> 
+                        <button name="action_view_payment_request" type="object" class="oe_stat_button" icon="fa-pencil-square-o" invisible="payment_request_count == 0">
+                            <field name="payment_request_count" widget="statinfo" string="Payment Request"/>
+                        </button> 
+                    </div> 
+                </xpath>
+                <xpath expr="//button[@name='action_withdraw']" position="attributes">
+                    <attribute name="invisible">request_status == 'new' or user_status in ['waiting', 'pending', 'cancel'] or not user_status or cash_advance_state in ['approved'] or expense_state in ['approved'] or pay_req_state in ['approved']
+                    </attribute>
+                </xpath>
+
+                <xpath expr="//button[@name='action_create_purchase_orders']" position="attributes">
+                    <attribute name="invisible">approval_type != 'purchase' or request_status != 'approved' or has_purchase_order</attribute>
+                </xpath>
+ 
+                <xpath expr="//button[@name='action_refuse']" position="attributes">
+                    <attribute name="invisible">request_status in ['approved', 'refused', 'cancel'] or user_status not in ['to_check', 'pending']</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_cancel']" position="attributes">
+                    <attribute name="invisible">request_status in ['cancel'] or not has_access_to_request</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_confirm'][1]" position="after">
+                    <button name="action_check" string="Check" type="object" invisible="attachment_number &lt; 1 or request_status in ['checked', 'approved', 'refused', 'cancel'] or user_status != 'to_check'" class="btn-primary" data-hotkey="v"/>
+                    <button name="action_check" string="Check" type="object" invisible="attachment_number &gt;= 1 or request_status in ['checked', 'approved', 'cancel'] or user_status != 'to_check'" data-hotkey="v"/>
+                </xpath>   
+                <xpath expr="//widget[@name='attach_document'][2]" position="after">
+                    <button name="action_create_PO" string="Create PO" type="object" invisible="approval_type != 'purchase_req' or request_status not in ['approved'] or 1" class="btn-primary" data-hotkey="v"/>
+                    
+                    <button name="action_create_cash_advance" string="Create Cash Advance" type="object" 
+                            invisible="approval_type != 'purchase_req' or request_status not in ['approved'] or
+                                    has_cash_advance" class="btn-primary" data-hotkey="v"/>
+
+                    <button name="action_create_expense" string="Create Expense" type="object" 
+                            invisible="approval_type != 'purchase_req' or request_status not in ['approved'] or
+                                    has_expense" class="btn-primary" data-hotkey="v" />
+
+                    <field name="enable_payment_request" invisible="1"/> 
+                    <field name="is_pr_payment_req" invisible="1"/> 
+                    <field name="is_pr_expense" invisible="1"/> 
+                    <field name="is_pr_cash_advance" invisible="1"/> 
+                    <button name="action_create_payment_request" string="Create Payment Request" type="object" 
+                            invisible="is_pr_payment_req == True or is_pr_expense == True or is_pr_cash_advance == True or not enable_payment_request or has_payment_request or request_status in ['cancel']" 
+                            class="btn-primary" data-hotkey="v" />
+                </xpath>        
+
+                <xpath expr="//widget[@name='attach_document']" position="before">
+                    <button name="action_print_approval_purchase_request"
+                            type="object"
+                            string="PR Print"
+                            invisible="approval_type != 'purchase_req'"/>
+                </xpath>   
+
+                <xpath expr="//group[@name='request_main']" position="after">
+                    <group name="employe_informations">
+                        <field name="purchase_order_id" invisible="1"/> 
+                        <field name="minimal_checker" invisible="1"/> 
+                        <field name="minimal_approver" invisible="1"/>
+                        <field name="employee_id" invisible="1"/> 
+                        <field name="PR_type" invisible="approval_type != 'purchase_req'" readonly="request_status in ('approved','pending','checked')"/>                        
+                        <field name="without_PO" invisible="approval_type != 'purchase_req'"/>                        
+                        <field name="department_id"/>                        
+                        <field name="currency_id" required="1" invisible="approval_type not in ('purchase_req','purchase')" readonly="request_status in ('approved','pending','checked')"/>                        
+                        <field name="est_delivery_date" invisible="approval_type not in ('purchase_req','purchase')" readonly="request_status in ('approved','pending','checked')"/>                        
+                        <field name="value_date" invisible="approval_type not in ('purchase_req','purchase')" readonly="request_status in ('approved','pending','checked')"/>                        
+                        <field name="pay_to_id" invisible="approval_type not in ('purchase_req','purchase')" readonly="request_status in ('approved','pending','checked')"/>                        
+                        <field name="pay_to_external" invisible="approval_type not in ('purchase_req','purchase')" readonly="request_status in ('approved','pending','checked')"/>
+                        <field name="created_po" readonly="1" invisible="approval_type not in ('purchase_req','purchase')"/>
+                    </group> 
+                </xpath>     
+              
+                <xpath expr="//group[@name='request_details']" position="after">
+                    <group>
+                        <field name="payment_type_id" invisible="approval_type != 'purchase_req'" readonly="request_status in ('approved','pending','checked')" required="1"/>  
+                        <field name="staff_location_id" required="1" invisible="approval_type not in ('purchase_req','purchase')" readonly="request_status in ('approved','pending','checked')"/>                                              
+                        <field name="default_journal_id" invisible="1"/>
+                        <field name="cash_advance_ids" widget="many2many_tags" invisible="1"/>
+                        <field name="expense_ids" widget="many2many_tags" invisible="1"/>
+                        <field name="payment_request_ids" widget="many2many_tags" invisible="1"/>
+                        <field name="purchase_ids" widget="many2many_tags" invisible="1"/>
+                        <field name="pr_done" readonly="request_status in ('refused','cancel')" invisible="approval_type not in ('purchase_req')"/>
+                        <label for="pr_line_ids" string="PR No" invisible="approval_type == 'purchase_req' or po_comparison_id"/>
+                        <div class="o_row">                            
+                            <field name="pr_line_ids" readonly="request_status not in ('new') or po_comparison_id" widget="many2many_tags" nolabel="1" 
+                                options="{'no_create': True, 'no_create_edit': True}" invisible="approval_type == 'purchase_req'"
+                                domain="[('request_status', '=', 'approved'), ('without_PO', '=', False), ('pr_done', '!=', True)]"/>
+                            <button name="action_generate_lines" type="object" string="Generate Lines" class="btn-primary" 
+                                invisible="approval_type == 'purchase_req' or request_status not in ('new')"/>
+                        </div>
+                    </group>
+                </xpath>
+                
+                <xpath expr="//field[@name='approver_ids']/tree//field[@name='status']" position="before"> 
+                    <field name="level" column_invisible="parent.approval_type != 'purchase_req'"/>
+                </xpath>
+
+                <xpath expr="//field[@name='approver_ids']/tree" position="attributes">
+                    <attribute name="decoration-warning">status in ['pending', 'waiting','to_check']</attribute>
+                    <attribute name="decoration-success">status in ['checked','approved']</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='approver_ids']" position="attributes">
+                    <attribute name="readonly">1</attribute>
+                </xpath>
+
+                <xpath expr="//group[@name='request_main']//field[@name='location']" position="attributes">
+                    <attribute name="string">Delivery Location</attribute>
+                </xpath>
+
+                <xpath expr="//group[@name='request_main']//field[@name='partner_id']" position="before">
+                    <field name="po_comparison_id" invisible="approval_type != 'purchase'" readonly="1"/>
+                </xpath>
+                <xpath expr="//group[@name='request_main']//field[@name='partner_id']" position="after">
+                    <field name="fmis_petty_cash_document_no" invisible="approval_type != 'purchase_req'"/>
+                </xpath>
+
+                <xpath expr="//group[@name='request_main']//field[@name='partner_id']" position="attributes">
+                    <attribute name="string">Vendor</attribute>
+                </xpath>
+
+                <!-- approval request's reference is use as 'Vendor Invoice No' in expense, cash advance and payment request -->
+                <xpath expr="//group[@name='request_details']//field[@name='reference']" position="attributes">
+                    <attribute name="string">Vendor Quotation No</attribute>
+                </xpath>
+
+                <xpath expr="//group[@name='request_details']//field[@name='reference']" position="after">
+                    <field name="vendor_quotation_date" invisible="approval_type != 'purchase'"/>
+                    <field name="vendor_invoice_no" readonly="request_status in ('approved')"/>
+                </xpath>
+
+                <xpath expr="//group[@name='request_details']//field[@name='reference']" position="attributes">
+                    <attribute name="readonly">request_status in ('approved','pending','checked')</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='request_owner_id']" position="attributes">
+                    <attribute name="required">1</attribute>
+                </xpath>
+
+                <xpath expr="//page[@name='approvers']//field[@name='user_id']" position="attributes">
+                    <attribute name="column_invisible">parent.approval_type == 'purchase_req'</attribute>
+                </xpath>
+
+                <xpath expr="//page[@name='approvers']//field[@name='user_id']" position="after">
+                    <field name="user_ids" widget="many2many_tags" options="{'no_create': True}" 
+                           column_invisible="parent.approval_type != 'purchase_req'" required="1"/>
+                </xpath>
+
+            </field>
+        </record>
+
+        <record id="approvals.approval_request_action_to_review" model="ir.actions.act_window">
+            <field name="domain">['&amp;',('approver_ids.user_id','=',uid),('request_status','in',['pending','checked'])]</field>    
+        </record>
+
+        <record id="action_approval_purchase_request" model="ir.actions.act_window">
+            <field name="name">Approval Purchase Request</field>
+            <field name="res_model">approval.request</field>
+            <field name="domain">[('approval_type','in',['purchase_req'])]</field> 
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No Approvals Requests
+                </p>
+                <p>
+                    Let's go to the <a type="action" class="text-primary" name="%(approvals.approval_category_action_new_request)d">new request</a> menu
+                </p>
+            </field>
+        </record>
+    
+        <menuitem id="menu_approval_purchase_request" 
+                  name="Approval Purchase Request" 
+                  parent="approvals.approvals_menu_manager"
+                  action="approval_extends.action_approval_purchase_request"
+                  sequence="40"/>
+
+    </data>
+</odoo>

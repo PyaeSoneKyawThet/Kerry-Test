@@ -1,0 +1,500 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="custom_header_footer_ap_invoice">
+            <div class="header">
+                <div style="report_header_style">
+                    <div class="row">
+                        <div class="col-3"></div>
+                        <div class="col-6 fw-bold py-4">
+                            <h4 class="text-center">
+                                <span>AP INVOICE VOUCHER</span>
+                            </h4>
+                        </div>
+                        <div class="col-3 text-end">
+                            <span t-field="doc.company_id.logo"
+                                t-options="{'widget':'image', 'style': 'height:85px; width:130px'}" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer" style="margin-bottom: -300px  !important;border-top: 1px solid black">                             
+                <div class="row">
+                    <div class="col-4">
+                        <span style="font-size: 15px;" t-if="doc.company_id.name" t-field="doc.company_id.name"></span>
+                    </div>
+                    <div class="col-4 text-center">
+                        <span style="font-size: 12px;">
+                            <span t-field="doc.name"/>
+                        </span>
+                    </div>
+                    <div class="col-4 text-end">                        
+                        <p style="font-size: 12px;"><small>
+                            Page: <span class="page"/> / <span class="topage"/>
+                            <span class="ms-2" t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y %H:%M:%S')"/>
+                        </small></p>                                               
+                    </div> 
+                </div>  
+            </div>
+        </template>
+
+        <template id="custom_ap_invoice">
+            <t t-call="web.external_layout">
+                <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)" />
+                <t t-set="forced_vat" t-value="doc.fiscal_position_id.foreign_vat" /> <!-- So that it
+                appears in the footer of the report instead of the company VAT if it's set -->
+
+                <div class="page" style="">
+
+                    <div class="d-flex flex-row pe-5">
+                        <span style="display: inline-block;width: 100px;">Voucher No</span>
+                        <div><span class="mx-2">:</span></div>
+                        <div>
+                            <span t-field="doc.name"/>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-row pe-5">
+                        <span style="display: inline-block;width: 100px;">Description</span>
+                        <div><span class="mx-2">:</span></div>
+                        <div t-if="doc.reason">
+                            <!-- <t t-set="invoice_line_description" t-value="', '.join(sorted(set(invoice_line.name for invoice_line in doc.invoice_line_ids if invoice_line.name)))" /> -->
+                            <span t-out="doc.reason" />
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row pe-5 mb-4">
+                        <span style="display: inline-block;width: 100px;">Vendor Name</span>
+                        <div><span class="mx-2">:</span></div>
+                        <div>
+                            <div t-if="doc.partner_id.name">
+                                <span t-field="doc.partner_id.name" />
+                            </div>
+                        </div>
+                    </div>
+
+
+                
+                    <div class="row mb-5" >
+                        <div class="col-4" name="Information 1">
+                            <!-- <div class="row">
+                                <div class="col-6">
+                                    <strong>Vendor No</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-5" t-if="doc.partner_id.ref">
+                                    <span t-field="doc.partner_id.ref" />
+                                </div>
+                            </div> -->
+                            <div class="row">
+                                <div class="col-6">
+                                    <strong>Vendor Invoice No</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-5" t-if="doc.vendor_invoice_no">
+                                    <span t-field="doc.vendor_invoice_no" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <strong>Payment Terms</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-5" t-if="doc.invoice_payment_term_id">
+                                    <span t-field="doc.invoice_payment_term_id" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <strong>Currency</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-5" t-if="doc.currency_id">
+                                    <span t-field="doc.currency_id" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-5" name="Information 2">
+                            <div class="row">
+                                <div class="col-4">
+                                    <strong>Invoice Date</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-7" t-if="doc.invoice_date">
+                                    <span t-field="doc.invoice_date" />
+                                </div>
+                            </div>
+                            <!-- <div class="row">
+                                <div class="col-4">
+                                    <strong>Vendor Name</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-7 " t-if="doc.partner_id.name">
+                                    <span t-field="doc.partner_id.name" />
+                                </div>
+                            </div> -->
+                            <div class="row">
+                                <div class="col-4">
+                                    <strong>Exchange Rate</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <!-- <div class="col-7" t-if="doc.currency_rate">
+                                    <span t-field="doc.currency_rate" />
+                                </div> -->
+                                <div class="col-7" t-if="doc.currency_rate">
+                                    <span t-field="doc.currency_rate" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-3 ps-1" name="Customer Information">
+                            <div class="row">
+                                <div class="col-5">
+                                    <strong>Due Date</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-6" t-if="doc.invoice_date_due">
+                                    <span t-field="doc.invoice_date_due" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-5">
+                                    <strong>GL Date</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-6" t-if="doc.date">
+                                    <span t-field="doc.date" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <t t-if="doc.line_ids">
+                        <table class="table table-borderless border-0 mt-1"  style="margin-bottom: 50px;">
+                            <tr class="border border-dark border-1 border-start-0 border-end-0 border-bottom-0">
+                                <th class="border-0 text-end" style="text-transform: capitalize;">No</th>
+                                <th class="border-0 text-start" style="text-transform: capitalize;">Account Code</th>
+                                <th class="border-0 text-start" style="text-transform: capitalize;">Account Name</th>
+                                <th class="border-0 text-end" style="text-transform: capitalize;">Invoice Amount</th>
+                                <th class="border-0" style="text-transform: capitalize;padding-left: 80px;" colspan="2">Amount(<span t-out="doc.company_id.currency_id.symbol"/>)</th>
+                                <th class="border-0  d-none"></th>
+                            </tr>
+                            <tr class="border border-dark border-1  border-top-0 border-start-0 border-end-0">
+                                <th class="border-0" style="text-transform: capitalize;"></th>
+                                <th class="border-0" style="text-transform: capitalize;"></th>
+                                <th class="border-0" style="text-transform: capitalize;"></th>
+                                <th class="border-0" style="text-transform: capitalize;"></th>
+                                <th class="border-0 text-end" style="text-transform: capitalize;">Debit</th>
+                                <th class="border-0 text-end" style="text-transform: capitalize;">Credit</th>
+                                <th class="border-0 d-none"></th>
+                            </tr>
+                            <tbody>
+                                <t t-set="total_credit" t-value="0" />
+                                <t t-set="total_debit" t-value="0" />
+                                <t t-set="index" t-value="1" />
+                                
+                                <t t-foreach="doc.line_ids" t-as="line">
+                                    <tr class="border-0">
+                                        <td class="border-0 text-end" style="white-space:nowrap;">
+                                            <span t-esc="index"/>
+                                        </td>
+                                        <td class="border-0" name="td_account_code">
+                                            <span t-field="line.account_id.code"/>
+                                        </td>
+                                        <td name="td_analytic_distribution" class="border-0">
+                                            <table style="width: 100%;" class="border-0">
+                                                <tr class="border-0">
+                                                    <td class="border-0 text-start" colspan="2">
+                                                        <span t-field="line.account_id.name"/>
+                                                    </td>
+                                                    <td class="d-none"></td>
+                                                </tr>
+                                                <t t-set="data_pairs" t-value="[line._get_report_data()[i:i+2] for i in range(0, len(line._get_report_data()), 2)]"/>
+                                                <t t-foreach="data_pairs" t-as="pair">
+                                                    <tr class="border-0">
+                                                        <t t-foreach="pair" t-as="distribution">
+                                                            <td class="border-0 mb-2" style="text-align: start; width: 50%;">
+                                                                <t t-esc="distribution['account_name']"/>
+                                                            </td>
+                                                            <td class="d-none"/>
+                                                        </t>
+                                                    </tr>
+                                                </t>
+                                            </table>
+                                        </td>
+
+                                        <td name="td_amount_currency" class="text-end border-0">
+                                            <span t-out="line.amount_currency" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                                        </td>
+                                        <td name="td_debit" class="text-end border-0">
+                                            <span t-esc="line.debit" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}" />
+                                        </td>
+                                        <t t-set="total_debit" t-value="total_debit + line.debit"></t>
+                                        <td name="td_credit" class="text-end border-0">
+                                             <span t-esc="line.credit" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}" />
+                                        </td>
+                                        <t t-set="total_credit" t-value="total_credit + line.credit"></t>
+                                        <td class="border-0  d-none"></td>
+
+                                        
+                                    </tr>
+                                    <t t-set="index" t-value="index + 1"/>
+                                </t>
+    
+                                <tr name="Total Row" class="border border-dark border-1 border-start-0 border-end-0" >
+                                    <td class="border-0"></td>
+                                    <td class="border-0">
+                                        <span>Total</span> 
+                                    </td>
+                                    <td class="border-0"></td>
+                                    <td class="border-0"></td>
+                                    <td class="text-end border-0">
+                                        <span t-esc="total_debit" t-options="{'widget': 'float', 'precision': 2}"/>
+                                    </td>
+                                    <td class="text-end border-0">
+                                        <span t-esc="total_credit" t-options="{'widget': 'float', 'precision': 2}"/>
+                                    </td>
+                                    <td class="border-0  d-none"></td>
+                                </tr>
+                            </tbody>
+                        </table> 
+                    </t>
+                    
+                    <t t-set="deferred_account_line" t-value="any(l.deferred_account_id for l in doc.line_ids)"/>
+                    <t t-if="deferred_account_line">
+                        <span style="font-weight: bold; font-size:16px;">Applied Prepaid:</span>
+                        <table class="table table-borderless border-0 mt-1"  style="margin-bottom: 50px;">
+                            <tr class="border border-dark border-1 border-start-0 border-end-0 border-bottom-0">
+                                <th class="border-0 text-end" style="text-transform: capitalize;">No</th>
+                                <th class="border-0 text-start" style="text-transform: capitalize;">Account Code</th>
+                                <th class="border-0 text-start" style="text-transform: capitalize;">Account Name</th>
+                                <th class="border-0 text-end" style="text-transform: capitalize;">Invoice Amount</th>
+                                <th class="border-0" style="text-transform: capitalize;padding-left: 80px;" colspan="2"><span t-out="doc.currency_id.symbol"/></th>
+                                <th class="border-0  d-none"></th>
+                            </tr>
+                            <tr class="border border-dark border-1  border-top-0 border-start-0 border-end-0">
+                                <th class="border-0" style="text-transform: capitalize;"></th>
+                                <th class="border-0" style="text-transform: capitalize;"></th>
+                                <th class="border-0" style="text-transform: capitalize;"></th>
+                                <th class="border-0" style="text-transform: capitalize;"></th>
+                                <th class="border-0 text-end" style="text-transform: capitalize;">Debit</th>
+                                <th class="border-0 text-end" style="text-transform: capitalize;">Credit</th>
+                                <th class="border-0 d-none"></th>
+                            </tr>
+
+                            <tbody>
+                                <t t-set="total_credit" t-value="0" />
+                                <t t-set="total_debit" t-value="0" />
+                                <t t-set="index" t-value="1" />
+                                
+                                <t t-foreach="doc.line_ids.filtered(lambda l: l.deferred_account_id)" t-as="line">
+                                    <tr class="border-0">
+                                        <td class="border-0 text-end" t-esc="index"></td>
+                                        <td class="border-0" name="td_account_code">
+                                            <span t-field="line.deferred_account_id.code"/>
+                                        </td>
+                                        <td class="border-0" name="td_account_name">
+                                            <span t-field="line.deferred_account_id.name"/>
+                                        </td>
+                                        <td class="text-end border-0" name="td_price_unit">
+                                            <span t-field="line.price_unit" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                                        </td>
+                                        <td name="td_debit" class="text-end border-0">
+                                             <span t-esc="line.debit" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}" />
+                                        </td>
+                                        <t t-set="total_debit" t-value="total_debit + line.debit"></t>
+                                        <td name="td_credit" class="text-end border-0">
+                                            <span t-esc="line.credit" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}" />
+                                        </td>
+                                        <t t-set="total_credit" t-value="total_credit + line.credit"></t>
+                                        <td class="border-0  d-none"></td>
+                                    </tr>
+                                    <t t-set="index" t-value="index + 1"/>
+                                </t>
+
+                                <tr name="Total Row" class="border border-dark border-1 border-start-0 border-end-0" >
+                                    <td class="border-0"></td>
+                                    <td class="border-0">
+                                        <span>Total</span> 
+                                    </td>
+                                    <td class="border-0"></td>
+                                    <td class="border-0"></td>
+                                    <td class="text-end border-0">
+                                        <span t-esc="total_debit" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>
+                                    </td>
+                                    <td class="text-end border-0">
+                                        <span t-esc="total_credit" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>
+                                    </td>
+                                    <td class="border-0  d-none"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </t>
+
+                    <div id="left-elements">
+                        <!-- <div class="col-4"> 
+                            <div class="row" style="height: 40px; position: relative;">
+                                <div class="col-4" style="position: absolute; bottom: 0;">
+                                    <span>Prepared By</span>
+                                </div>
+                                <div class="col-1 pb-1" style="position: absolute; bottom: 0; left: 33%;">
+                                    :
+                                </div>
+                                <div class="col-6" style="position: absolute; bottom: 0; left: 42%;">
+                                    <div>
+                                        <span t-if="doc.invoice_user_id.employee_id.digital_signature" 
+                                              t-field="doc.invoice_user_id.employee_id.digital_signature" 
+                                              t-options="{'widget':'image','style': 'height:45px; width:200px'}" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <span>Name</span>
+                                </div>
+                                <div class="col-1">:</div>
+                                <div class="col-6" t-if="doc.invoice_user_id.name">
+                                    <span t-field="doc.invoice_user_id.name" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <span>Date</span>
+                                </div>
+                                <div class="col-1">:</div>
+                                <div class="col-6" t-if="doc.invoice_submit_date">
+                                    <span t-field="doc.invoice_submit_date" />
+                                </div>
+                            </div>
+                        </div> -->
+                       
+                        <t t-set="checkers" t-value="doc.bill_approver_ids.filtered(lambda l: l.status == 'checked')"/>
+                        <t t-set="checker" t-value="checkers.sorted(key=lambda l: l.id)[-1] if checkers else None"/>
+
+                        <t t-set="approvers" t-value="doc.bill_approver_ids.filtered(lambda l: l.status == 'approved')"/>
+                        <t t-set="approver" t-value="approvers.sorted(key=lambda l: l.id)[-1] if approvers else None"/>
+
+                        <t t-set="final_user" t-value="checker if checker else approver"/>
+
+                        <table class="table table-borderless border-0 mt-2 avoid-page-break-inside">
+                            <tr class="border-0">
+                                <td class="border-0">
+                                    <strong>Prepared By:</strong>
+                                    <span t-field="doc.submit_user_id.employee_id.name"/>
+                                    <span t-if="doc.submit_user_id.employee_id.name">, </span>
+                                    <span t-field="doc.invoice_submit_date"/>
+                                </td>
+                            </tr>
+                            <tr class="border-0">
+                                <td class="border-0">
+                                    <strong>Checked By:</strong>
+                                    <t t-if="final_user">
+                                        <span t-out="final_user.approval_employee_id.name"/>
+                                        <t t-if="doc.invoice_check_date">
+                                            , <span t-out="doc.invoice_check_date.strftime('%d/%m/%Y')"/>
+                                        </t>
+                                        <t t-elif="doc.invoice_approved_date">
+                                            , <span t-out="doc.invoice_approved_date.strftime('%d/%m/%Y')"/>
+                                        </t>
+                                    </t>
+                                </td>
+                            </tr>
+                            <tr class="border-0">
+                                <td class="border-0">
+                                    <strong>Approved By:</strong>
+                                    <t t-if="approver">
+                                        <span t-out="approver.approval_employee_id.name"/>
+                                        <span t-if="doc.invoice_approved_date">, </span>
+                                        <span t-out="doc.invoice_approved_date.strftime('%d/%m/%Y')" t-if="doc.invoice_approved_date"/>
+                                    </t>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- <div class="col-4"> 
+                            <div class="row" style="height: 40px; position: relative;">
+                                <div class="col-4" style="position: absolute; bottom: 0;">
+                                    <span>Checked By</span>
+                                </div>
+                                <div class="col-1  pb-1" style="position: absolute; bottom: 0; left: 33%;">
+                                    :
+                                </div>
+                                <div class="col-6" style="position: absolute; bottom: 0; left: 42%;">
+                                    
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <span>Name</span>
+                                </div>
+                                <div class="col-1">:</div>
+                                <div>
+                                    <t t-if="final_user">
+                                        <span t-field="final_user.approval_employee_id.name"/>
+                                    </t>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <span>Date</span>
+                                </div>
+                                <div class="col-1">:</div>
+                                <div class="col-6"></div>
+                            </div>
+                        </div>
+
+                        <div class="col-4">
+                            <div class="row" style="height: 40px; position: relative;">
+                                <div class="col-4" style="position: absolute; bottom: 0;">
+                                    <span>Approved By</span>
+                                </div>
+                                <div class="col-1  pb-1" style="position: absolute; bottom: 0; left: 33%;">
+                                    :
+                                </div>
+                                <div class="col-6" style="position: absolute; bottom: 0; left: 42%;">
+                                    <div>
+                                        <span t-if="doc.approved_by_id.employee_id.digital_signature" 
+                                              t-field="doc.approved_by_id.employee_id.digital_signature" 
+                                              t-options="{'widget':'image','style': 'height:45px; width:200px'}" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <span>Name</span>
+                                </div>
+                                <div class="col-1">:</div>
+                                <div class="col-6">
+                                    <t t-if="approver">
+                                        <span t-field="approver.approval_employee_id.name"/>
+                                    </t>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <span>Date</span>
+                                </div>
+                                <div class="col-1">:</div>
+                                <div class="col-6" t-if="doc.invoice_date"> -->
+                                    <!-- <span t-field="doc.invoice_date" /> -->
+                                <!-- </div>
+                            </div>
+                        </div> -->
+                    </div>
+
+                </div>
+            </t>
+        </template>
+
+        <template id="ap_invoice_print">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="account_move_extends.custom_header_footer_ap_invoice" />
+                    <t t-set="lang" t-value="doc.partner_id.lang" />
+                    <t t-call="account_move_extends.custom_ap_invoice" t-lang="lang" />
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

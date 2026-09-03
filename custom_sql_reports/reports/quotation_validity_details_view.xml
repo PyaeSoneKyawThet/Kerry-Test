@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_quotation_validity_details_wizard" model="ir.ui.view">
+        <field name="name">quotation.validity.details.wizard.form</field>
+        <field name="model">quotation.validity.details.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Quotation Validity Details View">
+                <group>
+                    <group>
+                        <field name="report_date" required="1"/>
+                        <label for="before_expire"/>
+                        <div>
+                            <field name="before_expire" class="oe_inline" required="1"/> days
+                        </div>
+                    </group>
+                    <group>
+                        <field name="user_ids" widget="many2many_tags" options="{'no_open': True, 'no_create': True}"/>
+                        <field name="currency_ids" widget="many2many_tags" options="{'no_open': True, 'no_create': True}"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="generate_xlsx" string="🖨️ Print XLSX" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_quotation_validity_details" model="ir.actions.act_window">
+        <field name="name">Quotation Validity Details</field>
+        <field name="res_model">quotation.validity.details.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_quotation_validity_details_wizard"/>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_quotation_validity_details_report_admin" 
+        name="Quotation Validity Details" 
+        parent="sale.menu_sale_report"
+        action="custom_sql_reports.action_quotation_validity_details"
+        sequence="95"
+        />
+</odoo>

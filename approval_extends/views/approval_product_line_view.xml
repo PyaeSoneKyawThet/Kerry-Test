@@ -1,0 +1,155 @@
+<odoo>
+    <data>
+         <!--search view -->
+        <record id="approval_product_line_search_view" model="ir.ui.view">
+            <field name="name">approval.product.line.view.search</field>
+            <field name="model">approval.product.line</field>
+            <field name="arch" type="xml">
+                <search string="Approval Product Line">
+                    <field name="approval_request_id"/>
+                    <field name="department_id" filter_domain="[('department_id', 'child_of', raw_value)]"/>
+                </search>
+            </field>
+        </record>
+
+        <!-- form view -->
+        <record id="approval_product_line_view_form_inherit_custom" model="ir.ui.view">
+            <field name="name">approval.product.line.view.form.custom</field>
+            <field name="model">approval.product.line</field>
+            <field name="inherit_id" ref="approvals.approval_product_line_view_form"/>
+            <field name="arch" type="xml">  
+                <xpath expr="//form" position="attributes">
+                    <attribute name="create">false</attribute>
+                    <attribute name="edit">false</attribute>
+                    <attribute name="delete">false</attribute>
+                </xpath>
+                <xpath expr="//field[@name='product_id']" position="before">
+                    <field name="approval_request_id" string="PR No"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="approval_product_line_view_tree_independent_inherit" model="ir.ui.view">
+            <field name="name">approval.product.line.view.tree.inherit.independent</field>
+            <field name="model">approval.product.line</field>
+            <field name="inherit_id" ref="approvals.approval_product_line_view_tree_independent"/>
+            <field name="arch" type="xml">  
+                <xpath expr="//tree" position="attributes">
+                    <attribute name="create">false</attribute>
+                    <attribute name="delete">false</attribute>
+                    <attribute name="edit">false</attribute>
+                </xpath>
+
+                <xpath expr="//tree" position="inside">
+                    <header>
+                       <button name="action_create_po_comparison" type="object" string="Create PO Comparison" />
+                    </header>
+                </xpath> 
+                <xpath expr="//field[@name='approval_request_id']" position="after">
+                    <field name="request_category_id" string="Approval Type" optional="show"/>
+                    <field name="request_owner_id" optional="show"/>
+                    <field name="department_id" optional="show"/>
+                    <field name="without_PO" optional="show"/>
+                    <field name="created_po" optional="show"/>
+                    <field name="po_comparison_done" optional="show"/>
+                    <field name="pr_done" optional="show"/>
+                </xpath>
+                <xpath expr="//field[@name='product_uom_id']" position="after">
+                    <field name="request_status" widget="badge" decoration-info="request_status == 'new'" decoration-warning="request_status == 'refused'" decoration-success="request_status == 'approved'" decoration-danger="request_status == 'cancel'"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="approval_product_line_action_all" model="ir.actions.act_window">
+            <field name="name">Approvals Lines</field>
+            <field name="res_model">approval.product.line</field>
+            <field name="view_mode">list</field>
+            <field name="domain">[]</field>
+            <field name="view_id" ref="approval_extends.approval_product_line_view_tree_independent_inherit"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No Approval lines
+                </p>
+            </field>
+        </record>
+
+
+        <record id="approval_product_line_view_tree_inherit" model="ir.ui.view">
+            <field name="name">approval.product.line.tree.custom</field>
+            <field name="model">approval.product.line</field>
+            <field name="inherit_id" ref="approvals.approval_product_line_view_tree"/>
+            <field name="arch" type="xml"> 
+                
+                <xpath expr="//field[@name='product_id']" position="after">
+                    <field name="po_comparison_line_id" column_invisible="1"/>
+                </xpath>
+                <xpath expr="//field[@name='product_id']" position="before">
+                    <field name="purchase_request_line_id" widget="many2one_barcode" string="PR No" options="{'no_create': True, 'no_create_edit': True}"
+                    column_invisible="parent.approval_type not in ('purchase')" domain="[('request_status', '=', 'approved'), ('without_PO', '=', False), ('pr_done', '!=', True)]"
+                    readonly="parent.po_comparison_id"/>
+                </xpath>  
+                <xpath expr="//field[@name='product_id']" position="attributes">
+                    <attribute name="required">1</attribute>
+                    <attribute name="domain">[('purchase_ok', '=', True)]</attribute>
+                    <attribute name="readonly">parent.po_comparison_id</attribute>
+                </xpath> 
+
+                <xpath expr="//field[@name='description']" position="attributes">
+                    <attribute name="readonly">parent.po_comparison_id</attribute>
+                </xpath>
+                
+                <xpath expr="//field[@name='description']" position="after">
+                    <field name="brand_id" column_invisible="parent.approval_type not in ('purchase_req','purchase','po_comparison')"/>
+                    <field name="fmis_job_no" column_invisible="parent.approval_type not in ('purchase_req','purchase','po_comparison')"/>
+                    <field name="job_date" column_invisible="parent.approval_type not in ('purchase_req','purchase','po_comparison')"/>
+                    <field name="vehicle_no" column_invisible="parent.approval_type not in ('purchase_req','purchase','po_comparison')"/>
+                    <field name="bl_no" column_invisible="parent.approval_type not in ('purchase_req','purchase','po_comparison')"/>
+                    <field name="reference_key" column_invisible="parent.approval_type not in ('purchase_req','purchase','po_comparison')"/>
+                    <field name="analytic_distribution" widget="analytic_distribution" 
+                    required="parent.PR_type != 'cash_advance' and parent.approval_type == 'purchase_req'"
+                    column_invisible="parent.approval_type not in ('purchase_req', 'purchase', 'po_comparison')"/>
+                    <field name="without_PO" optional="hide"/>
+                    <field name="created_po" optional="hide"/>
+                    <field name="po_comparison_done" optional="hide"/>
+                    <field name="pr_done" optional="hide"/>
+                </xpath>     
+                <xpath expr="//field[@name='product_uom_id']" position="after">
+                    <field name="unit_price"/>
+                    <field name="total"/>
+                </xpath>       
+                
+                <xpath expr="//field[@name='warehouse_id']" position="attributes">
+                    <attribute name="column_invisible">1</attribute>
+                </xpath>  
+            </field>
+        </record>
+
+        <record id="action_rfq_comparison" model="ir.actions.act_window">
+            <field name="name">RFQ Comparison</field>
+            <field name="res_model">approval.product.line</field>
+            <field name="domain">[('approval_type','in',['purchase'])]</field> 
+            <field name="view_mode">pivot,tree,kanban,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No Approvals Line!
+                </p>
+                <p>
+                    Let's go to the <a type="action" class="text-primary" name="%(approvals.approval_category_action_new_request)d">new request</a> menu
+                </p>
+            </field>
+        </record>
+
+        <menuitem
+        id="approvals_product_line_menu_all"
+        parent="approvals.approvals_menu_manager"
+        name="Approval Lines"
+        action="approval_extends.approval_product_line_action_all"
+        sequence="60"/>
+    
+        <menuitem id="menu_rfq_comparison" 
+                  name="RFQ Comparison" 
+                  parent="approvals.approvals_menu_manager"
+                  action="approval_extends.action_rfq_comparison"
+                  sequence="10"/>
+    </data>
+</odoo>

@@ -1,0 +1,7 @@
+id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
+access_wizard_reject_reason,access_wizard_reject_reason,sale_extends.model_wizard_reject_reason,base.group_user,1,1,1,1
+access_revise_reason,access_revise_reason,sale_extends.model_revise_reason,base.group_user,1,1,1,1
+access_wizard_revise_reason,access_wizard_revise_reason,sale_extends.model_wizard_revise_reason,base.group_user,1,1,1,1
+access_approval_reason,access_approval_reason,sale_extends.model_approval_reason,base.group_user,1,1,1,1
+access_wizard_approval_reason,access_wizard_approval_reason,sale_extends.model_wizard_approval_reason,base.group_user,1,1,1,1
+

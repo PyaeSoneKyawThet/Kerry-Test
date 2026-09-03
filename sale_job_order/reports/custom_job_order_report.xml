@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="custom_header_footer_job_order">
+            <div class="header">
+                <div style="report_header_style">
+                    <div class="row" >
+                        <div class="col-4">
+                            <div style="margin-top:-60px; font-weight:bold;line-height: 0;">
+                                <h4><span>RECEIPT/INVOICE</span></h4>
+                                <h4><span style="text-transform: uppercase;" t-field="doc.job_order_type"></span></h4>
+                            </div>
+                        </div>
+                        <div class="col-5 text-center">
+    
+                        </div>
+                        <div class="col-3 text-end">
+                            <span t-field="doc.company_id.logo"
+                                t-options="{'widget':'image', 'style': 'height:85px; width:130px'}" />
+                        </div>
+                    </div>
+                    
+                    <t t-set="print_count" t-value="doc._get_print_count()"/>
+                    <div class="row" style="width: 100%; height: 900px;position: relative;" t-if="print_count == 1 and doc.state == 'sale'">
+                        <div style="margin-top: 250px;">
+                            <span style="-webkit-transform:rotate(-45deg); color:grey; font-size:10rem; text-align:center; position:absolute; opacity:0.3;font-weight:normal;font-family: Arial">ORIGINAL</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row" style="height:0px; width:100%; margin-left:2%;" t-if="doc.state in ['draft']">
+                    <div class="col-6" name="watermark">
+                        <span style="-webkit-transform:rotate(-45deg); color:grey; font-size:11rem; text-align:center; position:absolute; opacity:0.3; padding-top:180px; font-weight:normal;font-family: Arial">
+                            DRAFT
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer" style="margin-bottom: -300px  !important;border-top: 1px solid black">                             
+                <div class="row mt-2">
+                    <span t-if="doc.company_id.company_footer" t-field="doc.company_id.company_footer" 
+                        t-options="{'widget':'image','style': 'height:80px; width:900px'}"/>
+                </div>        
+                <div class="row text-end" style="height: 25px;">                        
+                    <p><small>
+                        Page: <span class="page"/> / <span class="topage"/>
+                        <span class="ms-2" t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')"/>
+                    </small></p>   
+                </div>  
+            </div>
+
+        </template>
+
+        <template id="custom_report_job_order_document">
+            <t t-call="web.external_layout">
+                <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)" />
+                <t t-set="forced_vat" t-value="doc.fiscal_position_id.foreign_vat" /> <!-- So that it
+                appears in the footer of the report instead of the company VAT if it's set -->
+
+                <t
+                    t-if="doc.partner_shipping_id == doc.partner_invoice_id
+                                     and doc.partner_invoice_id != doc.partner_id
+                                     or doc.partner_shipping_id != doc.partner_invoice_id">
+                    <t t-set="information_block">
+                        <strong>
+                            <t t-if="doc.partner_shipping_id == doc.partner_invoice_id">
+                                Invoicing and Shipping Address:
+                            </t>
+                            <t t-else="">
+                                Invoicing Address:
+                            </t>
+                        </strong>
+                        <div t-field="doc.partner_invoice_id"
+                            t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}' />
+                        <t t-if="doc.partner_shipping_id != doc.partner_invoice_id">
+                            <strong>Shipping Address:</strong>
+                            <div t-field="doc.partner_shipping_id"
+                                t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}' />
+                        </t>
+                    </t>
+                </t>
+                <div class="page" style="margin-top: -10px;">
+                    <div class="oe_structure" />
+                    <!-- information -->
+                    <div style="margin-bottom:30px;" class="row " name="customer_detail" id="informations">
+                        <!-- customer detail -->
+                        <div class="col-7 ">
+                            <!-- Customer Name -->
+                            <div class="row">
+                                <div class="col-3 ">
+                                    <strong>Customer Name</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-8">                            
+                                    <t t-if="doc.is_job_order and doc.job_order_type and doc.job_order_type in ('dry_port')">
+                                        <span t-field="doc.received_customer_id.complete_name" />
+                                    </t>
+                                    <t t-else="">
+                                        <span t-field="doc.partner_id.complete_name" />
+                                    </t>
+                                </div> 
+                            </div>
+                            <t t-set="lines_to_report" t-value="doc._get_order_lines_to_report()"/>
+                            <!-- Container No -->
+                            <div class="row">
+                                <div class="col-3">
+                                    <strong>Container No</strong> 
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-8">
+                                    <span
+                                        t-esc="', '.join(sorted(set(line.container_no for line in lines_to_report if line.container_no)))" />
+                                </div>
+                            </div>
+                            <!-- Container Type -->
+                            <div class="row">
+                                <div class="col-3">
+                                    <strong>Container Type</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-9">
+                                    <span
+                                        t-esc="', '.join(sorted(set(line.container_type_id.name for line in lines_to_report if line.container_type_id)))" />
+                                </div>
+                            </div>
+
+                            <!-- Vehicle NO -->
+                            <div class="row">
+                                <div class="col-3">
+                                    <strong>Vehicle NO</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-9">
+                                    <span
+                                        t-esc="', '.join(sorted(set(line.vehicle_no for line in lines_to_report if line.vehicle_no)))" />
+                                </div>
+                            </div>
+
+                            <!-- Vehicle Type -->
+                            <div class="row">
+                                <div class="col-3">
+                                    <strong>Vehicle Type</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-9">
+                                    <span
+                                        t-esc="', '.join(sorted(set(line.vehicle_type_id.name for line in lines_to_report if line.vehicle_type_id)))" />
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Order Details -->
+                        <div class="col-5" style="margin-left: 55px;" name="order_detail">
+                            <div class="row">
+                                <div class="col-4">
+                                    <strong>Document No</strong>
+                                </div>
+                                <span class="col-2">:</span>
+                                <div class="col-6" t-if="doc.name">
+                                    <span t-field="doc.name" class="ms-4" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <strong>Document Date</strong>
+                                </div>
+                                <span class="col-2">:</span>
+                                <div class="col-6" t-if="doc.job_date">
+                                    <span t-field="doc.job_date" class="ms-4" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <strong>Job Location</strong>
+                                </div>
+                                <span class="col-2">:</span>
+                                <div class="col-6">
+                                    <span t-field="doc.staff_location_id.name" class="ms-4" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <strong>Payment Type</strong>
+                                </div>
+                                <span class="col-2">:</span>
+                                <div class="col-6" t-if="doc.payment_term_id.name">
+                                    <span t-field="doc.payment_term_id.name" class="ms-4" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <strong>Attention To</strong>
+                                </div>
+                                <span class="col-2">:</span>
+                                <div class="col-6">
+                                    <span t-field="doc.partner_id.contact_person" class="ms-4" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="oe_structure"></div>
+
+                    <table class="table table-sm o_main_table my-0">
+                        <thead style="display: table-row-group" class="border-1">
+                            <tr style="color: dark; border: none !important;" class="border-1">
+                                <th name="th_index" class="text-center border-1" style="text-transform: capitalize; font-size: 16px; width: 5%;">No</th>
+                                <th name="th_description" class="text-start border-1" style="text-transform: capitalize; font-size: 16px; width: 40%;">Description</th>
+                                <th name="th_uom" class="text-center border-1" style="text-transform: capitalize; font-size: 16px;">UOM</th>
+                                <th name="th_qty" class="text-center border-1" style="text-transform: capitalize; font-size: 16px;">Qty</th>
+                                <th name="th_priceunit" class="text-end border-1" style="text-transform: capitalize; font-size: 16px;">Unit Price</th>
+                                <th name="th_amount" class="text-end border-1" style="text-transform: capitalize; font-size: 16px;width: 20%;">Amount</th> <!-- Adjusted width for Amount -->
+                            </tr>
+                        </thead>
+                        <tbody class="sale_tbody border-0">
+                            <t t-set="current_subtotal" t-value="0" />
+                            <t t-set="current_taxtotal" t-value="0" />
+                            <t t-set="index" t-value="1" />
+
+                            <!-- Loop Through Line Items -->
+                            <t t-foreach="lines_to_report" t-as="line">
+                                <t t-set="current_subtotal" t-value="current_subtotal + line.price_subtotal" />
+                                <t t-set="current_taxtotal" t-value="current_taxtotal + line.price_tax" />
+
+                                <tr>
+                                    <!-- Product details -->
+                                    <td name="td_no" class="text-center border-1">
+                                        <span t-esc="index"/>
+                                    </td>
+                                    <td name="td_name" class="border-1">
+                                        <span t-field="line.name" />
+                                    </td>
+                                    <td name="td_uom" class="text-center border-1">
+                                        <span t-field="line.product_uom" />
+                                    </td>
+                                    <td name="td_qty" class="text-center border-1">
+                                        <span t-esc="line.product_uom_qty" />
+                                    </td>
+                                    <td name="td_priceunit" class="text-end border-1">
+                                        <span t-field="line.price_unit" />
+                                    </td>
+                                    <td name="td_amount" class="text-end border-1">
+                                        <span t-field="line.price_subtotal" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>
+                                    </td>
+                                </tr>
+                                <t t-set="index" t-value="index + 1" />
+                            </t>
+                        </tbody>
+                    </table>
+
+                    <!-- Second table for totals -->
+                    <div class="oe_structure"></div>
+                    <!-- Second table for totals -->
+                    <div class="oe_structure"></div>
+                    <div class="d-flex justify-content-end" style="margin-top: 0;">
+                        <table class="table table-borderless border-0" style="margin-top: 0; width: 100%; table-layout: fixed;">
+                            <tr>
+                                <td class=" border-0 text-end" style="padding-left: 0; width: 80%;">
+                                    <span>Sub Total</span>
+                                    <span>(</span>
+                                    <span t-field="doc.currency_id.name" />
+                                    <span>)</span>
+                                </td>
+                                <td class="text-end border border-dark border-start-1 border-end-1 border-bottom-1" style="width: 20%;">
+                                    <span t-esc="('{:,.2f}'.format(current_subtotal))">500.00</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class=" border-0 text-end" style="padding-left: 0; width: 80%;">
+                                    <!-- testing -->
+                                    <t t-if="doc.tax_totals['groups_by_subtotal']['Untaxed Amount']">
+                                        <t t-foreach="doc.tax_totals['groups_by_subtotal']['Untaxed Amount']" t-as="amount_by_group">
+                                            <span>Commercial <strong t-esc="amount_by_group['tax_group_name']"></strong></span>
+                                        </t>
+                                    </t>
+                                    <t t-else="">
+                                        <span>Commercial Tax</span>
+                                    </t>
+                                    
+
+                                </td>
+                                <td class="text-end border border-dark border-top-1 border-start-1 border-end-1" style="width: 20%;">
+                                    <span t-esc="('{:,.2f}'.format(current_taxtotal))">0.00</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class=" border-0 text-end" style="padding-left: 0; width: 80%;">
+                                    <span>Grand Total</span>
+                                    <span>(</span>
+                                    <span t-field="doc.currency_id.name" />
+                                    <span>)</span>
+                                </td>
+                                <t t-if="current_taxtotal > 0">
+                                    <td class="text-end border border-dark border-top-1 border-start-1 border-end-1" style="width: 20%;">
+                                        <span t-esc="('{:,.2f}'.format(current_subtotal + current_taxtotal))">500.00</span>
+                                    </td>
+                                </t>
+                                <t t-else="current_taxtotal > 0">
+                                    <td class="text-end border border-dark border-top-1 border-start-1 border-end-1" style="width: 20%;">
+                                        <span t-esc="('{:,.2f}'.format(current_subtotal))">500.00</span>
+                                    </td>
+                                </t>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="oe_structure"></div>
+
+
+                    <!-- <div t-if="not doc.signature" class="oe_structure"></div>
+                    <div t-else="" class="mt-4 ml64 mr4" name="signature">
+                        <div class="offset-8">
+                            <strong>Signature</strong> 
+                        </div>
+                        <div class="offset-8">
+                            <img t-att-src="image_data_uri(doc.signature)" style="max-height: 4cm; max-width: 8cm;"/>
+                        </div>
+                        <div class="offset-8 text-center">
+                            <span t-field="doc.signed_by">Oscar Morgan</span>
+                        </div>
+                    </div>                   
+                    
+
+                    <div>
+                           
+                        <div style="display: flex;">
+                            
+                        </div>
+                        <span t-field="doc.category_note" t-attf-style="text-align:justify;text-justify:inter-word;"
+                    name="category_note"/>
+                        <span t-field="doc.note" t-attf-style="#{'text-align:justify;text-justify:inter-word;' if
+                    doc.company_id.terms_type != 'html' else ''}" name="order_note"/>
+                        <p t-if="not is_html_empty(doc.payment_term_id.note)">
+                            <span t-field="doc.payment_term_id.note">The payment should also be transmitted with love</span>
+                        </p>
+                        <p t-if="doc.fiscal_position_id and not is_html_empty(doc.fiscal_position_id.sudo().note)"
+                            id="fiscal_position_remark">
+                            <strong>Fiscal Position Remark:</strong>
+                            <span t-field="doc.fiscal_position_id.sudo().note">No further requirements for this payment</span>
+                        </p>                      
+                    </div>                   
+
+                    <div class="d-flex justify-content-end">
+                        <div>
+                            <table class="table table-borderless border-0">
+                                <tr>
+                                    <td class="px-3 py-2 border-0 ">
+                                        <span>SUB-TOTAL</span>
+                                        <span>(</span>
+                                        <span t-field="doc.currency_id.name" />
+                                        <span>)</span>
+                                    </td>
+                                    <td
+                                        class="text-end px-3 py-2 border border-dark border-start-1 border-end-1 border-bottom-1">
+                                        <span t-esc="('{:,.2f}'.format(current_subtotal))"
+                                        >31.05</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-3 py-2 border-0">
+                                        <span>Commercial Tax</span>
+                                    </td>
+                                    <td
+                                        class="text-end px-3 py-2 border border-dark border-top-1 border-start-1 border-end-1 ">
+                                        <span t-esc="('{:,.2f}'.format(current_taxtotal))"
+                                        >31.05</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-3 py-2 border-0">
+                                        <span>GRAND-TOTAL</span>
+                                        <span>(</span>
+                                        <span t-field="doc.currency_id.name" />
+                                        <span>)</span>
+                                    </td>
+                                    <t t-if="current_taxtotal > 0">
+                                        <td
+                                            class="px-3 py-2 border border-dark border-start-1 border-end-1">
+                                            <span
+                                                t-esc="('{:,.2f}'.format(current_subtotal + current_taxtotal))"
+                                            >
+                                                31.05</span>
+                                        </td>
+                                    </t>
+                                    <t t-else="current_taxtotal > 0">
+                                        <td
+                                            class="px-3  border border-dark border-start-1 border-end-1">
+                                            <span t-esc="('{:,.2f}'.format(current_subtotal))"
+                                            >31.05</span>
+                                        </td>
+                                    </t>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>-->
+
+                    <div class="row mt-2">
+                        <p>Amount In Words(<span t-field="doc.currency_id.name" />) <span
+                                class="me-2">:</span> 
+                            <span t-field="doc.amount_total_words" />
+                        </p>
+                    </div>
+                    <div class="row mt-2">
+                        <p>Received By: </p>
+                    </div>
+                </div>
+
+            </t>
+        </template>
+
+        <template id="report_job_order_new">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-if="doc.is_job_order">
+                        <t t-call="sale_job_order.custom_header_footer_job_order" />
+                        <t t-set="lang" t-value="doc.partner_id.lang" />
+                        <t t-call="sale_job_order.custom_report_job_order_document" t-lang="lang" />
+                    </t>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

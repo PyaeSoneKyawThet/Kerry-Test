@@ -1,0 +1,649 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="custom_header_footer_receipt_voucher">
+            <t t-foreach="docs" t-as="doc">
+                <div class="header">
+                    <div style="report_header_style">
+                        <div class="row justify-content-end">
+                            <div class="col-3"></div>
+                            <div class="col-6 py-4">
+                                <div style="font-weight:bold;">
+                                    <h4 class="text-center">  
+                                        <span>RECEIPT VOUCHER</span>  
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="col-3 text-end">
+                                <span t-field="doc.company_id.logo"
+                                    t-options="{'widget':'image', 'style': 'height:85px; width:130px'}" />
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+
+                <div class="footer" style="margin-bottom: -300px  !important;border-top: 1px solid black">                             
+                    <div class="row">
+                        <div class="col-4">
+                            <span style="font-size: 15px;" t-if="doc.company_id.name" t-field="doc.company_id.name"></span>
+                        </div>
+                        <div class="col-4 text-center">
+                            <span style="font-size: 12px;">
+                                <span t-field="doc.name"/>
+                            </span>
+                        </div>
+                        <div class="col-4 text-end" style="height: 25px;">                        
+                            <p style="font-size: 12px;"><small>
+                                Page: <span class="page"/> / <span class="topage"/>
+                                <span class="ms-2" t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y %H:%M:%S')"/>
+                            </small></p>                                               
+                        </div> 
+                    </div>  
+                </div>
+            </t>
+        </template>
+
+        <template id="custom_receipt_report">
+            <t t-call="web.external_layout">
+                <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)" />
+                <t t-set="forced_vat" t-value="doc.fiscal_position_id.foreign_vat" /> <!-- So that it
+                appears in the footer of the report instead of the company VAT if it's set -->
+
+                <div class="page" style="">
+                    <div class="row">
+                        <span>Description</span>
+                        <span class="mx-2">:</span>
+                        <span t-field="doc.ref"/>
+                    </div>
+
+                    <div class="row mb-4">
+                        <span>Receipt Voucher No</span>
+                        <span class="mx-2">:</span>
+                        <span t-field="doc.receipt_voucher_no"/>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-6" name="Receipt Information">
+                            <div class="row">
+                                <div class="col-4">
+                                    <strong>Customer Code</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-7" t-if="doc.partner_id.ref">
+                                    <span t-field="doc.partner_id.ref" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <strong>GL Date</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-7" t-if="doc.move_id.date">
+                                    <span t-field="doc.move_id.date" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <strong>Bank Name</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-7" t-if="doc.journal_id.name">
+                                    <span t-field="doc.journal_id.name" />
+                                </div>
+                            </div>
+                            <!-- <div class="row">
+                                <div class="col-4">
+                                    <strong>Bank Number</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-7" t-if="doc.bank_account_no">
+                                    <span t-field="doc.bank_account_no" />
+                                </div>
+                            </div> -->
+                            <div class="row">
+                                <div class="col-4">
+                                    <strong>Exchange Rate</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-7" t-if="doc.currency_id.rate">
+                                    <span t-field="doc.currency_rate" t-options="{'widget': 'float', 'precision': 4, 'thousand_separator': True}"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6" name="Customer Information" >
+                            <div class="row">
+                                <div class="col-5">
+                                    <strong>Customer Name</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-6" t-if="doc.partner_id.name">
+                                    <span t-field="doc.partner_id.name" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-5">
+                                    <strong>Receipt Type</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-6" t-if="doc.account_payment_type_id.name">
+                                    <span t-field="doc.account_payment_type_id.name" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-5">
+                                    <strong>Currency</strong>
+                                </div> 
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-6" t-if="doc.report_currency_id">
+                                    <span t-field="doc.report_currency_id.name" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-5">
+                                    <strong>Official Receipt No</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-6" t-if="doc.official_receipt_no">
+                                    <span t-field="doc.official_receipt_no" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-5">
+                                    <strong>Official Receipt Date</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-6" t-if="doc.official_receipt_date">
+                                    <span t-field="doc.official_receipt_date" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-5">
+                                    <strong>Received Amount</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-6" t-if="doc.report_amount">
+                                    <span t-field="doc.report_amount" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="table table-borderless border-0 "  style="margin-bottom: 50px;">
+                        <tr class="border border-dark border-1 border-start-0 border-end-0">
+                            <th class="border-0" style="text-transform: capitalize;">No</th>
+                            <th class="border-0" style="text-transform: capitalize;">Account Code</th>
+                            <th class="border-0" style="text-transform: capitalize;">Account Name</th>
+                            <th class="border-0" style="text-transform: capitalize;">Amount</th>
+                            <th class="border-0" style="text-transform: capitalize;">Debit Amount (MMK)</th>
+                            <th class="border-0" style="text-transform: capitalize;">Credit Amount (MMK)</th>
+                        </tr>
+                        <tbody>
+                            <t t-set="total_credit" t-value="0" />
+                            <t t-set="total_debit" t-value="0" />
+                            <t t-set="index" t-value="1" />
+                            <t t-foreach="doc.move_id.line_ids" t-as="line">
+                                <tr class="border-0">
+                                    <td class="border-0 text-end" t-esc="index"></td>
+                                    <td class="border-0" name="td_account_code">
+                                        <span t-field="line.account_id.code"/>
+                                    </td>
+                                    <td class="border-0" name="td_account_name">
+                                        <span t-field="line.account_id.name"/>
+                                    </td>
+                                    <td name="td_amount_currency" class="text-end border-0">
+                                        <span t-out="line.amount_currency" t-options="{'widget': 'monetary', 'display_currency': line.currency_id}"/>
+                                    </td>
+                                    <td name="td_debit" class="text-end border-0">
+                                        <span t-field="line.debit" t-options="{'widget': 'float','precision': 2, 'thousand_separator': True}"/>
+                                    </td>
+                                    <t t-set="total_debit" t-value="total_debit + line.debit"></t>
+                                    <td name="td_credit" class="text-end border-0" style="background-color: #ffffff; color:#665f60">
+                                        <span t-field="line.credit" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>
+                                    </td>
+                                    <t t-set="total_credit" t-value="total_credit + line.credit"></t>
+                                </tr>
+                                <t t-set="index" t-value="index + 1"/> 
+                            </t>
+
+                            <!-- check if the current payment is the last payment -->
+                            <t t-set="has_write_off" t-value="False"/> 
+                            <t t-foreach="doc.reconciled_invoice_ids" t-as="line">
+                                <t t-if="line.report_invoice_payments_widget">
+                                    <t t-set="payment_data" t-value="json.loads(line.report_invoice_payments_widget)" />
+                                    <t t-if="payment_data.get('content')">
+                                        <t t-set="payment_amount" t-value="0" />
+                                        <t t-set="payment_list" t-value="[payment for payment in payment_data['content'] if payment['invoice_id'] == line.id and not payment['is_exchange'] and payment['account_payment_id']]" />
+                                        <t t-if="payment_list">
+                                            <t t-set="last_payment" t-value="sorted(payment_list, key=lambda p: p['index_no'])[-1]" />
+                                            <t t-foreach="payment_list" t-as="payment">
+                                                <t t-if="payment['account_payment_id'] == doc.id">
+                                                    <t t-if="payment['account_payment_id'] == last_payment['account_payment_id']">
+                                                        <t t-set="has_write_off" t-value="True"/> 
+                                                    </t>
+                                                </t>
+                                            </t>
+                                        </t>
+                                    </t>
+                                </t>
+                            </t>
+
+                            <!-- write off created for extra payment amount 
+                             ( eg: invoice used:3000, paymnet:5000, write-off:2000 )
+                            -->
+                            <t t-if="has_write_off">
+                                <t t-set="extra_write_off_lines" t-value="doc._get_write_off_journal()" />
+                                <t t-if="extra_write_off_lines">
+                                    <t t-foreach="extra_write_off_lines" t-as="line">
+                                        <tr class="border-0">
+                                            <td class="border-0 text-end" t-esc="index"></td>
+                                            <td class="border-0" name="td_account_code">
+                                                <span t-field="line.account_id.code"/>
+                                            </td>
+                                            <td class="border-0" name="td_account_name">
+                                                <span t-field="line.account_id.name"/>
+                                            </td>
+                                            <td name="td_amount_currency" class="text-end border-0">
+                                                <span t-out="line.amount_currency" t-options="{'widget': 'monetary', 'display_currency': line.currency_id}"/>
+                                            </td>
+                                            <td name="td_debit" class="text-end border-0">
+                                                <span t-out="'-{:,.2f}'.format(line.debit) if line.debit != 0 else '{:,.2f}'.format(line.debit)"/>
+                                            </td>
+                                            <t t-set="total_debit" t-value="total_debit - line.debit"></t>
+                                            <td name="td_credit" class="text-end border-0" style="background-color: #ffffff; color:#665f60">
+                                                <span t-out="'-{:,.2f}'.format(line.credit) if line.credit != 0 else '{:,.2f}'.format(line.credit)"/>
+                                            </td>
+                                            <t t-set="total_credit" t-value="total_credit - line.credit"></t>
+                                        </tr>
+                                        <t t-set="index" t-value="index + 1"/> 
+                                    </t>
+                                </t> 
+                            </t>
+                            
+
+                            <!-- write off and exchange difference rows
+                             ( eg: invoice used:5000, paymnet:3000, write-off:2000 )
+                            -->
+                            <t t-foreach="doc.reconciled_invoice_ids" t-as="line">
+                                <t t-set="write_off_line" t-value="line._get_write_off_journal(doc.id)">  </t>
+                                <t t-if="has_write_off and write_off_line['write_off_moves']">
+                                    <t t-foreach="write_off_line['write_off_moves'].invoice_line_ids" t-as="line">
+                                        <tr class="border-0">
+                                            <td class="border-0 text-end" t-esc="index"></td>
+                                            <td class="border-0" name="td_account_code">
+                                                <span t-field="line.account_id.code"/>
+                                            </td>
+                                            <td class="border-0" name="td_account_name">
+                                                <span t-field="line.account_id.name"/>
+                                            </td>
+                                            <td name="td_amount_currency" class="text-end border-0">
+                                                <span t-out="line.amount_currency" t-options="{'widget': 'monetary', 'display_currency': line.currency_id}"/>
+                                            </td>
+                                            <td name="td_debit" class="text-end border-0">
+                                                <span t-field="line.debit" t-options="{'widget': 'float',  'precision': 2 , 'thousand_separator': True}"/>
+                                            </td>
+                                            <t t-set="total_debit" t-value="total_debit + line.debit"></t>
+                                            <td name="td_credit" class="text-end border-0" style="background-color: #ffffff; color:#665f60">
+                                                <span t-field="line.credit" t-options="{'widget': 'float',  'precision': 2, 'thousand_separator': True}"/>
+                                            </td> 
+                                            <t t-set="total_credit" t-value="total_credit + line.credit"></t>
+                                        </tr>
+                                        <t t-set="index" t-value="index + 1"/> 
+                                    </t>
+                                </t>    
+                            </t>
+                            
+                            <!-- total row -->
+                            <tr name="Total Row" class="border border-dark border-1 border-start-0 border-end-0" >
+                                <td class="border-0"></td>
+                                <td class="border-0 text-nowrap">
+                                    <span>Total Amount</span>
+                                </td>
+                                <td class="border-0"></td>
+                                <td class="border-0"></td>
+                                <td class="text-end border-0">
+                                     <span t-esc="total_debit" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>
+                                </td>
+                                <td class="text-end border-0" style="background-color: #ffffff; color: #665f60">
+                                    <span t-esc="total_credit" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <t t-set="credit_note_values" t-value="doc._get_credit_refund_value()"/>
+                    
+                    <t t-foreach="doc._get_grouped_invoice()" t-as="group">
+                        <p style="font-size: 15px;">Applied Invoice(<span t-out="group['currency'].name"/>)</p>
+
+                        <t t-if="group['invoices']">
+                            <table class="table table-borderless border-0" style="margin-bottom: 30px;">
+                                <tr class="border border-dark border-1 border-start-0 border-end-0" style="page-break-after: avoid;">
+                                    <th class="border-0 text-center" style="text-transform: capitalize;">No</th>
+                                    <th class="border-0 text-center" style="text-transform: capitalize;">Invoice Number</th>
+                                    <th class="border-0 text-center" style="text-transform: capitalize;" >Invoice Date</th>
+                                    <th class="border-0 text-center" style="text-transform: capitalize;">Invoice Amount</th>
+                                    <th class="border-0 text-center" style="text-transform: capitalize;">Amount Balance</th>
+                                    <th class="border-0 text-center" style="text-transform: capitalize;">This Payment</th>
+                                    <th class="border-0 text-center" style="text-transform: capitalize;">Balance Due</th>
+                                </tr>
+                                <tbody>
+                                    <t t-set="total_invoice_amount" t-value="0" />
+                                    <t t-set="total_this_payment" t-value="0" />
+                                    <t t-set="total_balance_due" t-value="0" />
+                                    <t t-set="total_amount_balance" t-value="0" />
+
+                                    <t t-set="balance_due" t-value="0" />
+                                    <t t-set="amount_balance" t-value="0" />
+                                    <t t-set="payment_amount" t-value="0" />
+                                    <t t-set="index_no" t-value="1" />
+                                    <t t-set="stop_summing" t-value="False" />
+                                    <t t-set="write_off_amount" t-value="0" />
+                                    <t t-set="refund_amount" t-value="0" />
+
+                                    <t t-foreach="group['invoices']" t-as="line">
+                                        <t t-if="line.report_invoice_payments_widget">
+                                            <t t-set="payment_data" t-value="json.loads(line.report_invoice_payments_widget)" />
+                                            <t t-if="payment_data.get('content')">
+
+                                                <t t-set="payment_amount" t-value="0" />
+                                                <t t-foreach="payment_data['content']" t-as="payment">
+                                                    <t t-if="payment['invoice_id'] == line.id and payment['account_payment_id'] != doc.id and payment['account_payment_id'] and not stop_summing">
+                                                        <t t-set="payment_amount" t-value="payment_amount + payment['amount']" /> <!-- payment_amount = amount paid for invoice before current payment -->
+                                                    </t>
+
+                                                    <t t-if="payment['invoice_id'] == line.id and not payment['is_exchange'] and payment['account_payment_id']">
+                                                        <t t-if="payment['account_payment_id'] == doc.id">
+                                                            <t t-set="amount" t-value="payment['amount']"/> <!-- amount = amount paid for invoice from current payment -->
+                                                            <t t-set="stop_summing" t-value="True"/>
+                                                        </t>
+                                                    </t>
+
+                                                    <t t-if="payment['invoice_id'] == line.id and not payment['is_exchange'] and 
+                                                            not payment['account_payment_id'] and 
+                                                            has_write_off and payment['move_type'] != 'out_refund'">
+                                                        <t t-set="write_off_amount" t-value="write_off_amount + payment['amount']" /> <!-- write_off_amount = write off amount if write-off is created after current payment -->
+                                                    </t>
+
+                                                    <t t-if="payment['invoice_id'] == line.id and not payment['is_exchange'] and 
+                                                            not payment['account_payment_id'] and has_write_off
+                                                            and payment['move_type'] == 'out_refund'">
+                                                        <t t-set="refund_amount" t-value="refund_amount + payment['amount']" /> <!-- refund_amount = refund amount if credit note is created before current payment -->
+                                                    </t>
+                                                </t>
+                                                
+
+                                                <t t-set="amount_balance" t-value="line.tax_totals['amount_total'] - (payment_amount + refund_amount)" /> <!-- amount_balance = amount that remain on invoice before current payment -->
+                                                <t t-set="amount" t-value="amount + write_off_amount"/>
+                                                <t t-set="write_off_amount" t-value="0"/>
+                                                <t t-set="refund_amount" t-value="0"/>
+                                            </t>
+                                            
+                                        </t>
+
+                                        <t t-set="credit_total" t-value="credit_note_values.get(line.id, {}).get('total', 0.0)"/>
+
+                                        <tr class="border-0" style="background-color: #ffffff;"> <!-- Enforced white background -->
+                                            <td class="border-0 text-center" t-esc="index_no"></td>
+                                            <td class="border-0 text-start" name="td_invoice_name">
+                                                <span t-field="line.name" />
+                                            </td>
+                                            <td class="border-0" name="td_invoice_date">
+                                                <span t-field="line.invoice_date"/>
+                                            </td>
+                                            <td name="td_invoice_amount" class="text-end border-0">
+                                                <span t-out="line.tax_totals['amount_total']" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>
+                                            </td>
+                                            <t t-set="total_invoice_amount" t-value="total_invoice_amount + line.tax_totals['amount_total']"></t>
+                                            <td class="text-end border-0" name="td_amount_balance">
+                                                <span t-out="amount_balance + credit_total"  t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>
+                                            </td>
+                                            <t t-set="total_amount_balance" t-value="total_amount_balance + amount_balance + credit_total" />
+
+                                            <td class="text-end border-0" name="td_this_payment">
+                                                <span t-esc="amount" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>
+                                            </td>
+                                            <t t-set="total_this_payment" t-value="total_this_payment + amount" />
+
+                                            <td class="text-end border-0" name="td_balance_due" style="background-color: #ffffff;color: #665f60"> <!-- Ensure white background explicitly -->
+                                                <t t-set="balance_due" t-value="round((amount_balance + credit_total) - amount,2)" />
+                                                <span t-out="balance_due" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>
+                                            </td>
+                                            <t t-set="total_balance_due" t-value="total_balance_due + balance_due" />
+                                        </tr>
+
+                                        <!-- credit note will display here -->
+                                        <t t-foreach="credit_note_values.get(line.id, {}).get('lines', [])" t-as="credit_note">
+                                            <tr class="border-0" style="background-color: #ffffff;"> <!-- Enforced white background -->
+                                                <td class="border-0 text-center"></td>
+                                                <td class="border-0 text-start" name="td_invoice_name">
+                                                    <span t-out="credit_note['name']" />
+                                                </td>
+                                                <td class="border-0" name="td_invoice_date">
+                                                    <span t-out="credit_note['date']"/>
+                                                </td>
+                                                <td name="td_invoice_amount" class="text-end border-0">
+                                                    <span t-out="credit_note['amount_total']" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>
+                                                </td>
+                                                <t t-set="total_invoice_amount" t-value="total_invoice_amount + credit_note['amount_total']"></t>
+                                                <td class="text-end border-0" name="td_amount_balance">
+                                                    <span t-out="credit_note['amount_total']"  t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>
+                                                </td>
+                                                <t t-set="total_amount_balance" t-value="total_amount_balance + credit_note['amount_total']" />
+
+                                                <td class="text-end border-0" name="td_this_payment">
+                                                    
+                                                </td>
+
+                                                <td class="text-end border-0" name="td_balance_due" style="background-color: #ffffff;color: #665f60"> <!-- Ensure white background explicitly -->
+                                                    <span t-out="credit_note['amount_total']" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>
+                                                </td>
+                                                <t t-set="total_balance_due" t-value="total_balance_due + credit_note['amount_total']" />
+                                            </tr>
+                                        </t>
+                                        
+                                        <t t-set="index_no" t-value="index_no + 1" />
+                                    </t>
+
+                                    <tr><td colspan="5" class="border-0" style="height: 5px;background-color: #ffffff;"></td></tr>
+                                    <tr name="Total Row" class="border border-dark border-1 border-start-0 border-end-0" style="background-color: #ffffff;"> <!-- Total row BG to white -->
+                                        <td class="border-0" style="background-color: #ffffff;"></td>
+                                        <td class="border-0 text-center" style="background-color: #ffffff;">
+                                            <span>Total Amount</span>
+                                        </td>
+                                        <td class="border-0"></td>
+                                        <td class="text-end border-0">
+                                            <span t-esc="total_invoice_amount" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>
+                                        </td>
+                                        <td class="text-end border-0" style="background-color: #ffffff;">
+                                            <span t-esc="total_amount_balance" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}" />
+                                        </td>
+                                        <td class="text-end border-0" style="background-color: #ffffff;">
+                                            <span t-esc="total_this_payment" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}" />
+                                        </td>
+                                        <td class="text-end border-0" style="background-color: #ffffff;color: #665f60">
+                                            <span t-esc="total_balance_due" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}" />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </t>
+                    </t>
+                    
+                    
+                    <!-- prepared by, checked by approved by -->
+                    <div class="row" style="margin-top: 200px;page-break-inside: avoid;">
+                        <!-- <div class="col-4"> 
+                            <div class="row" style="height: 40px; position: relative;">
+                                <div class="col-4" style="position: absolute; bottom: 0;">
+                                    <span>Prepared By</span>
+                                </div>
+                                <div class="col-1 pb-1" style="position: absolute; bottom: 0; left: 33%;">
+                                    :
+                                </div>
+                                <div class="col-6" style="position: absolute; bottom: 0; left: 42%;">
+                                    <div>
+                                        <span t-if="doc.submit_user_id.employee_id.digital_signature" 
+                                              t-field="doc.submit_user_id.employee_id.digital_signature" 
+                                              t-options="{'widget':'image','style': 'height:45px; width:200px'}" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <span>Name</span>
+                                </div>
+                                <div class="col-1">:</div>
+                                <div class="col-6" t-if="doc.submit_user_id.name">
+                                    <span t-field="doc.submit_user_id.name" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <span>Date</span>
+                                </div>
+                                <div class="col-1">:</div>
+                                <div class="col-6" t-if="doc.submit_date">
+                                    <span t-field="doc.submit_date" />
+                                </div>
+                            </div>
+                        </div> -->
+
+                        <t t-if="doc.payment_type == 'outbound'">
+                            <t t-set="checkers" t-value="doc.vendor_payment_approver_ids.filtered(lambda l: l.status == 'checked')"/>
+                            <t t-set="checker" t-value="checkers.sorted(key=lambda l: l.id)[-1] if checkers else None"/>
+
+                            <t t-set="approvers" t-value="doc.vendor_payment_approver_ids.filtered(lambda l: l.status == 'approved')"/>
+                            <t t-set="approver" t-value="approvers.sorted(key=lambda l: l.id)[-1] if approvers else None"/>
+
+                            <t t-set="final_user" t-value="checker if checker else approver"/>
+                        </t>
+                        
+                        <t t-if="doc.payment_type == 'inbound'">
+                            <t t-set="checkers" t-value="doc.customer_payment_approver_ids.filtered(lambda l: l.status == 'checked')"/>
+                            <t t-set="checker" t-value="checkers.sorted(key=lambda l: l.id)[-1] if checkers else None"/>
+
+                            <t t-set="approvers" t-value="doc.customer_payment_approver_ids.filtered(lambda l: l.status == 'approved')"/>
+                            <t t-set="approver" t-value="approvers.sorted(key=lambda l: l.id)[-1] if approvers else None"/>
+
+                            <t t-set="final_user" t-value="checker if checker else approver"/>
+                        </t>
+                        
+                        <!-- [TASK-3736] -->
+                        <div class="col-8">
+                            <p><strong>Prepared By: </strong> <span t-field="doc.submit_user_id.name" t-if="doc.submit_user_id"/><span t-if="doc.submit_user_id.name">, </span><span t-field="doc.submit_date"/></p>
+                            <p><strong>Checked By: </strong>
+                                <t t-if="final_user">
+                                    <span t-out="final_user.approval_employee_id.name"/>
+                                    <t t-if="doc.check_date">
+                                        <span>, </span><span t-field="doc.check_date"/>
+                                    </t>
+                                    <t t-elif="doc.submit_date">
+                                        <span>, </span><span t-field="doc.submit_date"/>
+                                    </t>
+                                </t>
+                                <t t-elif="doc.state == 'posted' and doc.config_id and not doc.config_id.need_approval">
+                                    <span t-field="doc.submit_user_id.name" t-if="doc.submit_user_id"/><span t-if="doc.submit_user_id.name">, </span><span t-field="doc.submit_date"/>
+                                </t>
+                            </p>
+                            <p><strong>Approved By: </strong>
+                                <t t-if="approver">
+                                    <span t-out="approver.approval_employee_id.name"/><span t-if="approver.approval_employee_id.name">, </span>
+                                    <span t-field="doc.approve_date"/>
+                                </t>
+                                <t t-elif="doc.state == 'posted' and doc.config_id and not doc.config_id.need_approval">
+                                    <span t-field="doc.submit_user_id.name" t-if="doc.submit_user_id"/><span t-if="doc.submit_user_id.name">, </span><span t-field="doc.submit_date"/>
+                                </t>
+                            </p>
+                        </div>
+                        <!-- <div class="col-4"> 
+                            <div class="row" style="height: 40px; position: relative;">
+                                <div class="col-4" style="position: absolute; bottom: 0;">
+                                    <span>Checked By</span>
+                                </div>
+                                <div class="col-1  pb-1" style="position: absolute; bottom: 0; left: 33%;">
+                                    :
+                                </div>
+                                <div class="col-6" style="position: absolute; bottom: 0; left: 42%;">
+                                    <div t-if="final_user.approval_employee_id and final_user.approval_employee_id.employee_id.digital_signature">
+                                        <span  
+                                              t-field="final_user.approval_employee_id.employee_id.digital_signature" 
+                                              t-options="{'widget':'image','style': 'height:45px; width:200px'}" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <span>Name</span>
+                                </div>
+                                <div class="col-1">:</div>
+                                <div>
+                                    <t t-if="final_user">
+                                        <span t-field="final_user.approval_employee_id.name"/>
+                                    </t>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <span>Date</span>
+                                </div>
+                                <div class="col-1">:</div>
+                                <div class="col-6">
+                                    <span t-field="doc.check_date" />
+                                </div>
+                            </div>
+                        </div> -->
+
+                        <!-- <div class="col-4">
+                            <div class="row" style="height: 40px; position: relative;">
+                                <div class="col-4" style="position: absolute; bottom: 0;">
+                                    <span>Approved By</span>
+                                </div>
+                                <div class="col-1  pb-1" style="position: absolute; bottom: 0; left: 33%;">
+                                    :
+                                </div>
+                                <div class="col-6" style="position: absolute; bottom: 0; left: 42%;">
+                                    <div t-if="approver.approval_employee_id and approver.approval_employee_id.employee_id.digital_signature">
+                                        <span  
+                                              t-field="approver.approval_employee_id.employee_id.digital_signature" 
+                                              t-options="{'widget':'image','style': 'height:45px; width:200px'}" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <span>Name</span>
+                                </div>
+                                <div class="col-1">:</div>
+                                <div class="col-6">
+                                    <t t-if="approver">
+                                        <span t-field="approver.approval_employee_id.name"/>
+                                    </t>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <span>Date</span>
+                                </div>
+                                <div class="col-1">:</div>
+                                <div class="col-6" t-if="doc.approve_date">
+                                    <span t-field="doc.approve_date" />
+                                </div>
+                            </div>
+                        </div> -->
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <template id="receipt_voucher_report">
+            <t t-call="web.html_container">
+                <t t-call="account_payment_report.custom_header_footer_receipt_voucher" />
+                <t t-foreach="docs" t-as="doc">
+                    <t t-set="lang" t-value="doc.partner_id.lang" />
+                    <t t-call="account_payment_report.custom_receipt_report" t-lang="lang" />
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

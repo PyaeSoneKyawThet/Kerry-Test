@@ -1,0 +1,14 @@
+<odoo>
+
+    <menuitem id="menu_document_location_configuration" 
+              name="Document Location" 
+              parent="sale.menu_sale_config"
+              action="kmtl_customization.action_staff_location"
+              sequence="10"/>
+    
+    <menuitem id="menu_job_location_configuration" 
+              name="Job Location" 
+              parent="sale.menu_sale_config"
+              action="kmtl_customization.action_job_location"
+              sequence="20"/>
+</odoo>

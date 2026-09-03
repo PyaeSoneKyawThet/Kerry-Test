@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<odoo>
+    <record id="view_picking_form_inherit" model="ir.ui.view">
+        <field name="name">view.picking.form.inherit</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml"> 
+            <xpath expr="//field[@name='backorder_id']" position="after">
+                <field name="purchase_order_id" string="PO No" readonly="state in ['done']" invisible="not is_from_po"/>
+                <field name="vendor_invoice_no" string="Vendor Invoice No" readonly="state in ['done']" invisible="not is_from_po"/>
+            </xpath> 
+            <xpath expr="//field[@name='origin']" position="before">
+                <field name="delivery_date" readonly="state in ['done']" invisible="not is_from_po"/>
+            </xpath>
+            <xpath expr="//field[@name='origin']" position="after">
+                <field name="prepared_by_id" string="Prepared By" readonly="state in ['done']" invisible="not is_from_po"/>
+                <field name="prepared_department_id" string="Prepared By Department" readonly="state in ['done']" invisible="not is_from_po"/>
+                <field name="receipt_by_id" string="Receipt by" readonly="state in ['done']" invisible="not is_from_po" required="1"/>
+                <field name="receipt_department_id" string="Receipt Department" readonly="state in ['done']" invisible="not is_from_po"/>
+                <field name="is_from_po" invisible="1"/>
+            </xpath> 
+
+            <xpath expr="//tree//field[@name='product_id']" position="after">
+                <field name="brand_id" column_invisible="not parent.is_from_po"/>
+                <field name="analytic_distribution" widget="analytic_distribution" groups="analytic.group_analytic_accounting" column_invisible="not parent.is_from_po"/>
+                <field name="vehicle_no" column_invisible="not parent.is_from_po"/>
+                <field name="purchase_order_id" optional="hide" column_invisible="parent.picking_type_code != 'incoming'"/>
+                <field name="vendor_invoice_no" optional="hide" column_invisible="parent.picking_type_code != 'incoming'"/>
+                <field name="delivery_date" optional="hide" column_invisible="parent.picking_type_code != 'incoming'"/>
+                <field name="owner_id" optional="hide" column_invisible="parent.picking_type_code != 'incoming'"/>
+            </xpath>
+
+        </field>
+    </record>
+
+    <record id="vpicktree_prepared_by_id" model="ir.ui.view">
+        <field name="name">view.stock.picking.tree.prepared.by.id</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.vpicktree"/>
+        <field name="arch" type="xml">       
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="prepared_by_id" optional="hide"/>
+                <field name="purchase_order_id" string="PO No" optional="hide"/>
+                <field name="vendor_invoice_no" optional="hide"/>
+                <field name="delivery_date" optional="hide"/>
+                <field name="prepared_department_id" optional="hide"/>
+                <field name="receipt_by_id" optional="hide"/>
+                <field name="receipt_department_id" optional="hide"/>
+                <field name="owner_id" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+</odoo> 

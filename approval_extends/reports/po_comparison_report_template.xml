@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="custom_header_footer_po_comparison">
+            <div class="header">
+                <div style="report_header_style">
+                    <div class="row">
+                        <div class="col-3"></div>
+                        <div class="col-6 fw-bold py-4">
+                            <p class="text-center" style="font-size: 24px"> 
+                                <span>COMPARISON</span>
+                            </p>
+                        </div>
+                        <div class="col-3 text-end">
+                            <span t-field="doc.company_id.logo"
+                                t-options="{'widget':'image', 'style': 'height:85px; width:130px'}" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer" style="margin-bottom: -400px  !important;">  
+                <div class="row text-end" style="height: 25px;">                        
+                    <p style="font-size: 11px;"><small>
+                        Page: <span class="page"/> / <span class="topage"/>
+                        <span class="ms-2" t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y %H:%M:%S')"/>
+                    </small></p>                                               
+                </div>  
+                <div style="border-top: 1px solid black;">
+                    <span t-if="doc.company_id.company_footer" t-field="doc.company_id.company_footer" 
+                    t-options="{'widget':'image','style': 'height:80px; width:900px'}"/>
+                </div>                                                   
+            </div>
+
+        </template>
+
+        <template id="po_comparison_template">
+            <t t-call="web.external_layout">
+                <t t-set="doc" t-value="doc" />
+                <div class="page" style="font-size: 15px;">
+                    <div class="float-end">
+                        <span>Reference No:</span>
+                        <span t-field="doc.name"/>
+                    </div>
+
+                    <!-- table will show all create_rfqs -->
+                    <table class="table">
+                        <!-- header row: main table -->
+                        <tr>
+                            <td colspan="3" style="text-align: center;background-color: #ffffff;"><span>Figure</span></td>
+                            <t t-foreach="doc._create_rfq_vals()" t-as="val">
+                                <td colspan="3" style="text-align: center;background-color: #ffffff;color:#585759;">
+                                    <span>Vendor -</span>
+                                    <span t-field="val.partner_id"/>
+                                </td>
+                            </t>
+                        </tr>
+
+                        <!-- header row: sub-table -->
+                        <tr>
+                            <td style="text-align: center;">Items</td>
+                            <td style="text-align: center;">Description</td>
+                            <td style="text-align: center;background-color: #ffffff;">Unit</td>
+                            <t t-foreach="doc._create_rfq_vals()" t-as="val">
+                                <td style="text-align: center;">Qty</td>
+                                <td style="text-align: center;">Price</td>
+                                <td style="text-align: center;background-color: #ffffff;"><span style="color:#585759;">Amount</span></td>
+                            </t>
+                        </tr>
+
+                        <!-- table data -->
+                        <t t-set="index_no" t-value="1" />
+                        <t t-foreach="doc.po_comparison_line_ids" t-as="line">
+                            <tr>
+                                <td class="text-end">
+                                    <span  t-esc="index_no"/>
+                                </td>
+                                <td>
+                                    <span t-field="line.description"/>
+                                </td>
+                                <td style="background-color: #ffffff;">
+                                    <span  t-field="line.product_uom_id"/>
+                                </td>
+
+                                <t t-foreach="doc._create_rfq_vals()" t-as="val">
+                                    <t t-set="rfq_line" t-value="val.product_line_ids.filtered(lambda l: l.po_comparison_line_id.id == line.id)"/>
+                                    <!-- <t t-set="all_rfq_line" t-value="all_rfq_line + rfq_line"/> -->
+                                    <t t-set="duplicate_product" t-value="len(rfq_line) > 1"/>
+
+                                    <t t-if="rfq_line">
+                                        <td class="text-end">
+                                            <span t-if="not duplicate_product" t-field="rfq_line.quantity" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <span t-if="not duplicate_product" t-field="rfq_line.unit_price" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>
+                                        </td>
+                                        <td class="text-end" style="background-color: #ffffff;color:#585759;">
+                                            <span t-if="not duplicate_product" t-field="rfq_line.total" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>
+                                        </td>
+                                    </t>
+                                    <t t-else="">
+                                        <td></td>
+                                        <td></td>
+                                        <td style="background-color: #ffffff;"></td>
+                                    </t>
+                                </t>
+                            </tr>
+                            <t t-set="index_no" t-value="index_no + 1"/>
+                        </t>  
+                        
+                        <!-- get total display 
+                         loop through create_rfq to display data by related rfq table
+                         loop through comparison_line to get total data of rfq
+                        -->
+                        <tr t-if="doc._create_rfq_vals()">
+                            <td colspan="3" style="border: none;text-align: right;">
+                                <span>Total</span>
+                            </td>
+                            <t t-foreach="doc._create_rfq_vals()" t-as="val">
+                                <t t-set="line_total_value" t-value="0"/>
+                                <t t-foreach="doc.po_comparison_line_ids" t-as="line">
+                                    <t t-set="rfq_line" t-value="val.product_line_ids.filtered(lambda l: l.po_comparison_line_id.id == line.id)"/>
+                                    <t t-set="duplicate_product" t-value="len(rfq_line) > 1"/>
+                                    <t t-if="rfq_line and not duplicate_product">
+                                        <t t-set="line_total_value" t-value="line_total_value + rfq_line.total"/>
+                                    </t>
+                                </t> 
+                                <td colspan="3" style="text-align: right;background-color: #ffffff;color:#585759;border: none;right;"><span t-out="'{:,.2f}'.format(line_total_value)"/></td>
+                            </t>
+                        </tr>
+                        
+
+                    </table>
+
+                    <div class="mt-4">
+                        <span>Comparison Remark:</span> <span t-field="doc.remark"/>
+                    </div>
+
+                    <!-- show the data of approved rfq -->
+                    <div class="mt-2" name="vendor_selection">
+                        <t t-set="selected_rfq" t-value="doc._create_rfq_vals().filtered(lambda l: l.request_status == 'approved')"/>
+                        <div>
+                            <span>Vendor Name:</span>
+                            <span t-field="selected_rfq.partner_id"/>
+                        </div>
+                        <div>
+                            <span>RFQ No:</span>
+                            <span t-field="selected_rfq.name"/>
+                        </div>
+                        <div>
+                            <span>Approved By:</span>
+                            <t t-set="rfq_approver" t-value="selected_rfq.approver_ids.filtered(lambda l: l.status == 'approved')"/>
+                            <t t-if="rfq_approver">
+                                <span t-field="rfq_approver.user_id.name" />
+                            </t>
+                        </div>
+                        <div>
+                            <span>Remark:</span>
+                            <span t-field="selected_rfq.reason"/>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <template id="po_comparison_print">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="approval_extends.custom_header_footer_po_comparison" />
+                    <!-- <t t-set="lang" t-value="doc.partner_id.lang" /> -->
+                    <t t-call="approval_extends.po_comparison_template" t-lang="lang" />
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

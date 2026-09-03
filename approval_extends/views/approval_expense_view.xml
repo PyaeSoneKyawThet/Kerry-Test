@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_cancel_expense" model="ir.actions.server">
+        <field name="name">Cancel Expense</field>
+        <field name="model_id" ref="model_approval_expense"/>
+        <field name="binding_model_id" ref="model_approval_expense"/>
+        <field name="binding_type">action</field> 
+        <field name="state">code</field>
+        <field name="code">
+            action = records.action_cancel()
+        </field>
+    </record>
+
+    <!-- search view -->
+    <record id="approval_expense_search_view" model="ir.ui.view">
+        <field name="name">approval.expense.view.search</field>
+        <field name="model">approval.expense</field>
+        <field name="arch" type="xml">
+            <search string="Approval Expense">
+                <field name="name"/>
+                <field name="request_owner_id"/>
+                <field name="partner_id"/>
+                <field name="request_id"/>
+                <field name="vendor_quotation_no"/>
+                <field name="vendor_invoice_no"/>
+                <field name="department_id" filter_domain="[('department_id', 'child_of', raw_value)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- tree view -->
+    <record id="approval_expense_tree_view" model="ir.ui.view"> 
+        <field name="name">Approval Expense</field>
+        <field name="model">approval.expense</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="request_owner_id" /> 
+                <field name="department_id"/>
+                <field name="partner_id"/>
+                <field name="request_id"/>
+                <field name="date"/>
+                <field name="vendor_quotation_no" optional="hide"/>
+                <field name="vendor_invoice_no" optional="hide"/>
+                <field name="is_cash_advance" widget="boolean_toggle" readonly="1"/>
+                <field name="staff_location_id"/>
+                <field name="currency_id" optional="show"/>                
+                <field name="payment_type_id" optional="show"/>
+                <field name="apply_credit_note" optional="hide"/>
+                <field name="amount" optional="show"/>
+                <field name="payment_state" widget="badge" 
+                    decoration-danger="payment_state == 'not_paid'" 
+                    decoration-warning="payment_state in ('partial', 'in_payment')" 
+                    decoration-success="payment_state in ('paid', 'reversed')"/>
+                <field name="bill_state" widget="badge" decoration-info="bill_state == 'draft'" 
+                    decoration-success="bill_state in ('posted')" decoration-muted="bill_state == 'cancel'"/>
+                <field name="request_status" decoration-info="request_status == 'new'" decoration-warning="request_status == 'pending'" decoration-success="request_status == 'approved'" decoration-danger="request_status == 'refused'" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- form view -->
+    <record id="approval_expense_form_view" model="ir.ui.view">
+        <field name="name">Expense Form</field>
+        <field name="model">approval.expense</field> 
+        <field name="arch" type="xml">
+            <form string="Expense Form">
+                <header>
+                    <field name="user_status" invisible="1"/>
+                    <field name="payment_state" invisible="1"/>
+                    <field name="bill_state" invisible="1"/>
+                    <field name="enable_cash_advance" invisible="1"/>
+                    <field name="enable_direct_payment" invisible="1"/>
+                    <field name="has_access_to_request" invisible="1"/>
+                    <field name="payment_id" invisible="1"/> 
+                    <field name="move_id" invisible="1"/> 
+                    <field name="reconcile_entry_id" invisible="1"/> 
+                    <field name="write_off_ids" invisible="1"/>
+                    <field name="is_locked" invisible="1"/>
+                    <!-- remove in task id ='2343' -->
+                    <button name="action_confirm" type="object" string="Submit" class="oe_highlight" invisible="request_status != 'new'"/>
+                    <button name="action_check" string="Check" type="object" invisible="request_status in ['checked', 'approved', 'refused', 'cancel'] or user_status != 'to_check'" class="btn-primary" data-hotkey="v"/>
+                    <button name="action_approve" string="Approve" type="object" invisible="request_status in ['approved', 'refused', 'cancel'] or user_status != 'pending'" class="btn-primary" data-hotkey="v"/>
+                    <button name="action_refuse" string="Refuse" type="object" invisible="request_status in ['approved', 'refused', 'cancel'] or user_status not in ['to_check', 'pending']" data-hotkey="z"/>
+                    <button name="action_draft" string="Back To Draft" type="object" invisible="request_status != 'cancel'" data-hotkey="w"/>
+                    <button name="action_cancel" string="Cancel" type="object" invisible="payment_state in ['in_payment', 'paid'] or request_status in ['cancel'] or is_locked" data-hotkey="x"/>
+                    <button name="action_lock" string="Locked" type="object" invisible="request_status != 'approved' or is_locked" data-hotkey="l"/> 
+                    <button name="action_unlock" string="UnLocked" type="object" invisible="request_status != 'approved' or not is_locked" data-hotkey="u"/>
+                    
+                    <!-- For Direct Payment -->
+                    <button name="action_register_payment" string="Register Payment" type="object" class="oe_highlight o_expense_sheet_pay" 
+                    context="{'dont_redirect_to_payments': True}" groups="account.group_account_invoice" data-hotkey="w" 
+                    invisible="not enable_direct_payment" />
+                    <!-- For Clear Cash Advance -->
+                    <button name="action_clear_cash_advance" type="object" class="oe_highlight o_expense_sheet_pay" 
+                    groups="account.group_account_invoice" data-hotkey="w" string="Clear Cash Advance"
+                    invisible="not enable_cash_advance" />
+                    <field name="request_status" widget="statusbar"/>
+
+                    <button name="action_print_clear_cash_advance" 
+                            string="Clear CA Print" 
+                            type="object" 
+                            class="oe_highlight" 
+                            invisible="not cash_advance_ids" 
+                    />
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_payment" string="Payment" type="object" class="oe_stat_button" icon="fa-pencil-square-o" invisible="not payment_id">
+                        </button>
+                        <button name="action_view_bill" string="Vendor Bills" type="object" class="oe_stat_button" icon="fa-pencil-square-o" invisible="not move_id">
+                        </button>
+                        <button name="action_view_credit_note" string="Credit Notes" type="object" class="oe_stat_button" icon="fa-pencil-square-o" invisible="not move_id">
+                        </button>
+                        <button name="action_view_journal" string="Journal Entry" type="object" class="oe_stat_button" icon="fa-pencil-square-o" invisible="not reconcile_entry_id">
+                        </button>
+                        <button name="action_view_write_off" string="Write Off" type="object" class="oe_stat_button" icon="fa-pencil-square-o" invisible="not write_off_ids">
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Paid" bg_color="text-bg-success" invisible="payment_state != 'paid'"/>
+                    <widget name="web_ribbon" title="Partial" bg_color="text-bg-info" invisible="payment_state != 'partial'"/>
+                    <widget name="web_ribbon" title="In Payment" invisible="payment_state != 'in_payment'"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/> 
+                        </h1>
+                    </div>
+                    <group> 
+                        <group>
+                            <field name="show_is_cash_advance" invisible="1"/>
+                            <field name="is_cash_advance" readonly="request_status not in ['new']" invisible="not show_is_cash_advance"/>
+                            <field name="clearance_date" readonly="1"/>
+                            <field name="clear_cash_advance" invisible="1" readonly="request_status not in ['new']"/>
+                            <field name="date" required="1" readonly="request_status not in ['new']"/>
+                            <field name="approval_type" invisible="1"/>
+                            <field name="category_id" domain="[('approval_type', '=', approval_type)]" readonly="request_status not in ['new']"/>
+                            <field name="request_owner_id" required="1" readonly="request_status not in ['new']"/>
+                            <field name="employee_id" invisible="1"/>
+                            <field name="department_id"/>
+                            <field name="request_id" domain="[('id', '=', request_id)]" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}" readonly="request_status not in ['new']"/>
+                            <field name="purchase_order_id" options="{'no_create': True, 'no_create_edit': True}" readonly="request_status not in ['new']"/>
+                            <field name="company_id" invisible="1"/>
+                            <field name="fmis_petty_cash_document_no" readonly="request_status not in ['new']"/>
+                            <field name="location" readonly="request_status not in ['new']"/>
+                            <field name="staff_location_id" readonly="request_status not in ['new']"/>
+                            <field name="pay_to_id" string="Pay to Employee" readonly="request_status not in ['new']"/>
+                            <field name="pay_to_external" string="Pay to External" readonly="request_status not in ['new']"/>
+                            <field name="reason" readonly="request_status not in ['new']"/>
+                            <field name="available_journal_ids" invisible="1"/>
+                            <field name="journal_id" string="Expense Journal" readonly="request_status not in ['new']" required="1" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="config_id" invisible="1"/>
+                            <field name="need_approval" invisible="1"/>
+                            <field name="is_expense_cancel" readonly="1"/>
+                            <field name="is_request_cancel" readonly="1"/>
+                            <field name="partner_id" options="{'no_create': True, 'no_create_edit': True}" readonly="request_status not in ['new']"/>
+                            <field name="vendor_quotation_no" readonly="request_status not in ['new']"/>
+                            <field name="vendor_invoice_no" readonly="request_status not in ['new']"/>
+                            <field name="delivery_date" readonly="request_status not in ['new']"/>
+                            <field name="received_date" readonly="request_status not in ['new']"/>
+                            <field name="value_date" readonly="request_status not in ['new']"/>
+                            <!-- <field name="grn_no" readonly="request_status not in ['new']"/> -->
+                            <field name="currency_id" required="1" options="{'no_create': True, 'no_create_edit': True}" readonly="request_status not in ['new']"/>
+                            <field name="payment_type_id" readonly="request_status not in ['new']"/>
+                            <field name="amount" readonly="expense_line_ids"/>
+                            <field name="available_cash_advance_ids" widget="many2many_tags" invisible="1"/>
+                            <field name="cash_advance_ids" widget="many2many_tags" 
+                            domain="[('id', 'in', available_cash_advance_ids),('request_status', '=', 'approved')]"
+                            readonly="request_status not in ['new']" required="is_cash_advance" invisible="not is_cash_advance"
+                            options="{'no_create': True, 'no_create_edit': True}"/> 
+                            <field name="cash_advance_amount" string="Cash Advance Amount" invisible="0" readonly="1"/>
+                            <field name="reimburse_amount" readonly="1" invisible="not reimburse_amount" string="Payable/ Receivable Amount"/>
+                            <field name="sub_total" readonly="request_status not in ['new']" string="Remaining Amount"/>
+                            <field name="apply_credit_note" readonly="request_status not in ['new']"/>
+                        </group> 
+                    </group>
+                    <notebook>
+                        <page string="Details"> 
+                            <field name="expense_line_ids" mode="tree,kanban" readonly="request_status not in ['new']">
+                                <tree editable="bottom" >
+                                    <field name="company_id" column_invisible="1"/>
+                                    <field name="department_id" column_invisible="1"/>
+                                    <!-- <field name="category_id" required="1" string="Category"/> -->
+                                    <field name="product_id" string="Product" domain="[('purchase_ok', '=', True)]"/>
+                                    <field name="description" force_save="1"/>
+                                    <field name="account_id" required="1"/>
+                                    <field name="bl_no" />
+                                    <field name="analytic_distribution" widget="analytic_distribution" required="1"
+                                    groups="analytic.group_analytic_accounting"/>
+                                    <field name="fmis_job_no" string="FMIS Job Number"/>
+                                    <field name="job_date" />
+                                    <field name="vehicle_no" string="Vehicle No"/>
+                                    <field name="reference_key" />
+                                    <field name="brand_id"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="quantity" />
+                                    <field name="product_uom_category_id" column_invisible="1"/>
+                                    <field name="product_uom_id" />
+                                    <field name="price_unit" />
+                                    <field name="tax_ids" widget="many2many_tags" options="{'no_create': True, 'no_create_edit': True}"/>
+                                    <field name="tax_amount" />
+                                    <field name="total_amount"/>
+                                </tree>
+                            </field>
+                            <group class="oe_subtotal_footer" colspan="2" name="expense_total">
+                                <field name="untaxed_amount"/>
+                                <div class="oe_inline o_td_label">
+                                    <label for="total_tax_amount"/>
+                                </div>
+                                <field name="total_tax_amount" nolabel="1"/>
+                                <div class="oe_inline o_td_label">
+                                    <label for="total_amount"/>
+                                </div>
+                                <field name="total_amount" nolabel="1" class="oe_subtotal_footer_separator"/>
+                                <field name="amount_residual" class="oe_subtotal_footer_separator" invisible="request_status not in ('approved')"/>
+                            </group>
+                        </page>
+                        <page string="Remark">
+                            <field name="remark" readonly="request_status not in ['new']"/>
+                        </page>
+
+                        <!-- remove in task id='2343' -->
+                        <page string="Approvers">
+                            <field name="approver_ids" mode="tree,kanban" readonly="1">
+                                <tree editable="bottom" decoration-success="status in ['checked', 'approved']" decoration-warning="status in ['pending', 'waiting', 'to_check']" decoration-danger="status=='refused'" no_open="1">
+                                    <field name="existing_request_user_ids" column_invisible="True"/>
+                                    <field name="sequence" column_invisible="True"/>
+                                    <field name="can_edit" column_invisible="True"/>
+                                    <field name="can_edit_user_id" column_invisible="True"/>
+                                    <field name="user_ids" string="Approvers" widget="many2many_tags" readonly="1" options="{'no_create': True}" 
+                                           required="1"/>
+                                    <field name="user_id" string="Approver" readonly="1" force_save="1" column_invisible="1"/>
+                                    <field name="required" readonly="not can_edit" force_save="1"/>
+                                    <field name="level"/>
+                                    <field name="status"/>
+                                    <field name="company_id" column_invisible="True"/>
+                                </tree>
+                            </field>
+                            <group class="oe_subtotal_footer" colspan="2" name="payment_request_total">
+                                <field name="untaxed_amount"/>
+                                <div class="oe_inline o_td_label">
+                                    <label for="total_tax_amount"/>
+                                </div>
+                                <field name="total_tax_amount" nolabel="1"/>
+                                <div class="oe_inline o_td_label">
+                                    <label for="total_amount"/>
+                                </div>
+                                <field name="total_amount" nolabel="1" class="oe_subtotal_footer_separator"/>
+                                <field name="amount_residual" class="oe_subtotal_footer_separator" invisible="request_status not in ('approved')"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_expense" model="ir.actions.act_window">
+        <field name="name">Approval Expense</field>
+        <field name="res_model">approval.expense</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No Approvals Requests
+            </p>
+            <p>
+                Let's go to the <a type="action" class="text-primary" name="%(approvals.approval_category_action_new_request)d">new request</a> menu
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_approval_expense" 
+              name="Approval Expense" 
+              parent="approvals.approvals_menu_manager"
+              action="approval_extends.action_expense"
+              sequence="20"/>
+</odoo>

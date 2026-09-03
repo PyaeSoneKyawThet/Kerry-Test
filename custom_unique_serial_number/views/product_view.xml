@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_template_only_form_view_advance" model="ir.ui.view">
+        <field name="name">product.template.advance.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='uom_po_id']" position="after">         
+                <label string="Item Code" for='item_code'/>
+                <div>
+                    <field name="item_code" class='oe_inline' readonly='1'/>   <button name="action_generate_item_code" type="object" icon="fa-refresh" role="img" title="Generate Reference" confirm="Are you sure you want to generate new reference code." invisible="count"/>
+                </div>         
+                <field name="next_serial_number" invisible="1"/>     
+                <field name="count" invisible="1"/>        
+            </xpath>
+        </field>
+    </record>
+
+    <record id="product_template_tree_view_inherit_serial" model="ir.ui.view">
+        <field name="name">product.template.tree.view.inherit.serial</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree//header" position="inside">
+                <button string="Item Code Generate" type="object" name="action_generate_item_code" confirm="Are you sure you want to generate new reference code."/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

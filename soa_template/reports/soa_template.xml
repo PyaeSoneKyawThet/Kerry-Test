@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="custom_header_footer_soa_template"> 
+            <div class="header">
+                <div style="report_header_style">
+                    <div class="row">
+                        <div class="col-9 pt-3">
+                            <h3><strong>STATEMENT OF ACCOUNT (SOA)</strong></h3>
+                        </div>
+                        <div class="col-3 text-end">
+                            <span t-field="doc.env.company.logo"
+                                t-options="{'widget':'image', 'style': 'height:85px; width:130px'}" />
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="footer">
+                <div class="row">
+                   <div class="col-6">
+                        <span style="font-size: 15px;" t-if="doc.env.company.name" t-field="doc.env.company.name"></span>
+                    </div>
+                    <div class="col-6 text-end" style="height: 25px;">                        
+                        <p style="font-size: 12px;"><small>
+                            Page: <span class="page"/> / <span class="topage"/>
+                            <span class="ms-2" t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y %H:%M:%S')"/>
+                        </small></p>                                               
+                    </div> 
+                </div>
+            </div>
+
+        </template>
+
+        <template id="follow_up_soa_template">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <p><strong>Customer Name:</strong><span t-field="doc.name"/></p>
+                    <p><strong>Address:</strong><span t-field="doc.contact_address_complete"/></p>
+                    <p><strong>As Of Date:</strong><span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y')"/></p>
+                
+
+                    <t t-if="doc._get_unpaid_invoices()">
+                        <t t-set="unpaid_invoices" t-value="doc._get_unpaid_invoices()"/>
+                        <t t-foreach="unpaid_invoices.keys()" t-as="key">
+                            <div style="page-break-after: avoid;">
+                                <p class="mb-2"><strong>Invoice Currency:</strong> <span t-esc="key"/></p>
+                            </div>
+                            <table class="table table-borderless border-0"  style="margin-bottom: 50px;">
+                                <tr class="border border-dark border-1 border-start-0 border-end-0" style="page-break-after: avoid;">
+                                    <th class="border-0 text-center" style="text-transform: capitalize;">No</th>
+                                    <th class="border-0 text-center" style="text-transform: capitalize;">Invoice No</th>
+                                    <th class="border-0 text-center" style="text-transform: capitalize;">Description</th>
+                                    <th class="border-0 text-center" style="text-transform: capitalize;width:13%">Invoice Date</th>
+                                    <th class="border-0 text-center" style="text-transform: capitalize;width:13%">Due Date</th>
+                                    <th class="border-0 text-center" style="text-transform: capitalize;width:10%">Over Due (Days)</th>
+                                    <th class="border-0 text-end" style="text-transform: capitalize;background-color: #ffffff;">Account Balance</th>
+                                </tr>
+                                <t t-set="total" t-value="0"/>
+                                <t t-set="no" t-value="0"/>
+                                <t t-foreach="unpaid_invoices[key]" t-as="invoice">
+                                    <t t-set="no" t-value="no + 1"/>
+                                    <tr class="border-0">
+                                        <td class="border-0 text-center"><span t-esc="no"/></td>
+                                        <td class="border-0"><span t-field="invoice.name"/></td>
+                                        <td class="border-0"><span t-field="invoice.reason"/></td>
+                                        <td class="border-0 text-end"><span t-esc="invoice.date" t-options='{"widget": "date","format": "dd-MM-yyyy"}'/></td>
+                                        <td class="border-0 text-end"><span t-esc="invoice.invoice_date_due" t-options='{"widget": "date","format": "dd-MM-yyyy"}'/></td>
+                                        <td class="border-0 text-center">
+                                            <span t-out="(invoice.invoice_date_due - context_timestamp(datetime.datetime.now()).date()).days"/>
+
+                                        </td>
+                                        <td class="border-0 text-end" style="white-spance: nowrap;background-color: #ffffff;">
+                                            <span t-field="invoice.amount_residual" t-options="{'widget': 'float', 'precision': 2, 'thousand_separator': True}"/>
+                                        </td>
+                                    </tr>
+                                    <t t-set="total" t-value="total + invoice.amount_residual"/>
+                                </t>
+                                <tr class="border border-dark border-1 border-start-0 border-end-0">
+                                    <td colspan="6" class="border-0 text-center"><strong>Total</strong></td>
+                                    <td class="border-0 text-end" style="white-spance: nowrap;background-color: #ffffff;"><span t-esc="('{:,.2f}'.format(total))"/></td>
+                                </tr>
+                                <t t-set="total" t-value="0"/>
+                            </table>
+                        </t>
+                    </t>
+                </div>
+            </t>
+        </template>
+
+        <template id="soa_template_print">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="soa_template.custom_header_footer_soa_template" />
+                    <t t-set="lang" t-value="doc.lang" />
+                    <t t-call="soa_template.follow_up_soa_template" t-lang="lang" />
+                </t>
+            </t>
+        </template>
+
+        
+    </data>
+</odoo>

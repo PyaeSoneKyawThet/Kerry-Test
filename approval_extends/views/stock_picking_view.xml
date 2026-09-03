@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<odoo>
+    <record id="view_picking_form_inherit_approval" model="ir.ui.view">
+        <field name="name">view.picking.form.inherit</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml"> 
+            <xpath expr="//tree//field[@name='product_id']" position="before">
+                <field name="purchase_request_line_id" string="PR No" column_invisible="not parent.is_from_po" 
+                domain="[('request_status', '=', 'approved'), ('without_PO', '=', False), ('pr_done', '!=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_picking_internal_search_approval" model="ir.ui.view">
+        <field name="name">view.picking.internal.search.approval</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_internal_search"/>
+        <field name="arch" type="xml"> 
+            <xpath expr="//search//field[@name='product_id']" position="after">
+                <field name="purchase_request_line_id"/>
+            </xpath>
+        </field>
+    </record>
+    
+</odoo> 

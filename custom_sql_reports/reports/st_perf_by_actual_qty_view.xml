@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_st_perf_by_actual_qty" model="ir.ui.view">
+        <field name="name">st.perf.actual.qty.wizard.form</field>
+        <field name="model">st.perf.actual.qty.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Sale Team Performance By Actual Quantity">
+                <group>
+                    <group>
+                        <field name="start_date" required="1"/>
+                        <field name="end_date" required="1"/>
+                    </group>
+                    <group>
+                        <field name="user_ids" widget="many2many_tags" options="{'no_open': True, 'no_create': True}"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="generate_xlsx" string="🖨️ Print XLSX" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_st_perf_by_actual_qty_wizard" model="ir.actions.act_window">
+        <field name="name">Sale Team Performance By Actual Quantity</field>
+        <field name="res_model">st.perf.actual.qty.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_st_perf_by_actual_qty"/>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_sale_team_perf_by_actual_qty" 
+        name="Sale Team Performance By Actual Quantity" 
+        parent="crm.crm_menu_report"
+        action="custom_sql_reports.action_st_perf_by_actual_qty_wizard"
+        sequence="160"
+        />
+</odoo>

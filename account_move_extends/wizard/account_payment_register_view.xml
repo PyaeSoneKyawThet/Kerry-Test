@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_account_payment_register_kmtl" model="ir.ui.view">
+            <field name="name">account.payment.register.view.inherit</field>
+            <field name="model">account.payment.register</field>
+            <field name="inherit_id" ref="account.view_account_payment_register_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='journal_id']" position="before">
+                    <field name="payment_available_journal_ids" invisible="1"/>
+                    <field name="account_payment_type_id" string="Type"/>
+                </xpath>                         
+                <xpath expr="//field[@name='partner_bank_id']" position="after">
+                    <field name="cheque_no"/>
+                </xpath>  
+                <!-- <xpath expr="//field[@name='communication']" position="after">
+                    <field name="staff_location_id"/>
+                </xpath>  -->
+                <xpath expr="//group[@name='group2']" position="inside">
+                    <field name="analytic_distribution" invisible="payment_difference_handling != 'reconcile'" widget="analytic_distribution" groups="analytic.group_analytic_accounting"/>
+                </xpath>  
+            </field>
+        </record>
+
+    </data>
+</odoo>

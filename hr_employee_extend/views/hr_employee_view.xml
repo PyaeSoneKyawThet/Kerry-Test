@@ -1,0 +1,14 @@
+<odoo>
+    <record id="view_employee_form_custom" model="ir.ui.view">
+        <field name="name">hr.employee.form.custom</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='parent_id']" position="after">
+                <field name="parent_path" invisible="1"/> 
+                <field name="parent_ids" widget="many2many_tags" invisible="1"/>
+                <field name="user_ids" widget="many2many_tags" invisible="1"/>                                      
+            </xpath> 
+        </field>
+    </record> 
+</odoo>

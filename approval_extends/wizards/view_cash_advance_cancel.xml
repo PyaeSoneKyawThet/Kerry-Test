@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="cash_advance_cancel_wizard" model="ir.ui.view">
+            <field name="name">cash.advance.cancel.wizard.form</field>
+            <field name="model">cash.advance.cancel.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Cash Advance Cancel">
+                    <sheet>
+                        <group>
+                            <field name="is_cash_advance_cancel"/>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button string="Confirm" type="object" name="action_cancel_payment" class="btn-primary"/>
+                        <button string="Discard" class="btn-secondary" special="cancel"/>
+                    </footer>  
+                </form>
+            </field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- tree view -->
+    <record id="purchase_brand_tree_view" model="ir.ui.view"> 
+        <field name="name">Brand</field>
+        <field name="model">purchase.brand</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="name" required="1"/>
+                <field name="code"/>
+                <field name="remark" optional="show"/>
+            </tree>
+        </field> 
+    </record>
+
+    <record id="action_purchase_brand" model="ir.actions.act_window">
+        <field name="name">Brand</field>
+        <field name="res_model">purchase.brand</field>
+        <field name="view_mode">tree,form</field>
+        <field name="target">current</field>
+    </record>
+</odoo>

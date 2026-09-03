@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="custom_header_footer_approval_purchase_request">
+            <div class="header">
+                <div style="report_header_style">
+                    <div class="row">
+                        <div class="col-3"></div>
+                        <div class="col-6 fw-bold py-4">
+                            <p class="text-center" style="font-size: 24px"> 
+                                <strong>PURCHASE REQUISITION</strong>
+                            </p>
+                        </div>
+                        <div class="col-3 text-end">
+                            <span t-field="doc.company_id.logo"
+                                t-options="{'widget':'image', 'style': 'height:85px; width:130px'}" />
+                        </div> 
+                    </div>
+
+                    <div class="row" t-if="report_type == 'pdf'" style="height:0px; width:100%; margin-left:10%;">
+                        <div class="col-6" name="watermark" t-if="doc.request_status in ['new', 'pending','checked']">
+                            <span style="-webkit-transform:rotate(-45deg); color:grey; font-size:12rem; text-align:center; position:absolute; opacity:0.3; padding-top:280px">
+                                DRAFT
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer" style="margin-bottom: -400px  !important;border-top: 1px solid black;" >  
+                <div class="row">
+                    <div class="col-4">
+                        <span style="font-size: 15px;" t-if="doc.company_id.name" t-field="doc.company_id.name"></span>
+                    </div>
+                    <div class="col-4 text-center">
+                        <span style="font-size: 12px;">
+                            <span t-field="doc.name"/>
+                        </span>
+                    </div>
+                    <div class="col-4 text-end" style="height: 25px;">                        
+                        <p style="font-size: 12px;"><small>
+                            Page: <span class="page"/> / <span class="topage"/>
+                            <span class="ms-2" t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y %H:%M:%S')"/>
+                        </small></p>                                               
+                    </div> 
+                </div>
+                <!-- <div >
+                    <span t-if="doc.company_id.company_footer" t-field="doc.company_id.company_footer" 
+                    t-options="{'widget':'image','style': 'height:80px; width:900px'}"/>
+                </div>                                                    -->
+            </div>
+
+        </template>
+
+        <template id="approval_purchase_request_template">
+            <t t-call="web.external_layout">
+                <t t-set="doc" t-value="doc" />
+                <div class="page" style="font-size: 15px;">
+                    <div class="d-flex justify-content-end">
+                        <strong>PR Reference No:</strong>
+                        <span t-field="doc.name"/>
+                    </div>
+
+                    <p style="margin-top: 30px;"><strong>Recommended Vendor Info</strong></p>
+
+                    <div class="row" name="header_row">
+                        <div class="col-6">
+                            <div class="row">
+                                <div class="col-3">
+                                    <span>Vendor Name</span>
+                                </div>
+                                
+                                <div class="col-8">
+                                    <span class="px-3">:</span>
+                                    <span t-field="doc.partner_id"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-3">
+                                    <span>Phone No</span>
+                                </div>
+                                
+                                <div class="col-8">
+                                    <span class="px-3">:</span>
+                                    <span t-field="doc.partner_id.phone"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-3">
+                                    <span>Email Address</span>
+                                </div>
+                                
+                                <div class="col-8">
+                                    <span class="px-3">:</span>
+                                    <span t-field="doc.partner_id.email"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="row">
+                                <div class="col-5">
+                                    <span>PR Date</span>
+                                </div>
+                                
+                                <div class="col-6">
+                                    <span class="px-3">:</span>
+                                    <span t-field="doc.date" t-options='{"widget": "date"}'/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-5">
+                                    <span>Department</span>
+                                </div>
+                                
+                                <div class="col-6">
+                                    <span class="px-3">:</span>    
+                                    <span t-field="doc.department_id"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-5">
+                                    <span>Estimated Delivery Date</span>
+                                </div>
+                                
+                                <div class="col-6">
+                                    <span class="px-3">:</span>
+                                    <span t-field="doc.est_delivery_date" t-options='{"widget": "date"}'/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-5">
+                                    <span>Delivery Location</span>
+                                </div>
+                                
+                                <div class="col-6">
+                                    <span class="px-3">:</span>
+                                    <span t-field="doc.location"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="table mt-3">
+                        <!-- <thead> -->
+                            <tr class="border-1" >
+                                <th style="text-transform: capitalize;" class="border-1">No</th>
+                                <th style="text-transform: capitalize;" class="border-1">Description</th>
+                                <th style="text-transform: capitalize;" class="border-1">Qty</th>
+                                <th style="text-transform: capitalize;" class="border-1">Unit Price</th>
+                                <th style="text-transform: capitalize;" class="border-1">Amount</th>
+                            </tr>
+                        <!-- </thead> -->
+
+                        <tbody class="border-1">
+                            <t t-set="index_no" t-value="1" />
+                            <t t-foreach="doc.product_line_ids" t-as="line">
+                                <tr class="border-0">
+                                    <td class="text-end border-1 border-top-0 border-bottom-0">
+                                        <span t-out="index_no"/> 
+                                    </td>
+
+                                    <td name="td_analytic_distribution" class="border-1 border-top-0 border-bottom-0 align-top" style="padding: 0; margin: 0;">
+                                        <table style="width: 100%; border-collapse: collapse; padding: 0; margin: 0;" class="table border-0 table-borderless ">
+                                                <tr class="border-0">
+                                                    <td class="border-0" colspan="2" style="background-color: #ffffff;color: #5f6163;">
+                                                        <span>Product Name:</span>
+                                                        <span t-out="line.description"/>
+                                                    </td>
+                                                </tr>
+                                                <t t-set="data_pairs" t-value="[line._get_report_data()[i:i+2] for i in range(0, len(line._get_report_data()), 2)]"/>
+                                                <t t-foreach="data_pairs" t-as="pair">
+                                                    <tr class="border-0">
+                                                        <t t-foreach="pair" t-as="distribution">
+                                                            <td class="border-0 mb-2" style="text-align: start; width: 50%;background-color: #ffffff;color: #5f6163;">
+                                                                <t t-esc="distribution['plan_name']"/>:<t t-esc="distribution['account_name']"/>
+                                                            </td>
+                                                        </t>
+                                                    </tr>
+                                                </t>
+                                                <tr class="border-0">
+                                                    <td class="border-0" colspan="2" style="background-color: #ffffff;color: #5f6163;">
+                                                        <span>Brand Name:</span>
+                                                        <span t-out="line.brand_id.name"/>
+                                                    </td>
+                                                </tr>
+                                         </table>        
+                                    </td>
+
+                                    <td class="text-end border-1 border-top-0 border-bottom-0">
+                                        <span t-field="line.quantity"/>
+                                    </td>
+                                    <td class="text-end border-1 border-top-0 border-bottom-0">
+                                        <span t-field="line.unit_price"/>
+                                    </td>
+                                    <td class="text-end border-1 border-top-0 border-bottom-0" style="background-color: #ffffff;color: #5f6163;">
+                                        <span t-field="line.total"/>
+                                    </td>
+                                </tr>
+                                
+                                <t t-set="index_no" t-value="index_no + 1"/> 
+                            </t>
+
+                            <tr style="border-top: 1px solid grey;">
+                                <td colspan="4" class="text-center">
+                                    <span>Sub-Total</span>
+                                </td>
+                                <td class="text-end" style="background-color: #ffffff;color: #5f6163;">
+                                    <span t-field="doc.amount"/>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="5" style="background-color: #ffffff;color: #5f6163;">
+                                    <div class="d-flex">
+                                        <span>Special Instructions:</span>
+                                        <span t-field="doc.reason"/>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="row" style="margin-top: 100px; break-inside: avoid; page-break-inside: avoid;">
+                        <div class="col-8">
+                            <p><strong>Requested By: </strong><span t-field="doc.request_owner_id"></span><span t-if="doc.request_owner_id">,</span><span t-field="doc.date" t-options='{"widget": "date"}'/></p>
+                            <p>
+                                <t t-set="checker" t-value="doc.approver_ids.filtered(lambda l: l.status == 'checked').sorted(key=lambda l: l.id)[-1] if doc.approver_ids.filtered(lambda l: l.status == 'checked') else None"/>
+                                <t t-set="approver" t-value="doc.approver_ids.filtered(lambda l: l.status == 'approved').sorted(key=lambda l: l.id)[-1] if doc.approver_ids.filtered(lambda l: l.status == 'approved') else None"/>
+
+                                <strong>Checked By: </strong>
+                                <t t-if="checker">
+                                    <span t-field="checker.user_id.name" />,<span t-field="doc.request_checked_date" t-options='{"widget": "date"}'/>
+                                </t>
+                                <t t-else="">
+                                    <t t-if="approver">
+                                        <span t-field="approver.user_id.name" />,<span t-field="doc.request_approved_date" t-options='{"widget": "date"}'/>
+                                    </t>
+                                </t>
+                            </p>
+                            <p>
+                                <t t-set="approver" t-value="doc.approver_ids.filtered(lambda l: l.status == 'approved').sorted(key=lambda l: l.id)[-1] if doc.approver_ids.filtered(lambda l: l.status == 'approved') else None"/>
+
+                                <strong>Approved By: </strong>
+                                <t t-if="approver">
+                                    <span t-field="approver.user_id.name" />
+                                    <span t-if="approver.user_id.name">,</span>
+                                </t>
+                                <span t-field="doc.request_approved_date" t-options='{"widget": "date"}'/>
+                            </p>   
+                        </div>
+
+                        <!-- <div class="col-4">
+                            <div class="row" style="margin-bottom: 50px">
+                                <strong>Requested By:</strong>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col">Name:
+                                <span t-field="doc.request_owner_id"></span>
+                                </div>
+                            </div>
+                            <div class="row">Date:
+                                <span t-field="doc.date" t-options='{"widget": "date"}'/>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="row" style="margin-bottom: 50px">
+                                <strong>Checked By:</strong>
+                            </div>
+                            <div class="row mb-2">Name:
+                                <t t-set="checker" t-value="doc.approver_ids.filtered(lambda l: l.status == 'checked').sorted(key=lambda l: l.id)[-1] if doc.approver_ids.filtered(lambda l: l.status == 'checked') else None"/>
+                                <t t-set="approver" t-value="doc.approver_ids.filtered(lambda l: l.status == 'approved').sorted(key=lambda l: l.id)[-1] if doc.approver_ids.filtered(lambda l: l.status == 'approved') else None"/>
+                                
+                                <t t-if="checker">
+                                    <span t-field="checker.user_id.name" />
+                                </t>
+                                <t t-else="">
+                                    <t t-if="approver">
+                                        <span t-field="approver.user_id.name" />
+                                    </t>
+                                </t>
+                            </div>
+
+                            <div class="row">Date:
+                                <span t-field="doc.request_checked_date" t-options='{"widget": "date"}'/>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="row" style="margin-bottom: 50px">
+                                <strong>Approved By:</strong>
+                            </div>
+                            <div class="row mb-2">Name:
+                                <t t-set="approver" t-value="doc.approver_ids.filtered(lambda l: l.status == 'approved').sorted(key=lambda l: l.id)[-1] if doc.approver_ids.filtered(lambda l: l.status == 'approved') else None"/>
+                                <t t-if="approver">
+                                    <span t-field="approver.user_id.name" />
+                            </t>
+                            </div>
+                            <div class="row">Date:
+                                <span t-field="doc.request_approved_date" t-options='{"widget": "date"}'/>
+                            </div>
+                        </div> -->
+                    </div> 
+                </div>
+            </t>
+        </template>
+
+        <template id="approval_purchase_request_print">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="approval_extends.custom_header_footer_approval_purchase_request" />
+                    <t t-set="lang" t-value="doc.partner_id.lang" />
+                    <t t-call="approval_extends.approval_purchase_request_template" t-lang="lang" />
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

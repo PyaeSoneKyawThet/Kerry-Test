@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_account_trial_balance_business_name,access_account_trial_balance_business_name,model_account_trial_balance_business_name,base.group_user,1,1,1,1
+
+

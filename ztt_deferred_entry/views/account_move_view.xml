@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<odoo>
+    <record id="view_move_form_inherit" model="ir.ui.view">
+        <field name="name">view_move_form_inherit</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='account_id']" position="after">                 
+                <field name="deferred_account_id" optional="hide"/>
+                <field name="deferred_booked_value" optional="hide" widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
+                <field name="depreciated_value" optional="hide" widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
+                <field name="deferred_booked_value_currency" optional="hide" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="depreciated_value_currency" optional="hide" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="view_move_tree_inherit_deferred" model="ir.ui.view">
+        <field name="name">account.move.tree.inherit.deferred</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_tree"/> 
+        <field name="arch" type="xml"> 
+            <xpath expr="//field[@name='amount_total_signed']" position="before">
+                <field name="total_deferred_value" optional="hide" widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
+                <field name="total_depreciated_value" optional="hide" widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
+                <field name="total_deferred_value_currency" optional="hide" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="total_depreciated_value_currency" optional="hide" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+            </xpath>
+        </field> 
+    </record>    
+
+    <record id="view_invoice_tree_inherit_deferred" model="ir.ui.view">
+        <field name="name">account.move.tree.inherit.deferred</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_invoice_tree"/> 
+        <field name="arch" type="xml"> 
+            <xpath expr="//field[@name='amount_untaxed_signed']" position="before">
+                <field name="total_deferred_value" optional="hide" widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
+                <field name="total_depreciated_value" optional="hide" widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
+                <field name="total_deferred_value_currency" optional="hide" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="total_depreciated_value_currency" optional="hide" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+            </xpath>
+        </field> 
+    </record> 
+    
+    <record id="view_acc_move_tree_inherit_journal_items" model="ir.ui.view">
+        <field name="name">account.move.tree.inherit.journal_items</field>
+        <field name="model">account.move.line</field>
+        <field name="inherit_id" ref="account.view_move_line_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='account_id']" position="after">
+                <field name="deferred_account_id" optional="hide"/>
+                <field name="deferred_booked_value" optional="hide" widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
+                <field name="depreciated_value" optional="hide" widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
+                <field name="deferred_booked_value_currency" optional="hide" widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
+                <field name="depreciated_value_currency" optional="hide" widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
+                <field name="deferred_start_date" optional="hide"/>
+                <field name="deferred_end_date" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

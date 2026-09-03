@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="custom_header_footer_cash_advance_form">
+            <div class="header">
+                <div style="report_header_style">
+                    <div class="row">
+                        <div class="col-3"></div>
+                        <div class="col-6 fw-bold py-4">
+                            <p class="text-center" style="font-size: 32px">
+                                <span>CASH ADVANCE</span>
+                            </p>
+                        </div>
+                        <div class="col-3 text-end">
+                            <span t-field="doc.company_id.logo"
+                                t-options="{'widget':'image', 'style': 'height:85px; width:130px'}" />
+                        </div>
+                    </div>
+
+                    <div class="row" t-if="report_type == 'pdf'" style="height:0px; width:100%; margin-left:10%;">
+                        <div class="col-6" name="watermark" t-if="doc.request_status in ['new', 'pending','checked']">
+                            <span style="-webkit-transform:rotate(-45deg); color:grey; font-size:12rem; text-align:center; position:absolute; opacity:0.3; padding-top:280px">
+                                DRAFT
+                            </span>
+                        </div> 
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer" style="margin-bottom: -400px  !important;border-top: 1px solid black;">  
+                <div class="row">
+                    <div class="col-4">
+                        <span style="font-size: 15px;" t-if="doc.company_id.name" t-field="doc.company_id.name"></span>
+                    </div>
+                    <div class="col-4 text-center">
+                        <span style="font-size: 12px;">
+                            <span t-field="doc.name"/>
+                        </span>
+                    </div>
+                    <div class="col-4 text-end" style="height: 25px;">                        
+                        <p style="font-size: 12px;"><small>
+                            Page: <span class="page"/> / <span class="topage"/>
+                            <span class="ms-2" t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%m-%Y %H:%M:%S')"/>
+                        </small></p>                                               
+                    </div> 
+                </div>
+                <!-- <div style="">
+                    <span t-if="doc.company_id.company_footer" t-field="doc.company_id.company_footer" 
+                    t-options="{'widget':'image','style': 'height:80px; width:100%'}"/>
+                </div>                                                    -->
+            </div>
+
+        </template>
+
+        <template id="cash_advance_template">
+            <t t-call="web.external_layout">
+                <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)" />
+                <div class="page" style="font-size: 15px;">
+                    <div class="row mt-2" style="margin-top: -30px;">
+                        <div class="col-4" name="Information 1">
+                            <div class="row mb-3">
+                                <div class="col-4">
+                                    <strong>CA No</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-7" t-if="doc.name">
+                                    <span t-field="doc.name" />
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-4">
+                                    <strong>CA Date</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-7" t-if="doc.date">
+                                    <span t-field="doc.date" />
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-4">
+                                    <strong>Currency</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-7" t-if="doc.currency_id.name">
+                                    <span t-field="doc.currency_id.name" />
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-4">
+                                    <strong>Payment Type</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-7" t-if="doc.payment_type_id.name">
+                                    <span t-field="doc.payment_type_id.name" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-5 ps-3" name="Information 2">
+                            <div class="row mb-3">
+                                <div class="col-4">
+                                    <strong>Vendor Code</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-7" t-if="doc.partner_id.ref">
+                                    <span t-field="doc.partner_id.ref" />
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-4">
+                                    <strong>Vendor Name</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-7" t-if="doc.partner_id">
+                                    <span t-field="doc.partner_id" />
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-4">
+                                    <strong>FMIS Job Number</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-7" t-if="doc.fmis_job_no">
+                                    <span t-field="doc.fmis_job_no" />
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-4">
+                                    <strong>Vehicle No</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-7" t-if="doc.vehicle_no">
+                                    <span t-field="doc.vehicle_no" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-3 ps-3" name="Customer Information">
+                            <div class="row mb-3">
+                                <div class="col-3">
+                                    <strong>Pay To</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-6" >
+                                    <t t-if="doc.pay_to_id">
+                                        <span t-field="doc.pay_to_id"/>
+                                    </t>
+                                    <t t-if="doc.pay_to_id and doc.pay_to_external">
+                                        <span>,</span>
+                                    </t>
+                                    <t t-if="doc.pay_to_external">
+                                        <span t-field="doc.pay_to_external"/>
+                                    </t>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-3">
+                                    <strong>PR No</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-6" t-if="doc.request_id">
+                                    <span t-field="doc.request_id" />
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-3">
+                                    <strong>PO No</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-6" t-if="doc.purchase_order_id.name">
+                                    <span t-field="doc.purchase_order_id.name" />
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-3">
+                                    <strong>Doc Loc</strong>
+                                </div>
+                                <span class="col-1 me-2">:</span>
+                                <div class="col-6" t-if="doc.staff_location_id">
+                                    <span t-field="doc.staff_location_id" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3 mt-3" style="margin-right:7px;">
+                        <div class="col-1">
+                            <strong>Description</strong>
+                        </div>
+                        <span class="col-1 me-2" style="margin-left:32px;">:</span>
+                        <div class="col-12" t-if="doc.description">
+                            <span t-field="doc.description" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-1">
+                            <strong>Amount</strong>
+                        </div>
+                    <span class="col-1 me-2" style="margin-left:30px;">:</span>
+                        <div class="col-auto" t-if="doc.amount">
+                            <span t-field="doc.amount" />
+                        </div>
+                    </div>
+                    
+                    <div class="row" style="margin-top: 250px;">
+                        <div class="col-5 "> 
+                            <div class="row" style="height: 40px; position: relative;">
+                                <div class="col-4" style="position: absolute; bottom: 0;">
+                                    <span>Received By</span>
+                                </div>
+                                <div class="col-1" style="position: absolute; bottom: 0; left: 25%;">
+                                    <span>:</span>
+                                </div>
+                                <div class="col-6" style="position: absolute; bottom: 0; left: 48%;">
+                                    <!-- <div>
+                                        <span t-if="doc.pay_to_id.digital_signature" 
+                                              t-field="doc.pay_to_id.digital_signature" 
+                                              t-options="{'widget':'image','style': 'height:45px; width:200px'}" />
+                                    </div> -->
+                                </div>
+                            </div>
+                            <div class="row" style="height: 40px;margin-top: 20px;">
+                                <div class="col-3">
+                                    <span>Name</span>
+                                </div>
+                                <div class="col-1"><span>:</span></div>
+                                <!-- <div class="col-6" t-if="doc.pay_to_id.name">
+                                    <span t-field="doc.pay_to_id.name" />
+                                </div> -->
+                            </div>
+                            <div class="row" style="height: 40px; ">
+                                <div class="col-3">
+                                    <span>Date</span>
+                                </div>
+                                <div class="col-1"><span>:</span></div>
+                                <!-- <div class="col-6" t-if="doc.create_date">
+                                    <span t-field="doc.create_date" t-options='{"widget": "date"}'/>
+                                </div> -->
+                            </div>
+                        </div>
+                        <div class="col-2"></div>
+
+
+                        <div class="col-5">
+                            <div class="row" style="height: 40px; position: relative;">
+                                <div class="col-3" style="position: absolute; bottom: 0;">
+                                    <span>Prepared By</span>
+                                </div>
+                                <div class="col-1  pb-1" style="position: absolute; bottom: 0; left: 33%;">
+                                    <span>:</span>
+                                </div>
+                                <div class="col-6" style="position: absolute; bottom: 0; left: 42%;">
+                                    <div>
+                                        <span t-if="doc.request_owner_id.name" 
+                                              t-field="doc.request_owner_id.name" 
+                                               />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row" style="height: 40px; position: relative;">
+                                <div class="col-3" style="position: absolute; bottom: 0;">
+                                    <span>CA Approved By</span>
+                                </div>
+                                <div class="col-1  pb-1" style="position: absolute; bottom: 0; left: 33%;">
+                                    <span>:</span>
+                                </div>
+                                <div class="col-6" style="position: absolute; bottom: 0; left: 42%;">
+                                    <div>
+                                       <span t-if="doc.approver_ids and doc.approver_ids.filtered(lambda r: r.status == 'approved').user_id"
+                                            t-field="doc.approver_ids.filtered(lambda r: r.status == 'approved').user_id.name" />
+
+                                        <span t-else=""
+                                            t-field="doc.request_id.approver_ids.filtered(lambda r: r.status == 'approved').user_id.name" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </t>
+        </template>
+
+        <template id="cash_advance_print">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="approval_extends.custom_header_footer_cash_advance_form" />
+                    <t t-set="lang" t-value="doc.partner_id.lang" />
+                    <t t-call="approval_extends.cash_advance_template" t-lang="lang" />
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

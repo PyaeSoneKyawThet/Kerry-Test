@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="BankRecRecordFormLineIds" t-inherit="account_accountant.BankRecRecordFormLineIds" t-inherit-mode="extension">
+        <xpath expr="div[@name='line_ids']/div/table/tbody/t//tr[contains(@class, 'o_data_row')]" position="inside">
+            <td>
+                <t t-esc="formatNumber(line.data.currency_rate, 2)"/>
+            </td>
+        </xpath>
+    </t>
+</templates>

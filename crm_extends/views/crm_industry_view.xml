@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- tree view -->
+    <record id="crm_industry_tree_view" model="ir.ui.view"> 
+        <field name="name">Industry</field>
+        <field name="model">crm.industry</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="name" string="Name" required="1"/>
+                <field name="code" string="Code"/>
+                <field name="remark" string="Remark" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- form view -->
+    <!-- <record id="crm_industry_form_view" model="ir.ui.view">
+        <field name="name">Industry</field>
+        <field name="model">crm.industry</field>
+        <field name="arch" type="xml">
+            <form string="Industry">
+                <sheet>
+                    <group>
+                        <field name="code" string="Reference"/>
+                        <field name="name" string="Name"/>
+                        <field name="remark" string="Remark"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record> -->
+</odoo>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_brand_configuration" 
+            name="Brand" 
+            parent="purchase.menu_purchase_config"
+            action="kmtl_customization.action_purchase_brand"
+            sequence="20"/>
+</odoo>

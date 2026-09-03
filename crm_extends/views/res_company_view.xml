@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<odoo>
+    <record id="res_company_form_inherit_crm" model="ir.ui.view">
+        <field name="name">res.company.form.inherit.crm</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">             
+            <xpath expr="//field[@name='currency_id']" position="after">
+                <field name="compute_crm_stage"/>
+                <field name="crm_stage_reason_seq1" invisible="1"/>
+                <field name="crm_stage_reason_seq2" invisible="1"/>
+                <field name="crm_stage_reason_seq3" invisible="1"/>
+                <field name="crm_stage_reason_seq4" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+    
+</odoo>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="backdate_limit_res_config_settings" model="ir.ui.view">
+        <field name="name">Backdate Settings</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="account.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <app name="account" position="inside">
+                <block title="Backdate Setting" name="backdate_limit">
+                    <setting>
+                        <field name="backdate_limit_day"/>
+                    </setting>
+                </block>
+            </app>
+        </field>
+    </record>
+
+</odoo>

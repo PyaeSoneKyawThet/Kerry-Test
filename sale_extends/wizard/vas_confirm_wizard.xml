@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="view_form_VAS_confirm_wizard" model="ir.ui.view">
+            <field name="name">form.VAS.confirm.wizard</field>
+            <field name="model">wizard.vas.confirm</field>            
+            <field name="arch" type="xml">
+                <form>
+                    <group>  
+                        <field name="sale_order_id" string="Sale Order" invisible="1"/>                          
+                            <p style="text-align:center; white-space: nowrap;">
+                            Are you sure to create a new quotation?
+                            </p>                                                                                                                                           
+                    </group>   
+                    <footer>
+                        <button string="Confirm" type="object" name="action_confirm" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" name="action_cancel" special="cancel"/>
+                    </footer>                                                               
+                </form>
+            </field>
+        </record>
+
+    </data>
+</odoo>

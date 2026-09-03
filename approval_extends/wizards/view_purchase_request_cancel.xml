@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="purchase_request_cancel_wizard" model="ir.ui.view">
+            <field name="name">purchase.request.cancel.wizard.form</field>
+            <field name="model">purchase.request.cancel.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Purchase Request Cancel">
+                    <sheet>
+                        <group>
+                            <field name="is_request_cancel"/>
+                        </group>
+                        <group>
+                            <field name="approval_expense_ids" invisible="1"/>
+                            <field name="approval_payment_request_ids" invisible="1"/>
+                            <field name="cash_advance_ids" invisible="1"/>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button string="Confirm" type="object" name="action_cancel_expense" class="btn-primary" invisible="not approval_expense_ids"/>
+                        <button string="Confirm" type="object" name="action_cancel_payment_request" class="btn-primary" invisible="not approval_payment_request_ids"/>
+                        <button string="Confirm" type="object" name="action_cancel_cash_advance" class="btn-primary" invisible="not cash_advance_ids"/>
+                        <button string="Discard" class="btn-secondary" special="cancel"/>
+                    </footer>  
+                </form>
+            </field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,9 @@
+<odoo>
+
+    <menuitem id="menu_po_comparison" 
+              name="PO Comparison" 
+              parent="approvals.approvals_approval_menu"
+              action="approval_extends.action_po_comparison"
+              sequence="30"/>
+
+</odoo>

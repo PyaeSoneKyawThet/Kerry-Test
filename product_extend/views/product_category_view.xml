@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<odoo>
+    <record id="view_category_form_note" model="ir.ui.view">
+        <field name="name">product.category.form.inherit.note</field>
+        <field name="model">product.category</field>
+        <field name="inherit_id" ref="account.view_category_property_form"/>
+        <field name="arch" type="xml">             
+            <xpath expr="//group[@name='account_property']" position="after">
+                <group name="note_group" col="6" class="mt-2 mt-md-0">
+                    <group colspan="3">
+                        <field colspan="2" name="note" nolabel="1" placeholder="Notes..."/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="product_category_form_view" model="ir.ui.view">
+        <field name="name">product.category.form.inherit.quotation</field>
+        <field name="model">product.category</field>
+        <field name="inherit_id" ref="product.product_category_form_view"/>
+        <field name="arch" type="xml">             
+            <xpath expr="//group[@name='first']" position="inside">
+                <field name="show_in_quotation"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="product_category_list_view" model="ir.ui.view">
+        <field name="name">product.category.list.inherit.quotation</field>
+        <field name="model">product.category</field>
+        <field name="inherit_id" ref="product.product_category_list_view"/>
+        <field name="arch" type="xml">             
+            <xpath expr="//field[@name='display_name']" position="after">
+                <field name="show_in_quotation" optional="show"/>
+            </xpath>
+        </field>
+    </record>   
+    
+</odoo>
